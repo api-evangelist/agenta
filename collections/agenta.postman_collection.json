@@ -1,0 +1,1235 @@
+{
+  "info": {
+    "_postman_id": "1ddb86a3-89f4-4604-af86-39c14a549534",
+    "name": "Agenta API",
+    "description": "Agenta is an open-source (MIT) LLMOps platform for prompt management, LLM evaluation, and LLM observability. This collection covers the cloud REST API at https://cloud.agenta.ai/api, authenticated with an API key in the Authorization header.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "id": "90379455-ea15-4855-a94f-30580cb44e99",
+      "name": "Applications",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "13678486-fe64-4201-9633-7f05d6e51eda",
+          "name": "Create a new application.",
+          "request": {
+            "name": "Create a new application.",
+            "description": {
+              "content": "Create a new LLM application.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/simple/applications/",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "simple",
+                "applications"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app\": {\n    \"slug\": \"my-app\",\n    \"name\": \"My App\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "ac02ea9d-3966-472a-af98-9b3fe0e4febb",
+          "name": "List and filter applications.",
+          "request": {
+            "name": "List and filter applications.",
+            "description": {
+              "content": "List and filter applications.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/simple/applications/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "simple",
+                "applications",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "533131dc-136e-4d2d-b597-1d5508b0acb9",
+          "name": "Fetch a single application by id.",
+          "request": {
+            "name": "Fetch a single application by id.",
+            "description": {
+              "content": "Fetch a single application by id.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/simple/applications/{{application_id}}",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "simple",
+                "applications",
+                "{{application_id}}"
+              ]
+            },
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "id": "c1bcd9d4-5e71-4f9e-ad15-25d34988b623",
+          "name": "List and filter application variants.",
+          "request": {
+            "name": "List and filter application variants.",
+            "description": {
+              "content": "List and filter application variants.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/applications/variants/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "variants",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "7dc012f5-8e4d-4b0f-bc9f-a7b2837a864d",
+          "name": "Fetch a single application variant by id.",
+          "request": {
+            "name": "Fetch a single application variant by id.",
+            "description": {
+              "content": "Fetch a single application variant by id.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/applications/variants/{{application_variant_id}}",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "variants",
+                "{{application_variant_id}}"
+              ]
+            },
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "id": "dc75eee6-d296-4ea0-baa5-2f0abfc77114",
+          "name": "Commit a new revision of an application variant.",
+          "request": {
+            "name": "Commit a new revision of an application variant.",
+            "description": {
+              "content": "Commit a new prompt/parameter revision of a variant.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/applications/revisions/commit",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "revisions",
+                "commit"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"revision\": {\n    \"variant_id\": \"{{application_variant_id}}\",\n    \"message\": \"update prompt\",\n    \"data\": {}\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "e21775ad-38be-4d04-83ba-16a1a5266c44",
+      "name": "Configs",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "0ced65b1-3d7f-4e33-980b-717967464e85",
+          "name": "Deploy an application revision to an environment.",
+          "request": {
+            "name": "Deploy an application revision to an environment.",
+            "description": {
+              "content": "Deploy a committed revision to an environment.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/applications/revisions/deploy",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "revisions",
+                "deploy"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"revision\": {\n    \"variant_id\": \"{{application_variant_id}}\",\n    \"environment_ref\": {\n      \"slug\": \"production\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "65a713df-e0ee-4db3-bab5-88ef8152dbcf",
+          "name": "Fetch a prompt configuration.",
+          "request": {
+            "name": "Fetch a prompt configuration.",
+            "description": {
+              "content": "Fetch the prompt/model configuration for a variant or environment.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/variants/configs/fetch",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "variants",
+                "configs",
+                "fetch"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"application_ref\": {\n    \"slug\": \"my-app\"\n  },\n  \"environment_ref\": {\n    \"slug\": \"production\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "0496be8b-7053-4ece-b99a-56fd02e638f6",
+      "name": "Testsets",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7e40c422-8f16-47f6-9b83-c2d2f4349074",
+          "name": "Create a testset.",
+          "request": {
+            "name": "Create a testset.",
+            "description": {
+              "content": "Create a testset.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/testsets/",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "testsets"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testset\": {\n    \"slug\": \"my-testset\",\n    \"name\": \"My Testset\",\n    \"data\": {\n      \"testcases\": []\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "54baeb4e-baf0-498d-80d3-308cceeb82a5",
+          "name": "List and filter testsets.",
+          "request": {
+            "name": "List and filter testsets.",
+            "description": {
+              "content": "List and filter testsets.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/testsets/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "testsets",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "7d6f573b-b09b-4513-a9a6-06003e806969",
+          "name": "Fetch a single testset by id.",
+          "request": {
+            "name": "Fetch a single testset by id.",
+            "description": {
+              "content": "Fetch a single testset by id.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/testsets/{{testset_id}}",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "testsets",
+                "{{testset_id}}"
+              ]
+            },
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "id": "8c11ed03-34ae-47ce-b9bf-d6e18f408288",
+          "name": "Create a testset from an uploaded CSV or JSON file.",
+          "request": {
+            "name": "Create a testset from an uploaded CSV or JSON file.",
+            "description": {
+              "content": "Upload a CSV/JSON file to create a testset (multipart/form-data).",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/simple/testsets/upload",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "simple",
+                "testsets",
+                "upload"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "81e5e929-ca92-4a5e-bbcb-298f8b63dd84",
+      "name": "Evaluators",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "cb90572e-83de-4e1e-8ea3-1c352b2c1bbd",
+          "name": "Create an evaluator.",
+          "request": {
+            "name": "Create an evaluator.",
+            "description": {
+              "content": "Create an evaluator.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/evaluators/",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "evaluators"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluator\": {\n    \"slug\": \"exact-match\",\n    \"name\": \"Exact Match\",\n    \"data\": {}\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "613ca2fb-9032-49ff-a2d0-bf2d6cd6b7a4",
+          "name": "List and filter evaluators.",
+          "request": {
+            "name": "List and filter evaluators.",
+            "description": {
+              "content": "List and filter evaluators.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/evaluators/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "evaluators",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "1a9524d4-9e04-4309-a4cb-6d060ec3d17b",
+          "name": "List the built-in evaluator catalog templates.",
+          "request": {
+            "name": "List the built-in evaluator catalog templates.",
+            "description": {
+              "content": "List built-in evaluator catalog templates.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/evaluators/catalog/templates/",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "evaluators",
+                "catalog",
+                "templates"
+              ]
+            },
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "dd2645fc-b442-4215-8467-494428726e7b",
+      "name": "Evaluations",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "ca009b82-8884-4e1e-8986-d5830af966cc",
+          "name": "Create an evaluation run.",
+          "request": {
+            "name": "Create an evaluation run.",
+            "description": {
+              "content": "Create an evaluation run.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/evaluations/runs/",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "evaluations",
+                "runs"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"run\": {\n    \"name\": \"my-run\",\n    \"testset_id\": \"{{testset_id}}\",\n    \"variant_ids\": [],\n    \"evaluator_ids\": []\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "dc968679-b734-4df3-902b-42bb0bb5949d",
+          "name": "List and filter evaluation runs.",
+          "request": {
+            "name": "List and filter evaluation runs.",
+            "description": {
+              "content": "List and filter evaluation runs.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/evaluations/runs/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "evaluations",
+                "runs",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "d2f7e0ba-e895-4c08-bb48-80c84b7b3f03",
+          "name": "Query evaluation results.",
+          "request": {
+            "name": "Query evaluation results.",
+            "description": {
+              "content": "Query evaluation results.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/evaluations/results/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "evaluations",
+                "results",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "ff3402d6-c419-47b8-8701-42fad18dee9d",
+          "name": "Query aggregated evaluation metrics.",
+          "request": {
+            "name": "Query aggregated evaluation metrics.",
+            "description": {
+              "content": "Query aggregated evaluation metrics.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/evaluations/metrics/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "evaluations",
+                "metrics",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "28448ebf-22dd-4269-a093-cfcccb8e8a1b",
+      "name": "Traces",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "78c43747-aab3-4087-894f-ea7bd1fa9223",
+          "name": "Fetch traces.",
+          "request": {
+            "name": "Fetch traces.",
+            "description": {
+              "content": "Fetch traces.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/traces/",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "traces"
+              ]
+            },
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "id": "fee75025-45b7-45ea-a0e0-a826fef2dd4a",
+          "name": "Query spans with filters.",
+          "request": {
+            "name": "Query spans with filters.",
+            "description": {
+              "content": "Query spans with filters.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/spans/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "spans",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "87d3f74f-e338-4ca1-bba6-de21ae8ecdc1",
+          "name": "Query span analytics.",
+          "request": {
+            "name": "Query span analytics.",
+            "description": {
+              "content": "Query span analytics (cost, latency, token usage).",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/spans/analytics/query",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "spans",
+                "analytics",
+                "query"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "47e8f96c-4b53-4906-9270-ea0af92a467a",
+      "name": "OpenTelemetry",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "f6691630-281a-42f7-8bec-c7825738fcf8",
+          "name": "Ingest traces via OpenTelemetry OTLP/HTTP.",
+          "request": {
+            "name": "Ingest traces via OpenTelemetry OTLP/HTTP.",
+            "description": {
+              "content": "Ingest OTLP-formatted spans for LLM observability.",
+              "type": "text/plain"
+            },
+            "url": {
+              "raw": "https://cloud.agenta.ai/api/otlp/v1/traces",
+              "protocol": "https",
+              "host": [
+                "cloud",
+                "agenta",
+                "ai"
+              ],
+              "path": [
+                "api",
+                "otlp",
+                "v1",
+                "traces"
+              ]
+            },
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceSpans\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://cloud.agenta.ai/api"
+    },
+    {
+      "key": "bearerToken",
+      "value": ""
+    },
+    {
+      "key": "application_id",
+      "value": ""
+    },
+    {
+      "key": "application_variant_id",
+      "value": ""
+    },
+    {
+      "key": "testset_id",
+      "value": ""
+    }
+  ]
+}

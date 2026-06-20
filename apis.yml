@@ -1,0 +1,153 @@
+aid: agenta
+url: https://raw.githubusercontent.com/api-evangelist/agenta/refs/heads/main/apis.yml
+name: Agenta
+kind: company
+description: Agenta is an open-source LLMOps platform that brings prompt management,
+  LLM evaluation, and LLM observability together in one place. Its cloud REST API at
+  https://cloud.agenta.ai/api exposes apps and variants, versioned prompt
+  configurations, evaluations and evaluators, testsets, and OpenTelemetry-based
+  tracing, all authenticated with a Bearer API key. The platform is MIT licensed and
+  can be self-hosted or used via Agenta Cloud.
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+tags:
+- AI
+- LLMOps
+- Prompt Management
+- LLM Evaluation
+- Observability
+created: '2026-06-20'
+modified: '2026-06-20'
+specificationVersion: '0.19'
+apis:
+- aid: agenta:agenta-apps-variants-api
+  name: Agenta Apps and Variants API
+  tags:
+  - Apps
+  - Variants
+  - Prompt Management
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  properties:
+  - url: https://docs.agenta.ai/prompt-engineering/overview
+    type: Documentation
+  - url: https://docs.agenta.ai/reference/api/list-api-endpoints
+    type: APIReference
+  - url: openapi/agenta-openapi.yml
+    type: OpenAPI
+  - url: collections/agenta.postman_collection.json
+    type: PostmanCollection
+  - url: collections/agenta.opencollection.json
+    type: OpenCollection
+  description: Create and manage LLM applications and their variants, including
+    revisions, forking, committing, and deploying. Variants hold versioned prompt
+    and parameter configurations that power Agenta's prompt management workflow.
+- aid: agenta:agenta-configs-prompts-api
+  name: Agenta Configs and Prompts API
+  tags:
+  - Configs
+  - Prompts
+  - Versioning
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  baseURL: https://cloud.agenta.ai/api
+  properties:
+  - url: https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+    type: Documentation
+  - url: https://docs.agenta.ai/reference/sdk/configuration-management
+    type: APIReference
+  - url: openapi/agenta-openapi.yml
+    type: OpenAPI
+  - url: collections/agenta.postman_collection.json
+    type: PostmanCollection
+  - url: collections/agenta.opencollection.json
+    type: OpenCollection
+  description: Fetch and deploy versioned prompt configurations by application,
+    variant, or environment so production code can pull the latest committed prompt
+    without a redeploy. Backs Agenta's configuration management SDK.
+- aid: agenta:agenta-evaluations-evaluators-api
+  name: Agenta Evaluations and Evaluators API
+  tags:
+  - Evaluations
+  - Evaluators
+  - LLM Evaluation
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.agenta.ai/reference/api/evaluations
+  baseURL: https://cloud.agenta.ai/api
+  properties:
+  - url: https://docs.agenta.ai/evaluation/overview
+    type: Documentation
+  - url: https://docs.agenta.ai/reference/api/evaluations
+    type: APIReference
+  - url: openapi/agenta-openapi.yml
+    type: OpenAPI
+  - url: collections/agenta.postman_collection.json
+    type: PostmanCollection
+  - url: collections/agenta.opencollection.json
+    type: OpenCollection
+  description: Run and manage evaluations and configure evaluators (LLM-as-a-judge,
+    exact match, similarity, custom code, and more) to score variants against
+    testsets, with queues, runs, results, and metrics.
+- aid: agenta:agenta-testsets-api
+  name: Agenta Testsets API
+  tags:
+  - Testsets
+  - Datasets
+  - Evaluation
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.agenta.ai/reference/api/testsets
+  baseURL: https://cloud.agenta.ai/api
+  properties:
+  - url: https://docs.agenta.ai/evaluation/create-test-sets
+    type: Documentation
+  - url: https://docs.agenta.ai/reference/api/testsets
+    type: APIReference
+  - url: openapi/agenta-openapi.yml
+    type: OpenAPI
+  - url: collections/agenta.postman_collection.json
+    type: PostmanCollection
+  - url: collections/agenta.opencollection.json
+    type: OpenCollection
+  description: Create, query, version, and import or export the testsets (evaluation
+    datasets) used to drive evaluations, including CSV/JSON file upload and download.
+- aid: agenta:agenta-observability-traces-api
+  name: Agenta Observability and Traces API
+  tags:
+  - Observability
+  - Traces
+  - OpenTelemetry
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://docs.agenta.ai/observability/overview
+  baseURL: https://cloud.agenta.ai/api
+  properties:
+  - url: https://docs.agenta.ai/observability/overview
+    type: Documentation
+  - url: https://docs.agenta.ai/reference/api/traces
+    type: APIReference
+  - url: openapi/agenta-openapi.yml
+    type: OpenAPI
+  - url: collections/agenta.postman_collection.json
+    type: PostmanCollection
+  - url: collections/agenta.opencollection.json
+    type: OpenCollection
+  description: Ingest LLM telemetry over the OpenTelemetry OTLP/HTTP endpoint and
+    query traces and spans for analytics, sessions, and users. Powers Agenta's LLM
+    observability for cost, latency, and quality monitoring.
+common:
+- type: GitHubOrganization
+  url: https://github.com/Agenta-AI
+- type: LinkedIn
+  url: https://www.linkedin.com/company/agenta-ai
+- type: Website
+  url: https://agenta.ai/
+- type: Documentation
+  url: https://docs.agenta.ai/
+- type: Plans
+  url: plans/agenta-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/agenta-rate-limits.yml
+- type: FinOps
+  url: finops/agenta-finops.yml
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

@@ -1,0 +1,115 @@
+specification: FinOps Framework
+specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
+provider: Agenta
+providerId: agenta
+created: '2026-06-20'
+modified: '2026-06-20'
+reconciled: true
+tags:
+- AI
+- LLMOps
+- Prompt Management
+- LLM Evaluation
+- Observability
+- FinOps
+- Cost Management
+- FOCUS
+description: >-
+  FinOps view of Agenta spend. Agenta Cloud bills a seat-based monthly
+  subscription per tier (Hobby free, Pro $49, Business $399, Enterprise custom)
+  with included monthly trace and evaluation allowances and a $5 per additional
+  10k traces overage on paid plans. The MIT-licensed open-source platform can be
+  self-hosted at no Agenta license cost, shifting spend entirely to your own
+  infrastructure. Note that LLM provider token costs incurred while running
+  prompts and evaluations are billed by those providers, not by Agenta.
+notes: >-
+  Per-tier prices, seat and trace allowances, and overage rates are subject to
+  change; verify against the Agenta pricing page during reconciliation. LLM
+  inference token spend is external to Agenta billing.
+sources:
+- https://agenta.ai/pricing
+- https://docs.agenta.ai/
+- https://focus.finops.org/focus-specification/v1-3/
+alignedWith:
+  framework: FinOps Foundation Framework
+  frameworkUrl: https://www.finops.org/framework/
+  dataSpec: FOCUS
+  dataSpecVersion: '1.3'
+  dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
+publisherName: Agenta
+serviceCategory: AI and Machine Learning
+billingModel:
+  pricingCategory: Subscription-Based
+  billingFrequency: Monthly
+  billingCurrency: USD
+  chargeCategories:
+  - Usage
+  - Purchase
+  - Adjustment
+focusColumns:
+  ServiceName: Agenta Cloud
+  ServiceCategory: AI and Machine Learning
+  ProviderName: Agenta
+  PublisherName: Agenta
+  InvoiceIssuerName: Agenta
+  BillingCurrency: USD
+  ChargeCategory: Purchase
+  PricingCategory: Subscription-Based
+meters:
+- name: subscription
+  description: Monthly base subscription per cloud tier (Pro $49, Business $399).
+  unit: months
+  aggregation: sum
+  dimensions:
+  - account
+  - plan
+- name: seats
+  description: Workspace member seats; additional Pro seats at $20 each up to 10.
+  unit: seats
+  aggregation: sum
+  dimensions:
+  - account
+  - plan
+- name: traces
+  description: Observability traces ingested; included allowance per plan with $5 per additional 10k overage.
+  unit: traces
+  aggregation: sum
+  dimensions:
+  - account
+  - plan
+  - application
+- name: evaluations
+  description: Evaluation runs executed; metered against the plan allowance (unlimited on Pro and above).
+  unit: evaluations
+  aggregation: sum
+  dimensions:
+  - account
+  - plan
+- name: self_hosted_infrastructure
+  description: Compute, database, and storage costs for MIT-licensed self-hosted deployments (no Agenta license fee).
+  unit: hours
+  aggregation: sum
+  dimensions:
+  - account
+  - environment
+- name: external_llm_tokens
+  description: LLM provider token spend incurred running prompts and evaluations; billed by the provider, not Agenta.
+  unit: tokens
+  aggregation: sum
+  dimensions:
+  - account
+  - provider
+  - model
+principles:
+- name: Visibility
+  description: Use Agenta observability traces and analytics to attribute cost, latency, and token usage per application and variant.
+- name: Allocation
+  description: Tag traces and API keys per project/team and map cloud subscription and trace overages to internal cost centers.
+- name: Optimization
+  description: Right-size the cloud tier to actual trace volume, prune retention, and consider self-hosting under MIT when infrastructure is cheaper than SaaS overages; route evaluation work to lower-cost models.
+- name: Accountability
+  description: Assign owners per workspace and review monthly subscription, trace overage, and external LLM token spend against budget.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

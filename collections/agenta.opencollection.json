@@ -1,0 +1,273 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Agenta API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Applications",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": { "name": "Create a new application.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/simple/applications/",
+            "body": { "type": "json", "data": "{\n  \"app\": {\n    \"slug\": \"my-app\",\n    \"name\": \"My App\"\n  }\n}" }
+          },
+          "docs": "Create a new LLM application."
+        },
+        {
+          "info": { "name": "List and filter applications.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/simple/applications/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "List and filter applications."
+        },
+        {
+          "info": { "name": "Fetch a single application by id.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/simple/applications/{{application_id}}"
+          },
+          "docs": "Fetch a single application by id."
+        },
+        {
+          "info": { "name": "List and filter application variants.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/applications/variants/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "List and filter application variants."
+        },
+        {
+          "info": { "name": "Fetch a single application variant by id.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/applications/variants/{{application_variant_id}}"
+          },
+          "docs": "Fetch a single application variant by id."
+        },
+        {
+          "info": { "name": "Commit a new revision of an application variant.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/applications/revisions/commit",
+            "body": { "type": "json", "data": "{\n  \"revision\": {\n    \"variant_id\": \"{{application_variant_id}}\",\n    \"message\": \"update prompt\",\n    \"data\": {}\n  }\n}" }
+          },
+          "docs": "Commit a new prompt/parameter revision of a variant."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Configs",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": { "name": "Deploy an application revision to an environment.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/applications/revisions/deploy",
+            "body": { "type": "json", "data": "{\n  \"revision\": {\n    \"variant_id\": \"{{application_variant_id}}\",\n    \"environment_ref\": { \"slug\": \"production\" }\n  }\n}" }
+          },
+          "docs": "Deploy a committed revision to an environment."
+        },
+        {
+          "info": { "name": "Fetch a prompt configuration.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/variants/configs/fetch",
+            "body": { "type": "json", "data": "{\n  \"application_ref\": { \"slug\": \"my-app\" },\n  \"environment_ref\": { \"slug\": \"production\" }\n}" }
+          },
+          "docs": "Fetch the prompt/model configuration for a variant or environment."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Testsets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": { "name": "Create a testset.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/testsets/",
+            "body": { "type": "json", "data": "{\n  \"testset\": {\n    \"slug\": \"my-testset\",\n    \"name\": \"My Testset\",\n    \"data\": { \"testcases\": [] }\n  }\n}" }
+          },
+          "docs": "Create a testset."
+        },
+        {
+          "info": { "name": "List and filter testsets.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/testsets/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "List and filter testsets."
+        },
+        {
+          "info": { "name": "Fetch a single testset by id.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/testsets/{{testset_id}}"
+          },
+          "docs": "Fetch a single testset by id."
+        },
+        {
+          "info": { "name": "Create a testset from an uploaded CSV or JSON file.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/simple/testsets/upload",
+            "body": { "type": "multipart-form", "data": [] }
+          },
+          "docs": "Create a testset from an uploaded CSV or JSON file."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Evaluators",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": { "name": "Create an evaluator.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluators/",
+            "body": { "type": "json", "data": "{\n  \"evaluator\": {\n    \"slug\": \"exact-match\",\n    \"name\": \"Exact Match\",\n    \"data\": {}\n  }\n}" }
+          },
+          "docs": "Create an evaluator."
+        },
+        {
+          "info": { "name": "List and filter evaluators.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluators/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "List and filter evaluators."
+        },
+        {
+          "info": { "name": "List the built-in evaluator catalog templates.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/evaluators/catalog/templates/"
+          },
+          "docs": "List the built-in evaluator catalog templates."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Evaluations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": { "name": "Create an evaluation run.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluations/runs/",
+            "body": { "type": "json", "data": "{\n  \"run\": {\n    \"name\": \"my-run\",\n    \"testset_id\": \"{{testset_id}}\",\n    \"variant_ids\": [],\n    \"evaluator_ids\": []\n  }\n}" }
+          },
+          "docs": "Create an evaluation run."
+        },
+        {
+          "info": { "name": "List and filter evaluation runs.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluations/runs/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "List and filter evaluation runs."
+        },
+        {
+          "info": { "name": "Query evaluation results.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluations/results/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "Query evaluation results."
+        },
+        {
+          "info": { "name": "Query aggregated evaluation metrics.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluations/metrics/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "Query aggregated evaluation metrics."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Traces",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": { "name": "Fetch traces.", "type": "http" },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/traces/"
+          },
+          "docs": "Fetch traces."
+        },
+        {
+          "info": { "name": "Query spans with filters.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/spans/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "Query spans with filters."
+        },
+        {
+          "info": { "name": "Query span analytics.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/spans/analytics/query",
+            "body": { "type": "json", "data": "{}" }
+          },
+          "docs": "Query span analytics (cost, latency, token usage)."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "OpenTelemetry",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": { "name": "Ingest traces via OpenTelemetry OTLP/HTTP.", "type": "http" },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/otlp/v1/traces",
+            "body": { "type": "json", "data": "{\n  \"resourceSpans\": []\n}" }
+          },
+          "docs": "Ingest OTLP-formatted spans for LLM observability."
+        }
+      ]
+    }
+  ]
+}

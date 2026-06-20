@@ -1,0 +1,72 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Agenta
+providerId: agenta
+created: '2026-06-20'
+modified: '2026-06-20'
+reconciled: false
+tags:
+- AI
+- LLMOps
+- Prompt Management
+- LLM Evaluation
+- Observability
+- Rate Limiting
+- Quotas
+- Throttling
+description: >-
+  Agenta does not publish explicit numeric per-endpoint request rate limits for
+  its cloud REST API. Practical usage is bounded by plan quotas - included
+  monthly traces (5k Hobby, 10k Pro, 1M Business) with $5 per additional 10k
+  trace overage, monthly evaluation allowances (20 on Hobby, unlimited on Pro
+  and above), seat counts, and data retention windows - rather than by RPM/TPM
+  throttling. Self-hosted deployments are bounded only by the operator's own
+  infrastructure. Specific per-endpoint throttling values are not reconciled in
+  this artifact.
+notes: >-
+  Verify any documented per-endpoint throttling, 429 behavior, and OTLP
+  ingestion limits in the Agenta docs and dashboard on reconciliation; quota
+  allowances scale with the cloud plan and self-hosting removes platform quotas.
+sources:
+- https://agenta.ai/pricing
+- https://docs.agenta.ai/
+- https://docs.agenta.ai/observability/overview
+responseCodes:
+  throttled: 429
+limits:
+- name: Included Traces
+  scope: account
+  metric: traces
+  limit: plan-based (5k Hobby / 10k Pro / 1M Business per month)
+  notes: Observability traces included per month; overage billed at $5 per additional 10k on paid plans.
+- name: Included Evaluations
+  scope: account
+  metric: evaluations
+  limit: 20/month Hobby; unlimited Pro and above
+  notes: Monthly evaluation runs allowance; varies by plan.
+- name: Seats
+  scope: account
+  metric: seats
+  limit: 2 Hobby / up to 10 Pro / unlimited Business
+  notes: Workspace member seats; not a request rate limit.
+- name: Data Retention
+  scope: account
+  metric: days
+  limit: 30 Hobby / 90 Pro / 365 Business
+  notes: Trace and evaluation data retention window per plan.
+- name: Per-Endpoint Request Rate
+  scope: account
+  metric: requests
+  limit: see provider documentation
+  notes: No explicit numeric RPM/TPM published for the REST or OTLP endpoints as of the review date.
+policies:
+- name: Quota-Based Usage
+  description: Cloud usage is bounded by plan quotas (traces, evaluations, seats, retention) rather than published RPM throttling.
+- name: Self-Hosting Removes Platform Quotas
+  description: MIT-licensed self-hosted deployments are limited only by the operator's own infrastructure and LLM provider limits.
+- name: Backoff Strategy
+  description: Clients should implement exponential backoff with jitter and honor any Retry-After header on 429 responses.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

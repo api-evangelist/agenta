@@ -1,0 +1,97 @@
+aid: agenta
+name: Agenta
+review:
+  question: Does Agenta expose a documented public WebSocket or streaming event API?
+  answer: false
+  date: '2026-06-20'
+  reviewer: API Evangelist
+  asyncapiSpecCreated: false
+  asyncapiScopeNote: |
+    Per API Evangelist scope, both WebSocket and HTTP Server-Sent Events (SSE)
+    are in-scope for AsyncAPI modeling. Agenta's cloud REST API documents
+    neither. Its event-shaped surface is OpenTelemetry OTLP/HTTP trace
+    ingestion (POST /otlp/v1/traces), which is a request/response HTTP export
+    of batched spans - not a streaming, bidirectional, or server-push
+    transport. No AsyncAPI document was created because no streaming protocol
+    surface exists to model.
+findings:
+  summary: |
+    Agenta does not publish a documented public WebSocket or SSE streaming API.
+    The platform is an open-source (MIT) LLMOps tool exposing a REST API over
+    HTTPS at https://cloud.agenta.ai/api (and https://eu.cloud.agenta.ai/api),
+    authenticated with an API key in the Authorization header. The
+    observability surface ingests telemetry via the OpenTelemetry OTLP/HTTP
+    protocol at POST /otlp/v1/traces - a batched HTTP export, not a streaming
+    channel - and exposes trace/span retrieval and analytics over standard REST
+    query endpoints. Prompt configurations are pulled with a request/response
+    fetch-config call, not a subscription. No ws:// or wss:// endpoint and no
+    SSE event stream are documented for apps, configs, evaluations, testsets, or
+    observability as of the review date.
+  transports:
+    - protocol: REST
+      scheme: https
+      baseURL: https://cloud.agenta.ai/api
+      documented: true
+    - protocol: OTLP/HTTP
+      scheme: https
+      note: OpenTelemetry trace ingestion via POST /otlp/v1/traces. Batched HTTP export of spans; not a streaming or push transport.
+      documented: true
+    - protocol: SSE
+      scheme: https
+      documented: false
+      note: No Server-Sent Events stream is documented in the Agenta API reference.
+    - protocol: WebSocket
+      scheme: wss
+      documented: false
+      note: No WebSocket endpoint is documented for any Agenta product surface as of the review date.
+  endpointsConfirmedRest:
+    - POST   https://cloud.agenta.ai/api/simple/applications/
+    - POST   https://cloud.agenta.ai/api/simple/applications/query
+    - GET    https://cloud.agenta.ai/api/simple/applications/{application_id}
+    - POST   https://cloud.agenta.ai/api/applications/variants/query
+    - GET    https://cloud.agenta.ai/api/applications/variants/{application_variant_id}
+    - POST   https://cloud.agenta.ai/api/applications/revisions/commit
+    - POST   https://cloud.agenta.ai/api/applications/revisions/deploy
+    - POST   https://cloud.agenta.ai/api/variants/configs/fetch
+    - POST   https://cloud.agenta.ai/api/testsets/
+    - POST   https://cloud.agenta.ai/api/testsets/query
+    - GET    https://cloud.agenta.ai/api/testsets/{testset_id}
+    - POST   https://cloud.agenta.ai/api/simple/testsets/upload
+    - POST   https://cloud.agenta.ai/api/evaluators/
+    - POST   https://cloud.agenta.ai/api/evaluators/query
+    - GET    https://cloud.agenta.ai/api/evaluators/catalog/templates/
+    - POST   https://cloud.agenta.ai/api/evaluations/runs/
+    - POST   https://cloud.agenta.ai/api/evaluations/runs/query
+    - POST   https://cloud.agenta.ai/api/evaluations/results/query
+    - POST   https://cloud.agenta.ai/api/evaluations/metrics/query
+    - GET    https://cloud.agenta.ai/api/traces/
+    - POST   https://cloud.agenta.ai/api/spans/query
+    - POST   https://cloud.agenta.ai/api/spans/analytics/query
+    - POST   https://cloud.agenta.ai/api/otlp/v1/traces
+    - GET    https://cloud.agenta.ai/api/otlp/v1/traces
+sources:
+  - url: https://docs.agenta.ai/
+    type: Documentation
+    note: Overview of the open-source MIT-licensed LLMOps platform; REST API and SDK, no WebSocket mentioned.
+  - url: https://cloud.agenta.ai/api/openapi.json
+    type: OpenAPI
+    note: Live OpenAPI 3.1 document (346 paths). Server /api; single security scheme APIKeyHeader (Authorization header). All paths are HTTPS REST or OTLP/HTTP.
+  - url: https://docs.agenta.ai/observability/overview
+    type: Documentation
+    note: Observability uses OpenTelemetry OTLP ingestion (POST /otlp/v1/traces); a batched HTTP export, not streaming.
+  - url: https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+    type: Documentation
+    note: Prompt configs are pulled with a request/response fetch-config call, not a subscription or stream.
+actions:
+  asyncapiPath: null
+  apisYmlUpdated: true
+  reason: |
+    No WebSocket or SSE streaming surface exists. The only event-shaped
+    transport is OpenTelemetry OTLP/HTTP trace ingestion, which is a batched
+    request/response HTTP export and is out of scope for AsyncAPI modeling. The
+    OTLP transport is documented explicitly in this review and in the OpenAPI so
+    it is never misrepresented as a streaming or WebSocket channel. No AsyncAPI
+    document was authored.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
