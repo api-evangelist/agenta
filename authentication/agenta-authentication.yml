@@ -1,0 +1,15 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/agenta-openapi.yml
+summary:
+  types:
+  - http
+schemes:
+- name: ApiKeyAuth
+  type: http
+  scheme: bearer
+  description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta
+    web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>`
+    (Bearer-style header credential).'
+  sources:
+  - openapi/agenta-openapi.yml

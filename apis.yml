@@ -134,6 +134,10 @@ apis:
     query traces and spans for analytics, sessions, and users. Powers Agenta's LLM
     observability for cost, latency, and quality monitoring.
 common:
+- type: DomainSecurity
+  url: security/agenta-domain-security.yml
+- type: Authentication
+  url: authentication/agenta-authentication.yml
 - type: GitHubOrganization
   url: https://github.com/Agenta-AI
 - type: LinkedIn
@@ -148,6 +152,8 @@ common:
   url: rate-limits/agenta-rate-limits.yml
 - type: FinOps
   url: finops/agenta-finops.yml
+- url: https://agenta.ai/blog
+  type: Blog
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
