@@ -134,6 +134,8 @@ apis:
     query traces and spans for analytics, sessions, and users. Powers Agenta's LLM
     observability for cost, latency, and quality monitoring.
 common:
+- type: AgenticAccess
+  url: agentic-access/agenta-agentic-access.yml
 - type: DomainSecurity
   url: security/agenta-domain-security.yml
 - type: Authentication
