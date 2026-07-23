@@ -1,0 +1,100 @@
+openapi: 3.0.1
+info:
+  title: Agenta Applications OpenTelemetry API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  termsOfService: https://agenta.ai/terms
+  contact:
+    name: Agenta Support
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  license:
+    name: MIT
+    url: https://github.com/Agenta-AI/agenta/blob/main/LICENSE
+  version: '1.0'
+servers:
+- url: https://cloud.agenta.ai/api
+  description: Agenta Cloud (US)
+- url: https://eu.cloud.agenta.ai/api
+  description: Agenta Cloud (EU)
+security:
+- ApiKeyAuth: []
+tags:
+- name: OpenTelemetry
+  description: Ingest LLM telemetry over OTLP/HTTP.
+paths:
+  /otlp/v1/traces:
+    post:
+      operationId: ingestOtlpTraces
+      tags:
+      - OpenTelemetry
+      summary: Ingest traces via OpenTelemetry OTLP/HTTP.
+      description: OpenTelemetry OTLP/HTTP trace ingestion endpoint. Send OTLP-formatted spans (typically protobuf or JSON over HTTP) here to record LLM telemetry. This is the recommended way to push observability data from instrumented applications and OpenTelemetry exporters.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OtlpExportTraceServiceRequest'
+          application/x-protobuf:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Export accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtlpExportTraceServiceResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      operationId: otlpStatusCheck
+      tags:
+      - OpenTelemetry
+      summary: Status check for the OTLP traces endpoint.
+      responses:
+        '200':
+          description: The endpoint is available.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  schemas:
+    OtlpExportTraceServiceResponse:
+      type: object
+      properties:
+        partialSuccess:
+          type: object
+          properties:
+            rejectedSpans:
+              type: integer
+            errorMessage:
+              type: string
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    OtlpExportTraceServiceRequest:
+      type: object
+      description: OTLP ExportTraceServiceRequest payload (resource spans). Mirrors the OpenTelemetry trace protocol; see the OpenTelemetry specification for the full structure.
+      properties:
+        resourceSpans:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>` (Bearer-style header credential).'

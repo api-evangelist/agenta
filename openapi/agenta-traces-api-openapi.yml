@@ -1,0 +1,217 @@
+openapi: 3.0.1
+info:
+  title: Agenta Applications Traces API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  termsOfService: https://agenta.ai/terms
+  contact:
+    name: Agenta Support
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  license:
+    name: MIT
+    url: https://github.com/Agenta-AI/agenta/blob/main/LICENSE
+  version: '1.0'
+servers:
+- url: https://cloud.agenta.ai/api
+  description: Agenta Cloud (US)
+- url: https://eu.cloud.agenta.ai/api
+  description: Agenta Cloud (EU)
+security:
+- ApiKeyAuth: []
+tags:
+- name: Traces
+  description: Query observability traces and spans.
+paths:
+  /traces/:
+    get:
+      operationId: fetchTraces
+      tags:
+      - Traces
+      summary: Fetch traces.
+      parameters:
+      - name: focus
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - trace
+          - span
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+      responses:
+        '200':
+          description: A list of traces.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trace'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /spans/query:
+    post:
+      operationId: querySpans
+      tags:
+      - Traces
+      summary: Query spans with filters.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpanQueryRequest'
+      responses:
+        '200':
+          description: A list of spans.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Span'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /spans/analytics/query:
+    post:
+      operationId: querySpanAnalytics
+      tags:
+      - Traces
+      summary: Query span analytics (cost, latency, token usage over time).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyticsQueryRequest'
+      responses:
+        '200':
+          description: Aggregated analytics buckets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Span:
+      type: object
+      properties:
+        trace_id:
+          type: string
+        span_id:
+          type: string
+        span_name:
+          type: string
+        span_kind:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        status_code:
+          type: string
+        attributes:
+          type: object
+          additionalProperties: true
+    Trace:
+      type: object
+      properties:
+        trace_id:
+          type: string
+        spans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Span'
+    AnalyticsQueryRequest:
+      type: object
+      properties:
+        filtering:
+          type: object
+          additionalProperties: true
+        time_range:
+          type: object
+          properties:
+            oldest:
+              type: string
+              format: date-time
+            newest:
+              type: string
+              format: date-time
+        interval:
+          type: string
+          example: 1h
+    SpanQueryRequest:
+      type: object
+      properties:
+        filtering:
+          type: object
+          additionalProperties: true
+        windowing:
+          $ref: '#/components/schemas/Windowing'
+    Windowing:
+      type: object
+      description: Cursor / time-window pagination controls.
+      properties:
+        next:
+          type: string
+        limit:
+          type: integer
+          default: 100
+        oldest:
+          type: string
+          format: date-time
+        newest:
+          type: string
+          format: date-time
+        order:
+          type: string
+          enum:
+          - ascending
+          - descending
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    AnalyticsResponse:
+      type: object
+      properties:
+        buckets:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              total_count:
+                type: integer
+              total_tokens:
+                type: integer
+              total_cost:
+                type: number
+              duration_ms:
+                type: number
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>` (Bearer-style header credential).'

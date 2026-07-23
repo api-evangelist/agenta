@@ -1,0 +1,227 @@
+openapi: 3.0.1
+info:
+  title: Agenta Applications Configs API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  termsOfService: https://agenta.ai/terms
+  contact:
+    name: Agenta Support
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  license:
+    name: MIT
+    url: https://github.com/Agenta-AI/agenta/blob/main/LICENSE
+  version: '1.0'
+servers:
+- url: https://cloud.agenta.ai/api
+  description: Agenta Cloud (US)
+- url: https://eu.cloud.agenta.ai/api
+  description: Agenta Cloud (EU)
+security:
+- ApiKeyAuth: []
+tags:
+- name: Configs
+  description: Fetch and deploy versioned prompt configurations.
+paths:
+  /applications/revisions/deploy:
+    post:
+      operationId: deployApplicationRevision
+      tags:
+      - Configs
+      summary: Deploy an application revision to an environment.
+      description: Deploys a committed revision to an environment (for example development, staging, or production) so that fetch-config calls scoped to that environment return the deployed configuration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployRevisionRequest'
+      responses:
+        '200':
+          description: The deployment result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Revision'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /variants/configs/fetch:
+    post:
+      operationId: fetchConfig
+      tags:
+      - Configs
+      summary: Fetch a prompt configuration.
+      description: Fetches the configuration (prompt template, model, and parameters) for a variant or environment reference. Production code uses this endpoint (or the configuration management SDK that wraps it) to pull the latest committed prompt without redeploying. Identify the configuration by application plus environment slug, or by variant reference.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigFetchRequest'
+      responses:
+        '200':
+          description: The resolved configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    DeployRevisionRequest:
+      type: object
+      required:
+      - revision
+      properties:
+        revision:
+          type: object
+          properties:
+            variant_id:
+              type: string
+              format: uuid
+            environment_ref:
+              type: object
+              properties:
+                slug:
+                  type: string
+                  example: production
+    PromptConfig:
+      type: object
+      description: A prompt template plus model and inference parameters.
+      properties:
+        prompt:
+          type: object
+          properties:
+            messages:
+              type: array
+              items:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    enum:
+                    - system
+                    - user
+                    - assistant
+                  content:
+                    type: string
+            llm_config:
+              type: object
+              properties:
+                model:
+                  type: string
+                  example: gpt-4o
+                temperature:
+                  type: number
+                  format: float
+                max_tokens:
+                  type: integer
+                top_p:
+                  type: number
+                  format: float
+            template_format:
+              type: string
+              enum:
+              - fstring
+              - jinja2
+              - curly
+              default: fstring
+            input_keys:
+              type: array
+              items:
+                type: string
+    ConfigFetchRequest:
+      type: object
+      description: Reference identifying which configuration to resolve. Provide either an application + environment reference or a direct variant reference.
+      properties:
+        application_ref:
+          $ref: '#/components/schemas/Reference'
+        variant_ref:
+          $ref: '#/components/schemas/Reference'
+        environment_ref:
+          $ref: '#/components/schemas/Reference'
+    Reference:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        version:
+          type: string
+    Lifecycle:
+      type: object
+      description: Audit metadata attached to most Agenta resources.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    Revision:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        version:
+          type: string
+        variant_id:
+          type: string
+          format: uuid
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/PromptConfig'
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+    ConfigResponse:
+      type: object
+      properties:
+        params:
+          $ref: '#/components/schemas/PromptConfig'
+        url:
+          type: string
+        application_ref:
+          $ref: '#/components/schemas/Reference'
+        variant_ref:
+          $ref: '#/components/schemas/Reference'
+        environment_ref:
+          $ref: '#/components/schemas/Reference'
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>` (Bearer-style header credential).'

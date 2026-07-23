@@ -1,0 +1,283 @@
+openapi: 3.0.1
+info:
+  title: Agenta Applications Evaluations API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  termsOfService: https://agenta.ai/terms
+  contact:
+    name: Agenta Support
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  license:
+    name: MIT
+    url: https://github.com/Agenta-AI/agenta/blob/main/LICENSE
+  version: '1.0'
+servers:
+- url: https://cloud.agenta.ai/api
+  description: Agenta Cloud (US)
+- url: https://eu.cloud.agenta.ai/api
+  description: Agenta Cloud (EU)
+security:
+- ApiKeyAuth: []
+tags:
+- name: Evaluations
+  description: Run evaluations of variants against testsets.
+paths:
+  /evaluations/runs/query:
+    post:
+      operationId: queryEvaluationRuns
+      tags:
+      - Evaluations
+      summary: List and filter evaluation runs.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRunQueryRequest'
+      responses:
+        '200':
+          description: A list of evaluation runs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EvaluationRun'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /evaluations/runs/:
+    post:
+      operationId: createEvaluationRun
+      tags:
+      - Evaluations
+      summary: Create an evaluation run.
+      description: Starts an evaluation run that executes one or more variants against a testset and scores the outputs with the configured evaluators.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRunCreateRequest'
+      responses:
+        '200':
+          description: The created evaluation run.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRun'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /evaluations/results/query:
+    post:
+      operationId: queryEvaluationResults
+      tags:
+      - Evaluations
+      summary: Query evaluation results.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationResultQueryRequest'
+      responses:
+        '200':
+          description: A list of evaluation results.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EvaluationResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /evaluations/metrics/query:
+    post:
+      operationId: queryEvaluationMetrics
+      tags:
+      - Evaluations
+      summary: Query aggregated evaluation metrics.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationMetricsQueryRequest'
+      responses:
+        '200':
+          description: Aggregated metrics for the matching runs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EvaluationMetrics'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  schemas:
+    EvaluationResultQueryRequest:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            run_id:
+              type: string
+              format: uuid
+        windowing:
+          $ref: '#/components/schemas/Windowing'
+    EvaluationMetricsQueryRequest:
+      type: object
+      properties:
+        metrics:
+          type: object
+          properties:
+            run_id:
+              type: string
+              format: uuid
+    EvaluationRun:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - running
+          - finished
+          - failed
+          - cancelled
+        testset_id:
+          type: string
+          format: uuid
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+    EvaluationRunQueryRequest:
+      type: object
+      properties:
+        run:
+          type: object
+          properties:
+            application_id:
+              type: string
+              format: uuid
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
+    EvaluationResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        scenario_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        outputs:
+          type: object
+          additionalProperties: true
+    Lifecycle:
+      type: object
+      description: Audit metadata attached to most Agenta resources.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
+    EvaluationMetrics:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        evaluator_slug:
+          type: string
+        value:
+          type: number
+        data:
+          type: object
+          additionalProperties: true
+    Windowing:
+      type: object
+      description: Cursor / time-window pagination controls.
+      properties:
+        next:
+          type: string
+        limit:
+          type: integer
+          default: 100
+        oldest:
+          type: string
+          format: date-time
+        newest:
+          type: string
+          format: date-time
+        order:
+          type: string
+          enum:
+          - ascending
+          - descending
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    EvaluationRunCreateRequest:
+      type: object
+      required:
+      - run
+      properties:
+        run:
+          type: object
+          properties:
+            name:
+              type: string
+            testset_id:
+              type: string
+              format: uuid
+            variant_ids:
+              type: array
+              items:
+                type: string
+                format: uuid
+            evaluator_ids:
+              type: array
+              items:
+                type: string
+                format: uuid
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>` (Bearer-style header credential).'
