@@ -1,0 +1,26 @@
+{
+  "provider": "agenta",
+  "sources": [
+    "agenta-applications-api-openapi.yml",
+    "agenta-configs-api-openapi.yml",
+    "agenta-evaluations-api-openapi.yml",
+    "agenta-evaluators-api-openapi.yml",
+    "agenta-opentelemetry-api-openapi.yml",
+    "agenta-testsets-api-openapi.yml",
+    "agenta-traces-api-openapi.yml"
+  ],
+  "outputs": [
+    "agenta-applications-api-openapi.yml",
+    "agenta-configs-api-openapi.yml",
+    "agenta-evaluations-api-openapi.yml",
+    "agenta-evaluators-api-openapi.yml",
+    "agenta-opentelemetry-api-openapi.yml",
+    "agenta-testsets-api-openapi.yml",
+    "agenta-traces-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
