@@ -1,0 +1,65 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Agenta Applications Evaluators API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Evaluators",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List and filter evaluators.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluators/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "List and filter evaluators."
+        },
+        {
+          "info": {
+            "name": "Create an evaluator.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluators/",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create an evaluator."
+        },
+        {
+          "info": {
+            "name": "List the built-in evaluator catalog templates.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/evaluators/catalog/templates/"
+          },
+          "docs": "List the built-in evaluator catalog templates."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

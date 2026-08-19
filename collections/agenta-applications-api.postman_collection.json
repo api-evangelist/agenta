@@ -1,0 +1,1235 @@
+{
+  "item": [
+    {
+      "id": "a88be0ab-023c-47bc-952f-9be78f2c2dbe",
+      "name": "Applications",
+      "description": {
+        "content": "Create and manage LLM applications and their variants.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "3dc10204-48f2-4f4e-b583-83bc4820ef2f",
+          "name": "Create a new application.",
+          "request": {
+            "name": "Create a new application.",
+            "description": {},
+            "url": {
+              "path": [
+                "simple",
+                "applications",
+                ""
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"description\": \"<string>\",\n    \"flags\": {\n      \"key_0\": 9894.917466979741,\n      \"key_1\": 2038.4822448481243\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "13906966-e3cd-4b63-b618-f9c0ad8a47e3",
+              "name": "The created application.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"app\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"description\": \"<string>\",\n    \"flags\": {\n      \"key_0\": 6744.260947066657,\n      \"key_1\": true\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 8626,\n  \"application\": {\n    \"id\": \"cd19058b-a568-e026-756a-eb468f366a6a\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"flags\": {\n      \"key_0\": 9117.121602833598\n    },\n    \"lifecycle\": {\n      \"created_at\": \"2019-08-31T13:21:23.956Z\",\n      \"updated_at\": \"1982-09-19T03:28:13.333Z\",\n      \"created_by_id\": \"c8585e5f-30df-b988-218f-919a065c126c\",\n      \"updated_by_id\": \"806ee751-74d9-a554-b00f-871e386d30d8\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "aec27683-8557-4ea6-b560-692a20a1a19d",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"app\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"description\": \"<string>\",\n    \"flags\": {\n      \"key_0\": 6744.260947066657,\n      \"key_1\": true\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6c341d96-870b-44b8-97e3-a6f589792646",
+          "name": "List and filter applications.",
+          "request": {
+            "name": "List and filter applications.",
+            "description": {},
+            "url": {
+              "path": [
+                "simple",
+                "applications",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"application\": {\n    \"flags\": {\n      \"key_0\": 8171.1814223650135,\n      \"key_1\": 8403,\n      \"key_2\": \"string\"\n    }\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c9a4fd42-1b51-4d90-87a1-d307dbd288f0",
+              "name": "A list of applications.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"application\": {\n    \"flags\": {\n      \"key_0\": \"string\",\n      \"key_1\": 1058.089669207003\n    }\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"count\": 910,\n    \"application\": {\n      \"id\": \"224819f6-a99a-9cab-5797-0a783ff5cec9\",\n      \"slug\": \"string\",\n      \"name\": \"string\",\n      \"description\": \"string\",\n      \"flags\": {\n        \"key_0\": 9127.655798614791,\n        \"key_1\": 9771.33228013007\n      },\n      \"lifecycle\": {\n        \"created_at\": \"1947-09-26T20:15:42.062Z\",\n        \"updated_at\": \"1969-02-23T22:06:12.480Z\",\n        \"created_by_id\": \"4c7f1029-b570-d928-2d39-e440d25a0277\",\n        \"updated_by_id\": \"24d72756-fd27-2561-a93d-a22b256729ba\"\n      }\n    }\n  },\n  {\n    \"count\": 2661,\n    \"application\": {\n      \"id\": \"56c21df0-27a1-deb0-768b-9c9e3846ccb1\",\n      \"slug\": \"string\",\n      \"name\": \"string\",\n      \"description\": \"string\",\n      \"flags\": {\n        \"key_0\": 5295,\n        \"key_1\": \"string\",\n        \"key_2\": 8321.469588137346,\n        \"key_3\": 4036\n      },\n      \"lifecycle\": {\n        \"created_at\": \"1964-09-17T22:45:20.350Z\",\n        \"updated_at\": \"2020-07-12T22:12:37.776Z\",\n        \"created_by_id\": \"a5b5f8d0-bab9-94e1-f071-102aacca0034\",\n        \"updated_by_id\": \"8690fe9e-92c9-be90-990b-5a959edc09c1\"\n      }\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0b02a0c5-08ed-47ff-84ed-cd930c4aa17a",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"application\": {\n    \"flags\": {\n      \"key_0\": \"string\",\n      \"key_1\": 1058.089669207003\n    }\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "eb6fe14d-b48c-43a7-9c75-af4b566e69d2",
+          "name": "Fetch a single application by id.",
+          "request": {
+            "name": "Fetch a single application by id.",
+            "description": {},
+            "url": {
+              "path": [
+                "simple",
+                "applications",
+                ":application_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "application_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "af8900b1-caa0-45c6-802a-9d0522ab142e",
+              "name": "The requested application.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    ":application_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "application_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 8626,\n  \"application\": {\n    \"id\": \"cd19058b-a568-e026-756a-eb468f366a6a\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"flags\": {\n      \"key_0\": 9117.121602833598\n    },\n    \"lifecycle\": {\n      \"created_at\": \"2019-08-31T13:21:23.956Z\",\n      \"updated_at\": \"1982-09-19T03:28:13.333Z\",\n      \"created_by_id\": \"c8585e5f-30df-b988-218f-919a065c126c\",\n      \"updated_by_id\": \"806ee751-74d9-a554-b00f-871e386d30d8\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1a0d2856-20fa-4677-9e91-0e8995f429dc",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    ":application_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "application_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "683eeb7f-d044-4608-ac25-bd6b6326f889",
+              "name": "The requested resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    ":application_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "application_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "14144569-8b3e-4b4b-aa8a-de0acb6b393b",
+          "name": "Edit an application by id.",
+          "request": {
+            "name": "Edit an application by id.",
+            "description": {},
+            "url": {
+              "path": [
+                "simple",
+                "applications",
+                ":application_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "application_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app\": {\n    \"name\": \"<string>\",\n    \"description\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "5f7e7dfa-7cad-4526-b952-1122cad53ba1",
+              "name": "The updated application.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    ":application_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "application_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"app\": {\n    \"name\": \"<string>\",\n    \"description\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 8626,\n  \"application\": {\n    \"id\": \"cd19058b-a568-e026-756a-eb468f366a6a\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"flags\": {\n      \"key_0\": 9117.121602833598\n    },\n    \"lifecycle\": {\n      \"created_at\": \"2019-08-31T13:21:23.956Z\",\n      \"updated_at\": \"1982-09-19T03:28:13.333Z\",\n      \"created_by_id\": \"c8585e5f-30df-b988-218f-919a065c126c\",\n      \"updated_by_id\": \"806ee751-74d9-a554-b00f-871e386d30d8\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a5ac48de-c398-409f-bd55-c975ea5a21d9",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "applications",
+                    ":application_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "application_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"app\": {\n    \"name\": \"<string>\",\n    \"description\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c1eebb73-b1f0-4274-87bd-8d7c81dac8df",
+          "name": "List and filter application variants.",
+          "request": {
+            "name": "List and filter application variants.",
+            "description": {},
+            "url": {
+              "path": [
+                "applications",
+                "variants",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variant\": {\n    \"application_id\": \"<uuid>\"\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "77f0ab70-7919-484c-8299-5dd5fa51f31f",
+              "name": "A list of application variants.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "variants",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"variant\": {\n    \"application_id\": \"<uuid>\"\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"61dc7fc4-7546-1022-2a06-ca7eac7d002b\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"application_id\": \"7d16e812-7563-e1da-ffdc-080c0c923c3b\",\n    \"lifecycle\": {\n      \"created_at\": \"1976-02-09T04:39:50.116Z\",\n      \"updated_at\": \"2018-10-02T01:57:14.087Z\",\n      \"created_by_id\": \"36bf80b4-ebc1-fb6a-1874-de9721fa58fe\",\n      \"updated_by_id\": \"ab13f68b-ca8e-ee74-f8d4-81980b2a999d\"\n    }\n  },\n  {\n    \"id\": \"43fd0370-0561-f0b0-4cf6-2ca53bf04cd5\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"application_id\": \"8cedac0c-a8ea-67dd-4388-ca7f41141c3a\",\n    \"lifecycle\": {\n      \"created_at\": \"1965-06-09T01:52:42.087Z\",\n      \"updated_at\": \"1966-09-15T12:27:41.109Z\",\n      \"created_by_id\": \"870e89c6-32ca-6c76-358b-77d51516153a\",\n      \"updated_by_id\": \"8d0f5310-a8b3-7d7a-e5a0-7a1ef5b36b50\"\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "21a8866f-a7ff-46d6-96b9-e15c43b4040e",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "variants",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"variant\": {\n    \"application_id\": \"<uuid>\"\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6730cd27-6f10-4c40-adce-b2b1d68deb34",
+          "name": "Fetch a single application variant by id.",
+          "request": {
+            "name": "Fetch a single application variant by id.",
+            "description": {},
+            "url": {
+              "path": [
+                "applications",
+                "variants",
+                ":application_variant_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "application_variant_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "890cbf1d-2b59-4786-953d-0cea1722b7f0",
+              "name": "The requested variant.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "variants",
+                    ":application_variant_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "application_variant_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"f05cb1d6-e81a-ee9a-d749-2797d1385855\",\n  \"slug\": \"string\",\n  \"name\": \"string\",\n  \"application_id\": \"f6762443-2f49-b910-f015-f2257043b248\",\n  \"lifecycle\": {\n    \"created_at\": \"1979-05-22T20:25:06.810Z\",\n    \"updated_at\": \"1979-01-16T21:54:54.139Z\",\n    \"created_by_id\": \"c842d584-5e72-3f0c-685b-7672f03c7491\",\n    \"updated_by_id\": \"7d3e964d-c3fe-9b10-ab6e-d9fff8422e74\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ad7b96af-3e8f-453a-ae78-d9296e75cb66",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "variants",
+                    ":application_variant_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "application_variant_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "cbce0a3d-3368-48fa-a20a-0fcad4c87e8a",
+              "name": "The requested resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "variants",
+                    ":application_variant_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "application_variant_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "50c2aadf-36c0-4baa-95ec-06060c5f3716",
+          "name": "Commit a new revision of an application variant.",
+          "request": {
+            "name": "Commit a new revision of an application variant.",
+            "description": {
+              "content": "Commits the supplied prompt and parameter configuration as a new, immutable revision of a variant. This is how new prompt versions are published in Agenta's prompt management workflow.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "applications",
+                "revisions",
+                "commit"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"revision\": {\n    \"slug\": \"<string>\",\n    \"variant_id\": \"<uuid>\",\n    \"message\": \"<string>\",\n    \"data\": {\n      \"prompt\": {\n        \"messages\": [\n          {\n            \"role\": \"<string>\",\n            \"content\": \"<string>\"\n          },\n          {\n            \"role\": \"<string>\",\n            \"content\": \"<string>\"\n          }\n        ],\n        \"llm_config\": {\n          \"model\": \"<string>\",\n          \"temperature\": \"<float>\",\n          \"max_tokens\": \"<integer>\",\n          \"top_p\": \"<float>\"\n        },\n        \"template_format\": \"fstring\",\n        \"input_keys\": [\n          \"<string>\",\n          \"<string>\"\n        ]\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "0ec6607d-3af4-44f5-8315-9b3a8ef1c304",
+              "name": "The committed revision.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "revisions",
+                    "commit"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"revision\": {\n    \"slug\": \"<string>\",\n    \"variant_id\": \"<uuid>\",\n    \"message\": \"<string>\",\n    \"data\": {\n      \"prompt\": {\n        \"messages\": [\n          {\n            \"role\": \"<string>\",\n            \"content\": \"<string>\"\n          },\n          {\n            \"role\": \"<string>\",\n            \"content\": \"<string>\"\n          }\n        ],\n        \"llm_config\": {\n          \"model\": \"gpt-4o\",\n          \"temperature\": \"<float>\",\n          \"max_tokens\": \"<integer>\",\n          \"top_p\": \"<float>\"\n        },\n        \"template_format\": \"fstring\",\n        \"input_keys\": [\n          \"<string>\",\n          \"<string>\"\n        ]\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"698d0072-e168-a3f8-5fd1-e0a5cc032481\",\n  \"slug\": \"string\",\n  \"version\": \"string\",\n  \"variant_id\": \"70bd2960-aa2c-480e-2af3-b644ead302ac\",\n  \"message\": \"string\",\n  \"data\": {\n    \"prompt\": {\n      \"messages\": [\n        {\n          \"role\": \"<string>\",\n          \"content\": \"<string>\"\n        },\n        {\n          \"role\": \"<string>\",\n          \"content\": \"<string>\"\n        }\n      ],\n      \"llm_config\": {\n        \"model\": \"gpt-4o\",\n        \"temperature\": \"<float>\",\n        \"max_tokens\": \"<integer>\",\n        \"top_p\": \"<float>\"\n      },\n      \"template_format\": \"fstring\",\n      \"input_keys\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  },\n  \"lifecycle\": {\n    \"created_at\": \"2005-11-23T12:32:11.596Z\",\n    \"updated_at\": \"2004-06-18T16:43:11.687Z\",\n    \"created_by_id\": \"06cb878e-960e-dc14-8865-0608ab33c601\",\n    \"updated_by_id\": \"e6ca059e-4b7c-c1a0-afb7-5ff4c1c01c26\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "480b29fe-b6f2-47eb-bbb0-33a7bcb7bed4",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "revisions",
+                    "commit"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"revision\": {\n    \"slug\": \"<string>\",\n    \"variant_id\": \"<uuid>\",\n    \"message\": \"<string>\",\n    \"data\": {\n      \"prompt\": {\n        \"messages\": [\n          {\n            \"role\": \"<string>\",\n            \"content\": \"<string>\"\n          },\n          {\n            \"role\": \"<string>\",\n            \"content\": \"<string>\"\n          }\n        ],\n        \"llm_config\": {\n          \"model\": \"gpt-4o\",\n          \"temperature\": \"<float>\",\n          \"max_tokens\": \"<integer>\",\n          \"top_p\": \"<float>\"\n        },\n        \"template_format\": \"fstring\",\n        \"input_keys\": [\n          \"<string>\",\n          \"<string>\"\n        ]\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://cloud.agenta.ai/api",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "267cd642-dc12-4ab1-b485-9a9c4066fb9c",
+    "name": "Agenta Applications API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.\n\nContact Support:\n Name: Agenta Support\n Email: team@agenta.ai",
+      "type": "text/plain"
+    }
+  }
+}

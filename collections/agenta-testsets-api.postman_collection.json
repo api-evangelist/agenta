@@ -1,0 +1,726 @@
+{
+  "item": [
+    {
+      "id": "7f51b74e-c368-468f-8b58-9255e165d2f8",
+      "name": "Testsets",
+      "description": {
+        "content": "Manage evaluation datasets (testsets).",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "f6f765eb-70ad-49d3-9a25-218d17c5fab8",
+          "name": "Create a testset.",
+          "request": {
+            "name": "Create a testset.",
+            "description": {},
+            "url": {
+              "path": [
+                "testsets",
+                ""
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testset\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"data\": {\n      \"testcases\": [\n        {\n          \"key_0\": 4227.397248537364,\n          \"key_1\": 4191,\n          \"key_2\": false,\n          \"key_3\": 3806.039669476802\n        },\n        {\n          \"key_0\": 5588.231988342673,\n          \"key_1\": 3892\n        }\n      ]\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "e31b39ac-8721-485c-a341-4afd78232dce",
+              "name": "The created testset.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "testsets",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"testset\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"data\": {\n      \"testcases\": [\n        {\n          \"key_0\": false,\n          \"key_1\": 1227\n        },\n        {\n          \"key_0\": false\n        }\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"d7bb546a-9b58-63f1-78a3-b71e4428d90f\",\n  \"slug\": \"string\",\n  \"name\": \"string\",\n  \"data\": {\n    \"testcases\": [\n      {\n        \"key_0\": \"string\",\n        \"key_1\": 1210.892971963885,\n        \"key_2\": false\n      },\n      {\n        \"key_0\": \"string\",\n        \"key_1\": true,\n        \"key_2\": \"string\",\n        \"key_3\": 1047.7466054768104\n      }\n    ]\n  },\n  \"lifecycle\": {\n    \"created_at\": \"2003-12-28T12:23:31.977Z\",\n    \"updated_at\": \"2007-10-19T04:26:15.379Z\",\n    \"created_by_id\": \"fa7e6af5-9f0d-2484-a7f6-d52c1d2d6906\",\n    \"updated_by_id\": \"44786e23-5e82-c5ea-5823-3b3855495fab\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ea860e07-37ba-49e5-9548-f2ffbe7248db",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "testsets",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"testset\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"data\": {\n      \"testcases\": [\n        {\n          \"key_0\": false,\n          \"key_1\": 1227\n        },\n        {\n          \"key_0\": false\n        }\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "1ae4a06b-32d8-40c9-ac70-4ce990cfbbb2",
+          "name": "List and filter testsets.",
+          "request": {
+            "name": "List and filter testsets.",
+            "description": {},
+            "url": {
+              "path": [
+                "testsets",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "eb5b6aff-c594-42fa-9f5e-b9098bbea8b4",
+              "name": "A list of testsets.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "testsets",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"78aaf151-0cac-c3ac-8a0a-46fdd9e068e2\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"data\": {\n      \"testcases\": [\n        {\n          \"key_0\": 3286,\n          \"key_1\": 6231\n        },\n        {\n          \"key_0\": false,\n          \"key_1\": 5351.626629868481\n        }\n      ]\n    },\n    \"lifecycle\": {\n      \"created_at\": \"1965-11-10T16:07:52.684Z\",\n      \"updated_at\": \"1999-11-17T01:09:45.775Z\",\n      \"created_by_id\": \"75783469-f6c1-0b29-0ed7-030fc3f4083f\",\n      \"updated_by_id\": \"226b8fbd-d1bf-835c-2975-77b001138970\"\n    }\n  },\n  {\n    \"id\": \"476f117f-2f19-37e7-8dc7-b2f28cbcf663\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"data\": {\n      \"testcases\": [\n        {\n          \"key_0\": 4121,\n          \"key_1\": \"string\"\n        },\n        {\n          \"key_0\": \"string\"\n        }\n      ]\n    },\n    \"lifecycle\": {\n      \"created_at\": \"2005-12-07T18:04:11.588Z\",\n      \"updated_at\": \"1955-05-21T03:34:30.742Z\",\n      \"created_by_id\": \"f5276b4a-9a4f-eafd-6917-c91c5c44096d\",\n      \"updated_by_id\": \"6a9cd222-f502-e769-d397-01f978b11669\"\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3d4c1cf9-f41a-404d-ac60-22f99d823c96",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "testsets",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ddfbefcd-7697-45e8-9be0-ca70dc0acaa3",
+          "name": "Fetch a single testset by id.",
+          "request": {
+            "name": "Fetch a single testset by id.",
+            "description": {},
+            "url": {
+              "path": [
+                "testsets",
+                ":testset_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "testset_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "37831432-0add-482a-87ba-929d5479ea48",
+              "name": "The requested testset.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "testsets",
+                    ":testset_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "testset_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"64fdd6c5-da89-7a15-ad1c-5e0331283251\",\n  \"slug\": \"string\",\n  \"name\": \"string\",\n  \"data\": {\n    \"testcases\": [\n      {\n        \"key_0\": 9202.910532627238,\n        \"key_1\": \"string\"\n      },\n      {\n        \"key_0\": 2131,\n        \"key_1\": true\n      }\n    ]\n  },\n  \"lifecycle\": {\n    \"created_at\": \"1995-03-06T06:59:43.890Z\",\n    \"updated_at\": \"1972-05-12T16:51:20.713Z\",\n    \"created_by_id\": \"680ea895-69ec-4fec-d34f-c2e439b6f526\",\n    \"updated_by_id\": \"a77ef898-ba89-2e59-6715-06010ac39b38\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0480cc83-4a50-4c88-b563-ce4b9799a214",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "testsets",
+                    ":testset_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "testset_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9a85b262-0c7d-4f6f-a7a5-63060940e700",
+              "name": "The requested resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "testsets",
+                    ":testset_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "testset_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b1a86d7d-a2a5-4fdc-8d28-0c1141c0ebae",
+          "name": "Create a testset from an uploaded CSV or JSON file.",
+          "request": {
+            "name": "Create a testset from an uploaded CSV or JSON file.",
+            "description": {},
+            "url": {
+              "path": [
+                "simple",
+                "testsets",
+                "upload"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": ""
+                },
+                {
+                  "key": "name",
+                  "value": "<string>",
+                  "type": "text",
+                  "description": ""
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "0bab9a5d-dbe5-412d-bbf9-db6f2d431d03",
+              "name": "The created testset.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "testsets",
+                    "upload"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "key": "file",
+                      "value": "<binary>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "key": "name",
+                      "value": "<string>",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"64fdd6c5-da89-7a15-ad1c-5e0331283251\",\n  \"slug\": \"string\",\n  \"name\": \"string\",\n  \"data\": {\n    \"testcases\": [\n      {\n        \"key_0\": 9202.910532627238,\n        \"key_1\": \"string\"\n      },\n      {\n        \"key_0\": 2131,\n        \"key_1\": true\n      }\n    ]\n  },\n  \"lifecycle\": {\n    \"created_at\": \"1995-03-06T06:59:43.890Z\",\n    \"updated_at\": \"1972-05-12T16:51:20.713Z\",\n    \"created_by_id\": \"680ea895-69ec-4fec-d34f-c2e439b6f526\",\n    \"updated_by_id\": \"a77ef898-ba89-2e59-6715-06010ac39b38\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8d871a17-d237-4a5b-a689-561f8b8e3992",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "simple",
+                    "testsets",
+                    "upload"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "key": "file",
+                      "value": "<binary>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "key": "name",
+                      "value": "<string>",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://cloud.agenta.ai/api",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "773a6726-8b24-407d-8c0d-1f6146cdd3f8",
+    "name": "Agenta Applications Testsets API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.\n\nContact Support:\n Name: Agenta Support\n Email: team@agenta.ai",
+      "type": "text/plain"
+    }
+  }
+}

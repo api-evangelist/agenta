@@ -1,0 +1,142 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Agenta Applications API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Applications",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a new application.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/simple/applications/",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create a new application."
+        },
+        {
+          "info": {
+            "name": "List and filter applications.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/simple/applications/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "List and filter applications."
+        },
+        {
+          "info": {
+            "name": "Fetch a single application by id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/simple/applications/:application_id",
+            "params": [
+              {
+                "name": "application_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Fetch a single application by id."
+        },
+        {
+          "info": {
+            "name": "Edit an application by id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://cloud.agenta.ai/api/simple/applications/:application_id",
+            "params": [
+              {
+                "name": "application_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Edit an application by id."
+        },
+        {
+          "info": {
+            "name": "List and filter application variants.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/applications/variants/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "List and filter application variants."
+        },
+        {
+          "info": {
+            "name": "Fetch a single application variant by id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/applications/variants/:application_variant_id",
+            "params": [
+              {
+                "name": "application_variant_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Fetch a single application variant by id."
+        },
+        {
+          "info": {
+            "name": "Commit a new revision of an application variant.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/applications/revisions/commit",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Commits the supplied prompt and parameter configuration as a new, immutable revision of a variant. This is how new prompt versions are published in Agenta's prompt management workflow."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,54 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Agenta Applications Configs API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Configs",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Deploy an application revision to an environment.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/applications/revisions/deploy",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Deploys a committed revision to an environment (for example development, staging, or production) so that fetch-config calls scoped to that environment return the deployed configuration."
+        },
+        {
+          "info": {
+            "name": "Fetch a prompt configuration.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/variants/configs/fetch",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Fetches the configuration (prompt template, model, and parameters) for a variant or environment reference. Production code uses this endpoint (or the configuration management SDK that wraps it) to pull the latest committed prompt without redeploying. Identify the configuration by application plus environment slug, or by variant reference."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

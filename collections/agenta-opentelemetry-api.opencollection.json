@@ -1,0 +1,50 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Agenta Applications OpenTelemetry API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "OpenTelemetry",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Status check for the OTLP traces endpoint.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/otlp/v1/traces"
+          },
+          "docs": "Status check for the OTLP traces endpoint."
+        },
+        {
+          "info": {
+            "name": "Ingest traces via OpenTelemetry OTLP/HTTP.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/otlp/v1/traces",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "OpenTelemetry OTLP/HTTP trace ingestion endpoint. Send OTLP-formatted spans (typically protobuf or JSON over HTTP) here to record LLM telemetry. This is the recommended way to push observability data from instrumented applications and OpenTelemetry exporters."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

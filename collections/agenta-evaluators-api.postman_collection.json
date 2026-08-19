@@ -1,0 +1,468 @@
+{
+  "item": [
+    {
+      "id": "f072f8de-941b-4fed-a910-509bd688e2a8",
+      "name": "Evaluators",
+      "description": {
+        "content": "Configure evaluators used to score variants.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "50de85a2-24a3-4d30-a1d5-2c9994f60261",
+          "name": "List and filter evaluators.",
+          "request": {
+            "name": "List and filter evaluators.",
+            "description": {},
+            "url": {
+              "path": [
+                "evaluators",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "66c79b43-276a-4ca6-bee6-728568a00e17",
+              "name": "A list of evaluators.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluators",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"f1f41b34-9a37-7c53-6855-fb82d0814dbd\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"data\": {\n      \"key_0\": 1477.6436593495268,\n      \"key_1\": 1579.0826755258702,\n      \"key_2\": 4789.108049551801,\n      \"key_3\": 7562.176269265185\n    },\n    \"lifecycle\": {\n      \"created_at\": \"2024-01-20T11:51:31.216Z\",\n      \"updated_at\": \"2014-12-25T08:17:02.079Z\",\n      \"created_by_id\": \"7258fba6-d4bb-314c-dbc3-755d817b9ff3\",\n      \"updated_by_id\": \"6044a67f-ebed-a661-226a-bd17a0c11ecc\"\n    }\n  },\n  {\n    \"id\": \"64e44c05-6425-a180-0ad0-43e270a3df9f\",\n    \"slug\": \"string\",\n    \"name\": \"string\",\n    \"data\": {\n      \"key_0\": 8434,\n      \"key_1\": 3647.9784246945655\n    },\n    \"lifecycle\": {\n      \"created_at\": \"1993-10-28T07:10:59.515Z\",\n      \"updated_at\": \"1962-03-26T06:58:04.875Z\",\n      \"created_by_id\": \"646c9014-f00c-0e60-9654-7a7b48434d22\",\n      \"updated_by_id\": \"6e64d49f-8d55-14d0-6fe9-ddce6b801144\"\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "011e6395-03e0-47ec-9886-e7bb0119bdff",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluators",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "83d51dc9-d743-49cd-8a6c-e20074e01a56",
+          "name": "Create an evaluator.",
+          "request": {
+            "name": "Create an evaluator.",
+            "description": {},
+            "url": {
+              "path": [
+                "evaluators",
+                ""
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluator\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"data\": {\n      \"key_0\": true\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "f411e972-3e8a-4bf0-8416-4e366f154410",
+              "name": "The created evaluator.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluators",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"evaluator\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"data\": {\n      \"key_0\": \"string\",\n      \"key_1\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"171487a7-b6c6-bf95-bd44-6bec254600d5\",\n  \"slug\": \"string\",\n  \"name\": \"string\",\n  \"data\": {\n    \"key_0\": \"string\",\n    \"key_1\": \"string\",\n    \"key_2\": \"string\"\n  },\n  \"lifecycle\": {\n    \"created_at\": \"1980-07-10T07:15:25.672Z\",\n    \"updated_at\": \"1949-10-02T19:33:53.979Z\",\n    \"created_by_id\": \"2855ce24-22a1-07c1-b026-e0c548153ef5\",\n    \"updated_by_id\": \"ef9ce72e-b0a8-6cb6-3263-cff250c08de9\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "85c72d32-99b9-4af2-aa29-b15754f326ce",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluators",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"evaluator\": {\n    \"slug\": \"<string>\",\n    \"name\": \"<string>\",\n    \"data\": {\n      \"key_0\": \"string\",\n      \"key_1\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "52564122-c7ce-4950-8f40-aa48e0eb6ea0",
+          "name": "List the built-in evaluator catalog templates.",
+          "request": {
+            "name": "List the built-in evaluator catalog templates.",
+            "description": {},
+            "url": {
+              "path": [
+                "evaluators",
+                "catalog",
+                "templates",
+                ""
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "dbae3fdb-a45e-4132-8ad2-e1de6ab254d2",
+              "name": "A list of evaluator templates.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluators",
+                    "catalog",
+                    "templates",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"key\": \"auto_exact_match\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"settings_schema\": {\n      \"key_0\": 5080,\n      \"key_1\": false\n    }\n  },\n  {\n    \"key\": \"auto_exact_match\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"settings_schema\": {\n      \"key_0\": 6203.840668542555,\n      \"key_1\": true\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "85cc9e43-ac9d-4da0-86cb-27a31634ee95",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluators",
+                    "catalog",
+                    "templates",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://cloud.agenta.ai/api",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "0a63b7ed-48db-45f6-b49b-81a23591a0dc",
+    "name": "Agenta Applications Evaluators API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.\n\nContact Support:\n Name: Agenta Support\n Email: team@agenta.ai",
+      "type": "text/plain"
+    }
+  }
+}

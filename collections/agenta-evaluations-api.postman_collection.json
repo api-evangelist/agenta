@@ -1,0 +1,656 @@
+{
+  "item": [
+    {
+      "id": "0de31fee-9f43-4619-93d5-9a93448239a3",
+      "name": "Evaluations",
+      "description": {
+        "content": "Run evaluations of variants against testsets.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "943dbab4-8fdd-4b46-a5ad-0c64e23ab9bf",
+          "name": "List and filter evaluation runs.",
+          "request": {
+            "name": "List and filter evaluation runs.",
+            "description": {},
+            "url": {
+              "path": [
+                "evaluations",
+                "runs",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"run\": {\n    \"application_id\": \"<uuid>\"\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c252980e-27e0-48b7-94e5-b9d50cbe8e24",
+              "name": "A list of evaluation runs.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluations",
+                    "runs",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"run\": {\n    \"application_id\": \"<uuid>\"\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"8d0e7cd4-0383-14ab-f5fa-177bf8edccb1\",\n    \"name\": \"string\",\n    \"status\": \"running\",\n    \"testset_id\": \"0970106a-8d73-c9a2-0893-f864640e64c9\",\n    \"lifecycle\": {\n      \"created_at\": \"1992-09-15T01:02:47.514Z\",\n      \"updated_at\": \"1979-01-29T12:16:28.542Z\",\n      \"created_by_id\": \"95758a2d-0625-d21d-ddaf-b4b36b9746fa\",\n      \"updated_by_id\": \"73ea044b-a4f6-945c-7645-d26597068e38\"\n    }\n  },\n  {\n    \"id\": \"f9cd4a31-eaac-b2e4-6a96-d51ad852bfa6\",\n    \"name\": \"string\",\n    \"status\": \"running\",\n    \"testset_id\": \"5298fc2f-c45d-43b5-890e-14404087dc72\",\n    \"lifecycle\": {\n      \"created_at\": \"1968-04-30T23:06:47.157Z\",\n      \"updated_at\": \"1969-08-19T11:23:17.041Z\",\n      \"created_by_id\": \"ec0363b9-c900-53a4-377d-3a9ca3e9e5a3\",\n      \"updated_by_id\": \"a0f33bff-dce3-a88e-4332-e329622fb9d8\"\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c06795f7-f2dd-455e-af62-8f477bb5455c",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluations",
+                    "runs",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"run\": {\n    \"application_id\": \"<uuid>\"\n  },\n  \"include_archived\": false,\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "f8f54115-07fd-4f7a-a965-c973257cee4c",
+          "name": "Create an evaluation run.",
+          "request": {
+            "name": "Create an evaluation run.",
+            "description": {
+              "content": "Starts an evaluation run that executes one or more variants against a testset and scores the outputs with the configured evaluators.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "evaluations",
+                "runs",
+                ""
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"run\": {\n    \"name\": \"<string>\",\n    \"testset_id\": \"<uuid>\",\n    \"variant_ids\": [\n      \"<uuid>\",\n      \"<uuid>\"\n    ],\n    \"evaluator_ids\": [\n      \"<uuid>\",\n      \"<uuid>\"\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "85420efe-99b1-4e53-98b4-d8765047e1f6",
+              "name": "The created evaluation run.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluations",
+                    "runs",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"run\": {\n    \"name\": \"<string>\",\n    \"testset_id\": \"<uuid>\",\n    \"variant_ids\": [\n      \"<uuid>\",\n      \"<uuid>\"\n    ],\n    \"evaluator_ids\": [\n      \"<uuid>\",\n      \"<uuid>\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"8c65a2ea-c3bb-aeaf-6f10-9e64318f6fb9\",\n  \"name\": \"string\",\n  \"status\": \"pending\",\n  \"testset_id\": \"2561a83f-d6a4-9b41-afdd-c5be84fa86f7\",\n  \"lifecycle\": {\n    \"created_at\": \"1998-06-29T04:34:11.822Z\",\n    \"updated_at\": \"1999-02-27T23:52:42.289Z\",\n    \"created_by_id\": \"486a4495-9d3d-8c30-99ea-27260e0bf226\",\n    \"updated_by_id\": \"1db0303b-c073-a34c-14ce-efd3fdd31b4a\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b6beb659-2e55-4cbc-b917-fec997a7be1d",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluations",
+                    "runs",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"run\": {\n    \"name\": \"<string>\",\n    \"testset_id\": \"<uuid>\",\n    \"variant_ids\": [\n      \"<uuid>\",\n      \"<uuid>\"\n    ],\n    \"evaluator_ids\": [\n      \"<uuid>\",\n      \"<uuid>\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0a8e0c68-8ab3-402d-a549-4439f19c8597",
+          "name": "Query evaluation results.",
+          "request": {
+            "name": "Query evaluation results.",
+            "description": {},
+            "url": {
+              "path": [
+                "evaluations",
+                "results",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"result\": {\n    \"run_id\": \"<uuid>\"\n  },\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "bd693ea0-6161-4b7c-ac9c-4c2276f0d665",
+              "name": "A list of evaluation results.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluations",
+                    "results",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"result\": {\n    \"run_id\": \"<uuid>\"\n  },\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"c67397e4-49e3-85d1-e3f4-088bb1310cfa\",\n    \"run_id\": \"d004676f-18bd-3b2f-0001-f174f7c7def8\",\n    \"scenario_id\": \"e3477e59-e07c-9ccf-c62b-939cb15d29ac\",\n    \"status\": \"string\",\n    \"outputs\": {\n      \"key_0\": 2609.5214048004154\n    }\n  },\n  {\n    \"id\": \"4285a5b4-637e-376b-3834-63ae6931f385\",\n    \"run_id\": \"f65da58b-fa96-bc27-ab28-2f4d7d116cbe\",\n    \"scenario_id\": \"4338b8d0-199a-f265-ce86-442ca129d7b2\",\n    \"status\": \"string\",\n    \"outputs\": {\n      \"key_0\": true,\n      \"key_1\": \"string\",\n      \"key_2\": \"string\",\n      \"key_3\": \"string\"\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f4cc5126-293a-4052-a1e1-0236dcb29244",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluations",
+                    "results",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"result\": {\n    \"run_id\": \"<uuid>\"\n  },\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ece9a699-c9ce-4189-b6ee-2e7d5701e610",
+          "name": "Query aggregated evaluation metrics.",
+          "request": {
+            "name": "Query aggregated evaluation metrics.",
+            "description": {},
+            "url": {
+              "path": [
+                "evaluations",
+                "metrics",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"metrics\": {\n    \"run_id\": \"<uuid>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "a2159ac2-0b4a-4d45-b7cc-9cbae6750a17",
+              "name": "Aggregated metrics for the matching runs.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluations",
+                    "metrics",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"metrics\": {\n    \"run_id\": \"<uuid>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"6952745f-346b-2672-970e-a11440b3afdb\",\n    \"run_id\": \"e00d06fa-86d8-de42-81cb-c984b22ebd43\",\n    \"evaluator_slug\": \"string\",\n    \"value\": 8393.934057807895,\n    \"data\": {\n      \"key_0\": true,\n      \"key_1\": 8036.831568720853,\n      \"key_2\": \"string\",\n      \"key_3\": 9080.591028801162\n    }\n  },\n  {\n    \"id\": \"be7564b0-16cc-33c9-c424-fd1bf49b2bc1\",\n    \"run_id\": \"1e99c6e3-47af-d87d-e16a-597f7d976df6\",\n    \"evaluator_slug\": \"string\",\n    \"value\": 3300.292786844573,\n    \"data\": {\n      \"key_0\": true\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "24ce500e-d53b-47e9-a11a-fdec2ddcbe54",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "evaluations",
+                    "metrics",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"metrics\": {\n    \"run_id\": \"<uuid>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://cloud.agenta.ai/api",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "8a376f24-f1ad-4faf-872a-0674ea6e890d",
+    "name": "Agenta Applications Evaluations API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.\n\nContact Support:\n Name: Agenta Support\n Email: team@agenta.ai",
+      "type": "text/plain"
+    }
+  }
+}

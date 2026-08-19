@@ -1,0 +1,494 @@
+{
+  "item": [
+    {
+      "id": "750db47c-d447-4053-9548-d0e2338b8acb",
+      "name": "Traces",
+      "description": {
+        "content": "Query observability traces and spans.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "883cf1fb-ef10-47a8-8462-481a802542d6",
+          "name": "Fetch traces.",
+          "request": {
+            "name": "Fetch traces.",
+            "description": {},
+            "url": {
+              "path": [
+                "traces",
+                ""
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "focus",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "100"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "1edb085a-55a4-4691-8e33-b61ff434d67d",
+              "name": "A list of traces.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "traces",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "focus",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "100"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"trace_id\": \"string\",\n    \"spans\": [\n      {\n        \"trace_id\": \"string\",\n        \"span_id\": \"string\",\n        \"span_name\": \"string\",\n        \"span_kind\": \"string\",\n        \"start_time\": \"2022-07-17T08:39:11.125Z\",\n        \"end_time\": \"1971-09-26T23:33:03.418Z\",\n        \"status_code\": \"string\",\n        \"attributes\": {\n          \"key_0\": 281,\n          \"key_1\": \"string\",\n          \"key_2\": false,\n          \"key_3\": 9720\n        }\n      },\n      {\n        \"trace_id\": \"string\",\n        \"span_id\": \"string\",\n        \"span_name\": \"string\",\n        \"span_kind\": \"string\",\n        \"start_time\": \"2006-06-17T22:18:41.198Z\",\n        \"end_time\": \"1964-01-13T03:58:45.576Z\",\n        \"status_code\": \"string\",\n        \"attributes\": {\n          \"key_0\": true,\n          \"key_1\": 8079.792198181544,\n          \"key_2\": \"string\"\n        }\n      }\n    ]\n  },\n  {\n    \"trace_id\": \"string\",\n    \"spans\": [\n      {\n        \"trace_id\": \"string\",\n        \"span_id\": \"string\",\n        \"span_name\": \"string\",\n        \"span_kind\": \"string\",\n        \"start_time\": \"1954-04-05T21:09:26.970Z\",\n        \"end_time\": \"1995-12-27T21:06:24.988Z\",\n        \"status_code\": \"string\",\n        \"attributes\": {\n          \"key_0\": \"string\",\n          \"key_1\": 8101,\n          \"key_2\": \"string\"\n        }\n      },\n      {\n        \"trace_id\": \"string\",\n        \"span_id\": \"string\",\n        \"span_name\": \"string\",\n        \"span_kind\": \"string\",\n        \"start_time\": \"2009-04-18T15:58:31.671Z\",\n        \"end_time\": \"2001-03-18T08:27:18.502Z\",\n        \"status_code\": \"string\",\n        \"attributes\": {\n          \"key_0\": 2894\n        }\n      }\n    ]\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "395e0c11-20e7-491c-bd3a-ec9d49294e43",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "traces",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "focus",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "100"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e6eb2888-4f75-41bf-aee2-651157dcdca8",
+          "name": "Query spans with filters.",
+          "request": {
+            "name": "Query spans with filters.",
+            "description": {},
+            "url": {
+              "path": [
+                "spans",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filtering\": {\n    \"key_0\": true\n  },\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "86531736-1294-4d63-9454-d21474c6af3b",
+              "name": "A list of spans.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "spans",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filtering\": {\n    \"key_0\": true,\n    \"key_1\": 9495\n  },\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"trace_id\": \"string\",\n    \"span_id\": \"string\",\n    \"span_name\": \"string\",\n    \"span_kind\": \"string\",\n    \"start_time\": \"1991-06-15T19:48:15.416Z\",\n    \"end_time\": \"1955-04-19T21:56:29.762Z\",\n    \"status_code\": \"string\",\n    \"attributes\": {\n      \"key_0\": true\n    }\n  },\n  {\n    \"trace_id\": \"string\",\n    \"span_id\": \"string\",\n    \"span_name\": \"string\",\n    \"span_kind\": \"string\",\n    \"start_time\": \"2002-12-09T08:27:34.229Z\",\n    \"end_time\": \"1970-11-23T15:42:14.921Z\",\n    \"status_code\": \"string\",\n    \"attributes\": {\n      \"key_0\": \"string\",\n      \"key_1\": \"string\"\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fda52142-b139-473c-9572-143f51b691e8",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "spans",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filtering\": {\n    \"key_0\": true,\n    \"key_1\": 9495\n  },\n  \"windowing\": {\n    \"next\": \"<string>\",\n    \"limit\": 100,\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\",\n    \"order\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "2458b9ed-2027-4e04-a405-facbc154c716",
+          "name": "Query span analytics (cost, latency, token usage over time).",
+          "request": {
+            "name": "Query span analytics (cost, latency, token usage over time).",
+            "description": {},
+            "url": {
+              "path": [
+                "spans",
+                "analytics",
+                "query"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filtering\": {\n    \"key_0\": true\n  },\n  \"time_range\": {\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\"\n  },\n  \"interval\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "5ad6d7ea-2ec9-48e4-8cbb-a14a8c22dd81",
+              "name": "Aggregated analytics buckets.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "spans",
+                    "analytics",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filtering\": {\n    \"key_0\": 8634.810122150382\n  },\n  \"time_range\": {\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\"\n  },\n  \"interval\": \"1h\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"buckets\": [\n    {\n      \"timestamp\": \"1978-06-03T14:44:55.467Z\",\n      \"total_count\": 7744,\n      \"total_tokens\": 3465,\n      \"total_cost\": 2633.4251278433417,\n      \"duration_ms\": 4929.64217443699\n    },\n    {\n      \"timestamp\": \"1962-02-16T13:54:59.272Z\",\n      \"total_count\": 941,\n      \"total_tokens\": 2151,\n      \"total_cost\": 5696.989968470133,\n      \"duration_ms\": 7111.493284279369\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e237bc02-77b3-4cf5-9d1c-7dd7b972c9eb",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "spans",
+                    "analytics",
+                    "query"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filtering\": {\n    \"key_0\": 8634.810122150382\n  },\n  \"time_range\": {\n    \"oldest\": \"<dateTime>\",\n    \"newest\": \"<dateTime>\"\n  },\n  \"interval\": \"1h\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://cloud.agenta.ai/api",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "1e01c5be-403c-4eee-964c-1d1e9e47b805",
+    "name": "Agenta Applications Traces API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.\n\nContact Support:\n Name: Agenta Support\n Email: team@agenta.ai",
+      "type": "text/plain"
+    }
+  }
+}

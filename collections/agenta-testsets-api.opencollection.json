@@ -1,0 +1,98 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Agenta Applications Testsets API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Testsets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a testset.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/testsets/",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create a testset."
+        },
+        {
+          "info": {
+            "name": "List and filter testsets.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/testsets/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "List and filter testsets."
+        },
+        {
+          "info": {
+            "name": "Fetch a single testset by id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/testsets/:testset_id",
+            "params": [
+              {
+                "name": "testset_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Fetch a single testset by id."
+        },
+        {
+          "info": {
+            "name": "Create a testset from an uploaded CSV or JSON file.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/simple/testsets/upload",
+            "body": {
+              "type": "multipart-form",
+              "data": [
+                {
+                  "name": "file",
+                  "type": "text",
+                  "value": ""
+                },
+                {
+                  "name": "name",
+                  "type": "text",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "docs": "Create a testset from an uploaded CSV or JSON file."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

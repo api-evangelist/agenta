@@ -1,0 +1,406 @@
+{
+  "item": [
+    {
+      "id": "87541799-6e07-4f47-9c7a-f0f89200d52c",
+      "name": "Configs",
+      "description": {
+        "content": "Fetch and deploy versioned prompt configurations.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "146cadfc-700b-46b1-b9c0-b93776ec64e2",
+          "name": "Deploy an application revision to an environment.",
+          "request": {
+            "name": "Deploy an application revision to an environment.",
+            "description": {
+              "content": "Deploys a committed revision to an environment (for example development, staging, or production) so that fetch-config calls scoped to that environment return the deployed configuration.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "applications",
+                "revisions",
+                "deploy"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"revision\": {\n    \"variant_id\": \"<uuid>\",\n    \"environment_ref\": {\n      \"slug\": \"<string>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "21bb8871-b8b7-44ed-b5a6-5b78802e4726",
+              "name": "The deployment result.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "revisions",
+                    "deploy"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"revision\": {\n    \"variant_id\": \"<uuid>\",\n    \"environment_ref\": {\n      \"slug\": \"production\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"6f5a0dfd-76cc-e356-13dc-34f3b4a92013\",\n  \"slug\": \"string\",\n  \"version\": \"string\",\n  \"variant_id\": \"9e511e68-c14a-2ae3-aee1-dc1125f22fa2\",\n  \"message\": \"string\",\n  \"data\": {\n    \"prompt\": {\n      \"messages\": [\n        {\n          \"role\": \"user\",\n          \"content\": \"string\"\n        },\n        {\n          \"role\": \"assistant\",\n          \"content\": \"string\"\n        }\n      ],\n      \"llm_config\": {\n        \"model\": \"gpt-4o\",\n        \"temperature\": 3326.279550448569,\n        \"max_tokens\": 1512,\n        \"top_p\": 1061.9558217735892\n      },\n      \"template_format\": \"fstring\",\n      \"input_keys\": [\n        \"string\",\n        \"string\"\n      ]\n    }\n  },\n  \"lifecycle\": {\n    \"created_at\": \"2009-12-03T16:14:46.540Z\",\n    \"updated_at\": \"1982-09-22T06:03:41.630Z\",\n    \"created_by_id\": \"4f5d7999-9006-32a3-eeb0-29a77256747b\",\n    \"updated_by_id\": \"5501cacc-caa0-6e45-c80e-90c72860b32a\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "beffdf6e-2773-4d0e-8653-b2b0f8db5c1b",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "applications",
+                    "revisions",
+                    "deploy"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"revision\": {\n    \"variant_id\": \"<uuid>\",\n    \"environment_ref\": {\n      \"slug\": \"production\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6621cc45-3ffd-4423-bdcc-1af8f5b1d3f8",
+          "name": "Fetch a prompt configuration.",
+          "request": {
+            "name": "Fetch a prompt configuration.",
+            "description": {
+              "content": "Fetches the configuration (prompt template, model, and parameters) for a variant or environment reference. Production code uses this endpoint (or the configuration management SDK that wraps it) to pull the latest committed prompt without redeploying. Identify the configuration by application plus environment slug, or by variant reference.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "variants",
+                "configs",
+                "fetch"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"application_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"variant_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"environment_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "f69f2ba3-91f9-403f-b26f-c803f844f864",
+              "name": "The resolved configuration.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "variants",
+                    "configs",
+                    "fetch"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"application_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"variant_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"environment_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"params\": {\n    \"prompt\": {\n      \"messages\": [\n        {\n          \"role\": \"assistant\",\n          \"content\": \"string\"\n        },\n        {\n          \"role\": \"system\",\n          \"content\": \"string\"\n        }\n      ],\n      \"llm_config\": {\n        \"model\": \"gpt-4o\",\n        \"temperature\": 612.3290685754623,\n        \"max_tokens\": 3332,\n        \"top_p\": 5100.4615290750835\n      },\n      \"template_format\": \"fstring\",\n      \"input_keys\": [\n        \"string\",\n        \"string\"\n      ]\n    }\n  },\n  \"url\": \"string\",\n  \"application_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"variant_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"environment_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "89c9b185-ac74-4bfc-b8b9-ce841861ee7a",
+              "name": "Missing or invalid API key.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "variants",
+                    "configs",
+                    "fetch"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"application_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"variant_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"environment_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "217f9d3c-babe-409c-9014-cb0d1dfd4f9f",
+              "name": "The requested resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "variants",
+                    "configs",
+                    "fetch"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"application_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"variant_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  },\n  \"environment_ref\": {\n    \"id\": \"<uuid>\",\n    \"slug\": \"<string>\",\n    \"version\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://cloud.agenta.ai/api",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "13c7d77c-59e9-4b87-8e37-3531a702774c",
+    "name": "Agenta Applications Configs API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.\n\nContact Support:\n Name: Agenta Support\n Email: team@agenta.ai",
+      "type": "text/plain"
+    }
+  }
+}

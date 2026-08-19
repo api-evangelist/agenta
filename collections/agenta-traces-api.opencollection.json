@@ -1,0 +1,77 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Agenta Applications Traces API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Traces",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Fetch traces.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://cloud.agenta.ai/api/traces/",
+            "params": [
+              {
+                "name": "focus",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query"
+              }
+            ]
+          },
+          "docs": "Fetch traces."
+        },
+        {
+          "info": {
+            "name": "Query spans with filters.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/spans/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Query spans with filters."
+        },
+        {
+          "info": {
+            "name": "Query span analytics (cost, latency, token usage over time).",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/spans/analytics/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Query span analytics (cost, latency, token usage over time)."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

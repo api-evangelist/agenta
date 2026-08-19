@@ -1,0 +1,84 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Agenta Applications Evaluations API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Evaluations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List and filter evaluation runs.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluations/runs/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "List and filter evaluation runs."
+        },
+        {
+          "info": {
+            "name": "Create an evaluation run.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluations/runs/",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Starts an evaluation run that executes one or more variants against a testset and scores the outputs with the configured evaluators."
+        },
+        {
+          "info": {
+            "name": "Query evaluation results.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluations/results/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Query evaluation results."
+        },
+        {
+          "info": {
+            "name": "Query aggregated evaluation metrics.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://cloud.agenta.ai/api/evaluations/metrics/query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Query aggregated evaluation metrics."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
