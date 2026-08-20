@@ -23,6 +23,12 @@ accessModel:
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/agenta.png
 tags:
+- Artificial Intelligence
+- LLMOps
+- Prompt Management
+- LLM Evaluation
+- Observability
+tags_raw:
 - AI
 - LLMOps
 - Prompt Management
@@ -38,6 +44,8 @@ apis:
   humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
   baseURL: https://cloud.agenta.ai/api
   tags:
+  - Application
+  tags_raw:
   - Applications
   properties:
   - type: OpenAPI
