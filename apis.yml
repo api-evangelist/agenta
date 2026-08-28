@@ -8,6 +8,18 @@ description: Agenta is an open-source LLMOps platform that brings prompt managem
   configurations, evaluations and evaluators, testsets, and OpenTelemetry-based
   tracing, all authenticated with a Bearer API key. The platform is MIT licensed and
   can be self-hosted or used via Agenta Cloud.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: self-serve
