@@ -193,76 +193,6 @@ apis:
     url: https://docs.agenta.ai/observability/overview
   - type: APIReference
     url: https://docs.agenta.ai/reference/api/traces
-- aid: agenta:agenta-opentelemetry-api
-  name: Agenta OpenTelemetry API
-  description: Ingest LLM telemetry over OTLP/HTTP.
-  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
-  baseURL: https://cloud.agenta.ai/api
-  tags:
-  - OpenTelemetry
-  properties:
-  - type: OpenAPI
-    url: openapi/agenta-opentelemetry-api-openapi.yml
-  - type: Documentation
-    url: https://docs.agenta.ai/prompt-engineering/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/list-api-endpoints
-  - type: PostmanCollection
-    url: collections/agenta.postman_collection.json
-  - type: OpenCollection
-    url: collections/agenta.opencollection.json
-  - type: Documentation
-    url: >-
-      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/sdk/configuration-management
-  - type: Documentation
-    url: https://docs.agenta.ai/evaluation/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/evaluations
-  - type: Documentation
-    url: https://docs.agenta.ai/evaluation/create-test-sets
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/testsets
-  - type: Documentation
-    url: https://docs.agenta.ai/observability/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/traces
-- aid: agenta:agenta-testsets-api
-  name: Agenta Testsets API
-  description: Manage evaluation datasets (testsets).
-  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
-  baseURL: https://cloud.agenta.ai/api
-  tags:
-  - Testsets
-  properties:
-  - type: OpenAPI
-    url: openapi/agenta-testsets-api-openapi.yml
-  - type: Documentation
-    url: https://docs.agenta.ai/prompt-engineering/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/list-api-endpoints
-  - type: PostmanCollection
-    url: collections/agenta.postman_collection.json
-  - type: OpenCollection
-    url: collections/agenta.opencollection.json
-  - type: Documentation
-    url: >-
-      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/sdk/configuration-management
-  - type: Documentation
-    url: https://docs.agenta.ai/evaluation/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/evaluations
-  - type: Documentation
-    url: https://docs.agenta.ai/evaluation/create-test-sets
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/testsets
-  - type: Documentation
-    url: https://docs.agenta.ai/observability/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/traces
 - aid: agenta:agenta-traces-api
   name: Agenta Traces API
   description: Query observability traces and spans.
@@ -273,6 +203,76 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/agenta-traces-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-open-telemetry-api
+  name: Agenta Open Telemetry API
+  description: Ingest LLM telemetry over OTLP/HTTP.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Open Telemetry
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-open-telemetry-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-test-sets-api
+  name: Agenta Test Sets API
+  description: Manage evaluation datasets (testsets).
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Test Sets
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-test-sets-api-openapi.yml
   - type: Documentation
     url: https://docs.agenta.ai/prompt-engineering/overview
   - type: APIReference
