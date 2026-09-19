@@ -35,6 +35,9 @@ accessModel:
   generated: '2026-09-03'
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/agenta.png
+x-docs-platform: docusaurus
+x-docs-platform-confidence: medium
+x-docs-platform-checked: 2026-09-17
 tags:
 - Artificial Intelligence
 - LLMOps
@@ -129,6 +132,8 @@ apis:
   humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
   baseURL: https://cloud.agenta.ai/api
   tags:
+  - Evaluation
+  tags_raw:
   - Evaluations
   properties:
   - type: OpenAPI
@@ -234,6 +239,8 @@ apis:
   humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
   baseURL: https://cloud.agenta.ai/api
   tags:
+  - OpenTelemetry
+  tags_raw:
   - Open Telemetry
   properties:
   - type: OpenAPI
@@ -269,6 +276,8 @@ apis:
   humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
   baseURL: https://cloud.agenta.ai/api
   tags:
+  - Testsets
+  tags_raw:
   - Test Sets
   properties:
   - type: OpenAPI
