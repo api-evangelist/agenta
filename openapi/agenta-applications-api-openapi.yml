@@ -1,7 +1,7 @@
-openapi: 3.0.1
+openapi: 3.2.0
 info:
   title: Agenta Applications API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
   termsOfService: https://agenta.ai/terms
   contact:
     name: Agenta Support
@@ -27,7 +27,7 @@ paths:
       operationId: createSimpleApplication
       tags:
       - Applications
-      summary: Create a new application.
+      summary: Create a new application
       requestBody:
         required: true
         content:
@@ -48,7 +48,7 @@ paths:
       operationId: querySimpleApplications
       tags:
       - Applications
-      summary: List and filter applications.
+      summary: List and filter applications
       requestBody:
         required: false
         content:
@@ -71,7 +71,7 @@ paths:
       operationId: fetchSimpleApplication
       tags:
       - Applications
-      summary: Fetch a single application by id.
+      summary: Fetch a single application by id
       parameters:
       - $ref: '#/components/parameters/ApplicationId'
       responses:
@@ -89,7 +89,7 @@ paths:
       operationId: editSimpleApplication
       tags:
       - Applications
-      summary: Edit an application by id.
+      summary: Edit an application by id
       parameters:
       - $ref: '#/components/parameters/ApplicationId'
       requestBody:
@@ -112,7 +112,7 @@ paths:
       operationId: queryApplicationVariants
       tags:
       - Applications
-      summary: List and filter application variants.
+      summary: List and filter application variants
       requestBody:
         required: false
         content:
@@ -135,7 +135,7 @@ paths:
       operationId: fetchApplicationVariant
       tags:
       - Applications
-      summary: Fetch a single application variant by id.
+      summary: Fetch a single application variant by id
       parameters:
       - name: application_variant_id
         in: path
@@ -159,7 +159,7 @@ paths:
       operationId: commitApplicationRevision
       tags:
       - Applications
-      summary: Commit a new revision of an application variant.
+      summary: Commit a new revision of an application variant
       description: Commits the supplied prompt and parameter configuration as a new, immutable revision of a variant. This is how new prompt versions are published in Agenta's prompt management workflow.
       requestBody:
         required: true
@@ -178,16 +178,22 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    SimpleApplicationEditRequest:
+    Lifecycle:
       type: object
+      description: Audit metadata attached to most Agenta resources.
       properties:
-        app:
-          type: object
-          properties:
-            name:
-              type: string
-            description:
-              type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
     SimpleApplicationResponse:
       type: object
       properties:
@@ -195,7 +201,7 @@ components:
           type: integer
         application:
           $ref: '#/components/schemas/Application'
-    ApplicationVariant:
+    Application:
       type: object
       properties:
         id:
@@ -205,11 +211,61 @@ components:
           type: string
         name:
           type: string
-        application_id:
+        description:
           type: string
-          format: uuid
+        flags:
+          type: object
+          additionalProperties: true
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
+    SimpleApplicationCreateRequest:
+      type: object
+      required:
+      - app
+      properties:
+        app:
+          type: object
+          required:
+          - slug
+          properties:
+            slug:
+              type: string
+              description: URL-friendly unique slug for the application.
+            name:
+              type: string
+            description:
+              type: string
+            flags:
+              type: object
+              additionalProperties: true
+    VariantQueryRequest:
+      type: object
+      properties:
+        variant:
+          type: object
+          properties:
+            application_id:
+              type: string
+              format: uuid
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
+    ApplicationQueryRequest:
+      type: object
+      properties:
+        application:
+          type: object
+          properties:
+            flags:
+              type: object
+              additionalProperties: true
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
     PromptConfig:
       type: object
       description: A prompt template plus model and inference parameters.
@@ -262,74 +318,6 @@ components:
           oneOf:
           - type: string
           - type: object
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
-    CommitRevisionRequest:
-      type: object
-      required:
-      - revision
-      properties:
-        revision:
-          type: object
-          properties:
-            slug:
-              type: string
-            variant_id:
-              type: string
-              format: uuid
-            message:
-              type: string
-              description: Commit message describing the change.
-            data:
-              $ref: '#/components/schemas/PromptConfig'
-    SimpleApplicationCreateRequest:
-      type: object
-      required:
-      - app
-      properties:
-        app:
-          type: object
-          required:
-          - slug
-          properties:
-            slug:
-              type: string
-              description: URL-friendly unique slug for the application.
-            name:
-              type: string
-            description:
-              type: string
-            flags:
-              type: object
-              additionalProperties: true
-    ApplicationQueryRequest:
-      type: object
-      properties:
-        application:
-          type: object
-          properties:
-            flags:
-              type: object
-              additionalProperties: true
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
     Revision:
       type: object
       properties:
@@ -349,6 +337,16 @@ components:
           $ref: '#/components/schemas/PromptConfig'
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
+    SimpleApplicationEditRequest:
+      type: object
+      properties:
+        app:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -369,21 +367,7 @@ components:
           enum:
           - ascending
           - descending
-    VariantQueryRequest:
-      type: object
-      properties:
-        variant:
-          type: object
-          properties:
-            application_id:
-              type: string
-              format: uuid
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
-    Application:
+    ApplicationVariant:
       type: object
       properties:
         id:
@@ -393,26 +377,29 @@ components:
           type: string
         name:
           type: string
-        description:
+        application_id:
           type: string
-        flags:
-          type: object
-          additionalProperties: true
+          format: uuid
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
-  responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: The requested resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+    CommitRevisionRequest:
+      type: object
+      required:
+      - revision
+      properties:
+        revision:
+          type: object
+          properties:
+            slug:
+              type: string
+            variant_id:
+              type: string
+              format: uuid
+            message:
+              type: string
+              description: Commit message describing the change.
+            data:
+              $ref: '#/components/schemas/PromptConfig'
   parameters:
     ApplicationId:
       name: application_id
@@ -421,6 +408,19 @@ components:
       schema:
         type: string
         format: uuid
+  responses:
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     ApiKeyAuth:
       type: http

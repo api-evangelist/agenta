@@ -1,7 +1,7 @@
-openapi: 3.0.1
+openapi: 3.2.0
 info:
-  title: Agenta Applications OpenTelemetry API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  title: Agenta Open Telemetry API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
   termsOfService: https://agenta.ai/terms
   contact:
     name: Agenta Support
@@ -19,15 +19,15 @@ servers:
 security:
 - ApiKeyAuth: []
 tags:
-- name: OpenTelemetry
+- name: Open Telemetry
   description: Ingest LLM telemetry over OTLP/HTTP.
 paths:
   /otlp/v1/traces:
     post:
       operationId: ingestOtlpTraces
       tags:
-      - OpenTelemetry
-      summary: Ingest traces via OpenTelemetry OTLP/HTTP.
+      - Open Telemetry
+      summary: Ingest traces via OpenTelemetry OTLP/HTTP
       description: OpenTelemetry OTLP/HTTP trace ingestion endpoint. Send OTLP-formatted spans (typically protobuf or JSON over HTTP) here to record LLM telemetry. This is the recommended way to push observability data from instrumented applications and OpenTelemetry exporters.
       requestBody:
         required: true
@@ -51,8 +51,8 @@ paths:
     get:
       operationId: otlpStatusCheck
       tags:
-      - OpenTelemetry
-      summary: Status check for the OTLP traces endpoint.
+      - Open Telemetry
+      summary: Status check for the OTLP traces endpoint
       responses:
         '200':
           description: The endpoint is available.
@@ -60,6 +60,22 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
+    OtlpExportTraceServiceRequest:
+      type: object
+      description: OTLP ExportTraceServiceRequest payload (resource spans). Mirrors the OpenTelemetry trace protocol; see the OpenTelemetry specification for the full structure.
+      properties:
+        resourceSpans:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
     OtlpExportTraceServiceResponse:
       type: object
       properties:
@@ -70,22 +86,6 @@ components:
               type: integer
             errorMessage:
               type: string
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
-    OtlpExportTraceServiceRequest:
-      type: object
-      description: OTLP ExportTraceServiceRequest payload (resource spans). Mirrors the OpenTelemetry trace protocol; see the OpenTelemetry specification for the full structure.
-      properties:
-        resourceSpans:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
   responses:
     Unauthorized:
       description: Missing or invalid API key.

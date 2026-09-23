@@ -1,7 +1,7 @@
-openapi: 3.0.1
+openapi: 3.2.0
 info:
-  title: Agenta Applications Evaluators API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  title: Agenta Evaluators API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
   termsOfService: https://agenta.ai/terms
   contact:
     name: Agenta Support
@@ -27,7 +27,7 @@ paths:
       operationId: queryEvaluators
       tags:
       - Evaluators
-      summary: List and filter evaluators.
+      summary: List and filter evaluators
       requestBody:
         required: false
         content:
@@ -50,7 +50,7 @@ paths:
       operationId: createEvaluator
       tags:
       - Evaluators
-      summary: Create an evaluator.
+      summary: Create an evaluator
       requestBody:
         required: true
         content:
@@ -71,7 +71,7 @@ paths:
       operationId: listEvaluatorCatalogTemplates
       tags:
       - Evaluators
-      summary: List the built-in evaluator catalog templates.
+      summary: List the built-in evaluator catalog templates
       responses:
         '200':
           description: A list of evaluator templates.
@@ -84,14 +84,23 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 components:
-  responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
+    Lifecycle:
+      type: object
+      description: Audit metadata attached to most Agenta resources.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
     EvaluatorCreateRequest:
       type: object
       required:
@@ -109,14 +118,6 @@ components:
             data:
               type: object
               additionalProperties: true
-    EvaluatorQueryRequest:
-      type: object
-      properties:
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
     Evaluator:
       type: object
       properties:
@@ -132,22 +133,6 @@ components:
           additionalProperties: true
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
     EvaluatorTemplate:
       type: object
       properties:
@@ -161,6 +146,13 @@ components:
         settings_schema:
           type: object
           additionalProperties: true
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -181,13 +173,21 @@ components:
           enum:
           - ascending
           - descending
-    Error:
+    EvaluatorQueryRequest:
       type: object
       properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     ApiKeyAuth:
       type: http

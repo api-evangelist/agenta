@@ -1,7 +1,7 @@
-openapi: 3.0.1
+openapi: 3.2.0
 info:
-  title: Agenta Applications Evaluations API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  title: Agenta Evaluations API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
   termsOfService: https://agenta.ai/terms
   contact:
     name: Agenta Support
@@ -27,7 +27,7 @@ paths:
       operationId: queryEvaluationRuns
       tags:
       - Evaluations
-      summary: List and filter evaluation runs.
+      summary: List and filter evaluation runs
       requestBody:
         required: false
         content:
@@ -50,7 +50,7 @@ paths:
       operationId: createEvaluationRun
       tags:
       - Evaluations
-      summary: Create an evaluation run.
+      summary: Create an evaluation run
       description: Starts an evaluation run that executes one or more variants against a testset and scores the outputs with the configured evaluators.
       requestBody:
         required: true
@@ -72,7 +72,7 @@ paths:
       operationId: queryEvaluationResults
       tags:
       - Evaluations
-      summary: Query evaluation results.
+      summary: Query evaluation results
       requestBody:
         required: false
         content:
@@ -95,7 +95,7 @@ paths:
       operationId: queryEvaluationMetrics
       tags:
       - Evaluations
-      summary: Query aggregated evaluation metrics.
+      summary: Query aggregated evaluation metrics
       requestBody:
         required: false
         content:
@@ -115,78 +115,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    EvaluationResultQueryRequest:
-      type: object
-      properties:
-        result:
-          type: object
-          properties:
-            run_id:
-              type: string
-              format: uuid
-        windowing:
-          $ref: '#/components/schemas/Windowing'
-    EvaluationMetricsQueryRequest:
-      type: object
-      properties:
-        metrics:
-          type: object
-          properties:
-            run_id:
-              type: string
-              format: uuid
-    EvaluationRun:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        status:
-          type: string
-          enum:
-          - pending
-          - running
-          - finished
-          - failed
-          - cancelled
-        testset_id:
-          type: string
-          format: uuid
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
-    EvaluationRunQueryRequest:
-      type: object
-      properties:
-        run:
-          type: object
-          properties:
-            application_id:
-              type: string
-              format: uuid
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
-    EvaluationResult:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        run_id:
-          type: string
-          format: uuid
-        scenario_id:
-          type: string
-          format: uuid
-        status:
-          type: string
-        outputs:
-          type: object
-          additionalProperties: true
     Lifecycle:
       type: object
       description: Audit metadata attached to most Agenta resources.
@@ -203,49 +131,20 @@ components:
         updated_by_id:
           type: string
           format: uuid
-    EvaluationMetrics:
+    EvaluationRunQueryRequest:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-        run_id:
-          type: string
-          format: uuid
-        evaluator_slug:
-          type: string
-        value:
-          type: number
-        data:
+        run:
           type: object
-          additionalProperties: true
-    Windowing:
-      type: object
-      description: Cursor / time-window pagination controls.
-      properties:
-        next:
-          type: string
-        limit:
-          type: integer
-          default: 100
-        oldest:
-          type: string
-          format: date-time
-        newest:
-          type: string
-          format: date-time
-        order:
-          type: string
-          enum:
-          - ascending
-          - descending
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
+          properties:
+            application_id:
+              type: string
+              format: uuid
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
     EvaluationRunCreateRequest:
       type: object
       required:
@@ -269,6 +168,107 @@ components:
               items:
                 type: string
                 format: uuid
+    EvaluationRun:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - running
+          - finished
+          - failed
+          - cancelled
+        testset_id:
+          type: string
+          format: uuid
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+    EvaluationResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        scenario_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        outputs:
+          type: object
+          additionalProperties: true
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    Windowing:
+      type: object
+      description: Cursor / time-window pagination controls.
+      properties:
+        next:
+          type: string
+        limit:
+          type: integer
+          default: 100
+        oldest:
+          type: string
+          format: date-time
+        newest:
+          type: string
+          format: date-time
+        order:
+          type: string
+          enum:
+          - ascending
+          - descending
+    EvaluationMetrics:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        evaluator_slug:
+          type: string
+        value:
+          type: number
+        data:
+          type: object
+          additionalProperties: true
+    EvaluationMetricsQueryRequest:
+      type: object
+      properties:
+        metrics:
+          type: object
+          properties:
+            run_id:
+              type: string
+              format: uuid
+    EvaluationResultQueryRequest:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            run_id:
+              type: string
+              format: uuid
+        windowing:
+          $ref: '#/components/schemas/Windowing'
   responses:
     Unauthorized:
       description: Missing or invalid API key.

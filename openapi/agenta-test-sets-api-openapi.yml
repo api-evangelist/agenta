@@ -1,7 +1,7 @@
-openapi: 3.0.1
+openapi: 3.2.0
 info:
-  title: Agenta Applications Testsets API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  title: Agenta Testsets API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
   termsOfService: https://agenta.ai/terms
   contact:
     name: Agenta Support
@@ -19,15 +19,15 @@ servers:
 security:
 - ApiKeyAuth: []
 tags:
-- name: Testsets
+- name: Test Sets
   description: Manage evaluation datasets (testsets).
 paths:
   /testsets/:
     post:
       operationId: createTestset
       tags:
-      - Testsets
-      summary: Create a testset.
+      - Test Sets
+      summary: Create a testset
       requestBody:
         required: true
         content:
@@ -47,8 +47,8 @@ paths:
     post:
       operationId: queryTestsets
       tags:
-      - Testsets
-      summary: List and filter testsets.
+      - Test Sets
+      summary: List and filter testsets
       requestBody:
         required: false
         content:
@@ -70,8 +70,8 @@ paths:
     get:
       operationId: fetchTestset
       tags:
-      - Testsets
-      summary: Fetch a single testset by id.
+      - Test Sets
+      summary: Fetch a single testset by id
       parameters:
       - name: testset_id
         in: path
@@ -94,8 +94,8 @@ paths:
     post:
       operationId: createTestsetFromFile
       tags:
-      - Testsets
-      summary: Create a testset from an uploaded CSV or JSON file.
+      - Test Sets
+      summary: Create a testset from an uploaded CSV or JSON file
       requestBody:
         required: true
         content:
@@ -118,40 +118,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 components:
-  responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: The requested resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
-    Testset:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        name:
-          type: string
-        data:
-          type: object
-          properties:
-            testcases:
-              type: array
-              items:
-                type: object
-                additionalProperties: true
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
     Lifecycle:
       type: object
       description: Audit metadata attached to most Agenta resources.
@@ -168,6 +135,14 @@ components:
         updated_by_id:
           type: string
           format: uuid
+    TestsetQueryRequest:
+      type: object
+      properties:
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
     TestsetCreateRequest:
       type: object
       required:
@@ -190,14 +165,33 @@ components:
                   items:
                     type: object
                     additionalProperties: true
-    TestsetQueryRequest:
+    Testset:
       type: object
       properties:
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        data:
+          type: object
+          properties:
+            testcases:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -218,13 +212,19 @@ components:
           enum:
           - ascending
           - descending
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
+  responses:
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     ApiKeyAuth:
       type: http

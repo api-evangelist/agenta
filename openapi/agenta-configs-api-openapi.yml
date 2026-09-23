@@ -1,7 +1,7 @@
-openapi: 3.0.1
+openapi: 3.2.0
 info:
-  title: Agenta Applications Configs API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability. This specification documents the public cloud REST API surface used to manage applications and variants, fetch and deploy versioned prompt configurations, run evaluations and configure evaluators, manage testsets, and ingest and query observability traces. All endpoints are authenticated with an Agenta API key passed in the Authorization header. Agenta is MIT licensed and may also be self-hosted.
+  title: Agenta Configs API
+  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
   termsOfService: https://agenta.ai/terms
   contact:
     name: Agenta Support
@@ -27,7 +27,7 @@ paths:
       operationId: deployApplicationRevision
       tags:
       - Configs
-      summary: Deploy an application revision to an environment.
+      summary: Deploy an application revision to an environment
       description: Deploys a committed revision to an environment (for example development, staging, or production) so that fetch-config calls scoped to that environment return the deployed configuration.
       requestBody:
         required: true
@@ -49,7 +49,7 @@ paths:
       operationId: fetchConfig
       tags:
       - Configs
-      summary: Fetch a prompt configuration.
+      summary: Fetch a prompt configuration
       description: Fetches the configuration (prompt template, model, and parameters) for a variant or environment reference. Production code uses this endpoint (or the configuration management SDK that wraps it) to pull the latest committed prompt without redeploying. Identify the configuration by application plus environment slug, or by variant reference.
       requestBody:
         required: true
@@ -70,23 +70,42 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
-    DeployRevisionRequest:
+    Lifecycle:
       type: object
-      required:
-      - revision
+      description: Audit metadata attached to most Agenta resources.
       properties:
-        revision:
-          type: object
-          properties:
-            variant_id:
-              type: string
-              format: uuid
-            environment_ref:
-              type: object
-              properties:
-                slug:
-                  type: string
-                  example: production
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
+    Reference:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        version:
+          type: string
+    ConfigFetchRequest:
+      type: object
+      description: Reference identifying which configuration to resolve. Provide either an application + environment reference or a direct variant reference.
+      properties:
+        application_ref:
+          $ref: '#/components/schemas/Reference'
+        variant_ref:
+          $ref: '#/components/schemas/Reference'
+        environment_ref:
+          $ref: '#/components/schemas/Reference'
     PromptConfig:
       type: object
       description: A prompt template plus model and inference parameters.
@@ -132,42 +151,19 @@ components:
               type: array
               items:
                 type: string
-    ConfigFetchRequest:
+    ConfigResponse:
       type: object
-      description: Reference identifying which configuration to resolve. Provide either an application + environment reference or a direct variant reference.
       properties:
+        params:
+          $ref: '#/components/schemas/PromptConfig'
+        url:
+          type: string
         application_ref:
           $ref: '#/components/schemas/Reference'
         variant_ref:
           $ref: '#/components/schemas/Reference'
         environment_ref:
           $ref: '#/components/schemas/Reference'
-    Reference:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        version:
-          type: string
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
     Error:
       type: object
       properties:
@@ -194,28 +190,32 @@ components:
           $ref: '#/components/schemas/PromptConfig'
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
-    ConfigResponse:
+    DeployRevisionRequest:
       type: object
+      required:
+      - revision
       properties:
-        params:
-          $ref: '#/components/schemas/PromptConfig'
-        url:
-          type: string
-        application_ref:
-          $ref: '#/components/schemas/Reference'
-        variant_ref:
-          $ref: '#/components/schemas/Reference'
-        environment_ref:
-          $ref: '#/components/schemas/Reference'
+        revision:
+          type: object
+          properties:
+            variant_id:
+              type: string
+              format: uuid
+            environment_ref:
+              type: object
+              properties:
+                slug:
+                  type: string
+                  example: production
   responses:
-    Unauthorized:
-      description: Missing or invalid API key.
+    NotFound:
+      description: The requested resource was not found.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    NotFound:
-      description: The requested resource was not found.
+    Unauthorized:
+      description: Missing or invalid API key.
       content:
         application/json:
           schema:
