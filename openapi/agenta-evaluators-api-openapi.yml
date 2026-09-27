@@ -85,22 +85,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    Lifecycle:
+    Error:
       type: object
-      description: Audit metadata attached to most Agenta resources.
       properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
+        detail:
+          oneOf:
+          - type: string
+          - type: object
     EvaluatorCreateRequest:
       type: object
       required:
@@ -146,13 +137,30 @@ components:
         settings_schema:
           type: object
           additionalProperties: true
-    Error:
+    Lifecycle:
+      type: object
+      description: Audit metadata attached to most Agenta resources.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
+    EvaluatorQueryRequest:
       type: object
       properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -173,14 +181,6 @@ components:
           enum:
           - ascending
           - descending
-    EvaluatorQueryRequest:
-      type: object
-      properties:
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
   responses:
     Unauthorized:
       description: Missing or invalid API key.

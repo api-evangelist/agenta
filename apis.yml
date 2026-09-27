@@ -239,8 +239,6 @@ apis:
   humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
   baseURL: https://cloud.agenta.ai/api
   tags:
-  - OpenTelemetry
-  tags_raw:
   - Open Telemetry
   properties:
   - type: OpenAPI
@@ -276,8 +274,6 @@ apis:
   humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
   baseURL: https://cloud.agenta.ai/api
   tags:
-  - Testsets
-  tags_raw:
   - Test Sets
   properties:
   - type: OpenAPI

@@ -115,36 +115,29 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
-    EvaluationRunQueryRequest:
+    Error:
       type: object
       properties:
-        run:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    EvaluationMetrics:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        evaluator_slug:
+          type: string
+        value:
+          type: number
+        data:
           type: object
-          properties:
-            application_id:
-              type: string
-              format: uuid
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
+          additionalProperties: true
     EvaluationRunCreateRequest:
       type: object
       required:
@@ -168,27 +161,6 @@ components:
               items:
                 type: string
                 format: uuid
-    EvaluationRun:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        status:
-          type: string
-          enum:
-          - pending
-          - running
-          - finished
-          - failed
-          - cancelled
-        testset_id:
-          type: string
-          format: uuid
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
     EvaluationResult:
       type: object
       properties:
@@ -204,49 +176,6 @@ components:
         status:
           type: string
         outputs:
-          type: object
-          additionalProperties: true
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
-    Windowing:
-      type: object
-      description: Cursor / time-window pagination controls.
-      properties:
-        next:
-          type: string
-        limit:
-          type: integer
-          default: 100
-        oldest:
-          type: string
-          format: date-time
-        newest:
-          type: string
-          format: date-time
-        order:
-          type: string
-          enum:
-          - ascending
-          - descending
-    EvaluationMetrics:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        run_id:
-          type: string
-          format: uuid
-        evaluator_slug:
-          type: string
-        value:
-          type: number
-        data:
           type: object
           additionalProperties: true
     EvaluationMetricsQueryRequest:
@@ -269,6 +198,77 @@ components:
               format: uuid
         windowing:
           $ref: '#/components/schemas/Windowing'
+    EvaluationRunQueryRequest:
+      type: object
+      properties:
+        run:
+          type: object
+          properties:
+            application_id:
+              type: string
+              format: uuid
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
+    EvaluationRun:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - running
+          - finished
+          - failed
+          - cancelled
+        testset_id:
+          type: string
+          format: uuid
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+    Lifecycle:
+      type: object
+      description: Audit metadata attached to most Agenta resources.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
+    Windowing:
+      type: object
+      description: Cursor / time-window pagination controls.
+      properties:
+        next:
+          type: string
+        limit:
+          type: integer
+          default: 100
+        oldest:
+          type: string
+          format: date-time
+        newest:
+          type: string
+          format: date-time
+        order:
+          type: string
+          enum:
+          - ascending
+          - descending
   responses:
     Unauthorized:
       description: Missing or invalid API key.

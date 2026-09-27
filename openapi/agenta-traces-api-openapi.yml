@@ -100,6 +100,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
     Span:
       type: object
       properties:
@@ -130,13 +137,52 @@ components:
           additionalProperties: true
         windowing:
           $ref: '#/components/schemas/Windowing'
-    Error:
+    Trace:
       type: object
       properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
+        trace_id:
+          type: string
+        spans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Span'
+    AnalyticsResponse:
+      type: object
+      properties:
+        buckets:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              total_count:
+                type: integer
+              total_tokens:
+                type: integer
+              total_cost:
+                type: number
+              duration_ms:
+                type: number
+    AnalyticsQueryRequest:
+      type: object
+      properties:
+        filtering:
+          type: object
+          additionalProperties: true
+        time_range:
+          type: object
+          properties:
+            oldest:
+              type: string
+              format: date-time
+            newest:
+              type: string
+              format: date-time
+        interval:
+          type: string
+          example: 1h
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -157,52 +203,6 @@ components:
           enum:
           - ascending
           - descending
-    Trace:
-      type: object
-      properties:
-        trace_id:
-          type: string
-        spans:
-          type: array
-          items:
-            $ref: '#/components/schemas/Span'
-    AnalyticsQueryRequest:
-      type: object
-      properties:
-        filtering:
-          type: object
-          additionalProperties: true
-        time_range:
-          type: object
-          properties:
-            oldest:
-              type: string
-              format: date-time
-            newest:
-              type: string
-              format: date-time
-        interval:
-          type: string
-          example: 1h
-    AnalyticsResponse:
-      type: object
-      properties:
-        buckets:
-          type: array
-          items:
-            type: object
-            properties:
-              timestamp:
-                type: string
-                format: date-time
-              total_count:
-                type: integer
-              total_tokens:
-                type: integer
-              total_cost:
-                type: number
-              duration_ms:
-                type: number
   responses:
     Unauthorized:
       description: Missing or invalid API key.

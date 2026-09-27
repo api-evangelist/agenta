@@ -119,6 +119,55 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    Testset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        data:
+          type: object
+          properties:
+            testcases:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+    TestsetCreateRequest:
+      type: object
+      required:
+      - testset
+      properties:
+        testset:
+          type: object
+          required:
+          - slug
+          properties:
+            slug:
+              type: string
+            name:
+              type: string
+            data:
+              type: object
+              properties:
+                testcases:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
     Lifecycle:
       type: object
       description: Audit metadata attached to most Agenta resources.
@@ -143,55 +192,6 @@ components:
           default: false
         windowing:
           $ref: '#/components/schemas/Windowing'
-    TestsetCreateRequest:
-      type: object
-      required:
-      - testset
-      properties:
-        testset:
-          type: object
-          required:
-          - slug
-          properties:
-            slug:
-              type: string
-            name:
-              type: string
-            data:
-              type: object
-              properties:
-                testcases:
-                  type: array
-                  items:
-                    type: object
-                    additionalProperties: true
-    Testset:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        name:
-          type: string
-        data:
-          type: object
-          properties:
-            testcases:
-              type: array
-              items:
-                type: object
-                additionalProperties: true
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -213,14 +213,14 @@ components:
           - ascending
           - descending
   responses:
-    NotFound:
-      description: The requested resource was not found.
+    Unauthorized:
+      description: Missing or invalid API key.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Missing or invalid API key.
+    NotFound:
+      description: The requested resource was not found.
       content:
         application/json:
           schema:

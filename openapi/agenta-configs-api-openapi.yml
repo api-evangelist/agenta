@@ -70,6 +70,43 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    DeployRevisionRequest:
+      type: object
+      required:
+      - revision
+      properties:
+        revision:
+          type: object
+          properties:
+            variant_id:
+              type: string
+              format: uuid
+            environment_ref:
+              type: object
+              properties:
+                slug:
+                  type: string
+                  example: production
+    ConfigResponse:
+      type: object
+      properties:
+        params:
+          $ref: '#/components/schemas/PromptConfig'
+        url:
+          type: string
+        application_ref:
+          $ref: '#/components/schemas/Reference'
+        variant_ref:
+          $ref: '#/components/schemas/Reference'
+        environment_ref:
+          $ref: '#/components/schemas/Reference'
     Lifecycle:
       type: object
       description: Audit metadata attached to most Agenta resources.
@@ -96,16 +133,6 @@ components:
           type: string
         version:
           type: string
-    ConfigFetchRequest:
-      type: object
-      description: Reference identifying which configuration to resolve. Provide either an application + environment reference or a direct variant reference.
-      properties:
-        application_ref:
-          $ref: '#/components/schemas/Reference'
-        variant_ref:
-          $ref: '#/components/schemas/Reference'
-        environment_ref:
-          $ref: '#/components/schemas/Reference'
     PromptConfig:
       type: object
       description: A prompt template plus model and inference parameters.
@@ -151,26 +178,6 @@ components:
               type: array
               items:
                 type: string
-    ConfigResponse:
-      type: object
-      properties:
-        params:
-          $ref: '#/components/schemas/PromptConfig'
-        url:
-          type: string
-        application_ref:
-          $ref: '#/components/schemas/Reference'
-        variant_ref:
-          $ref: '#/components/schemas/Reference'
-        environment_ref:
-          $ref: '#/components/schemas/Reference'
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
     Revision:
       type: object
       properties:
@@ -190,32 +197,25 @@ components:
           $ref: '#/components/schemas/PromptConfig'
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
-    DeployRevisionRequest:
+    ConfigFetchRequest:
       type: object
-      required:
-      - revision
+      description: Reference identifying which configuration to resolve. Provide either an application + environment reference or a direct variant reference.
       properties:
-        revision:
-          type: object
-          properties:
-            variant_id:
-              type: string
-              format: uuid
-            environment_ref:
-              type: object
-              properties:
-                slug:
-                  type: string
-                  example: production
+        application_ref:
+          $ref: '#/components/schemas/Reference'
+        variant_ref:
+          $ref: '#/components/schemas/Reference'
+        environment_ref:
+          $ref: '#/components/schemas/Reference'
   responses:
-    NotFound:
-      description: The requested resource was not found.
+    Unauthorized:
+      description: Missing or invalid API key.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Missing or invalid API key.
+    NotFound:
+      description: The requested resource was not found.
       content:
         application/json:
           schema:
