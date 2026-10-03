@@ -118,14 +118,20 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 components:
+  responses:
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
     Testset:
       type: object
       properties:
@@ -146,6 +152,42 @@ components:
                 additionalProperties: true
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
+    Windowing:
+      type: object
+      description: Cursor / time-window pagination controls.
+      properties:
+        next:
+          type: string
+        limit:
+          type: integer
+          default: 100
+        oldest:
+          type: string
+          format: date-time
+        newest:
+          type: string
+          format: date-time
+        order:
+          type: string
+          enum:
+          - ascending
+          - descending
+    Lifecycle:
+      type: object
+      description: Audit metadata attached to most Agenta resources.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
     TestsetCreateRequest:
       type: object
       required:
@@ -168,22 +210,6 @@ components:
                   items:
                     type: object
                     additionalProperties: true
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
     TestsetQueryRequest:
       type: object
       properties:
@@ -192,39 +218,13 @@ components:
           default: false
         windowing:
           $ref: '#/components/schemas/Windowing'
-    Windowing:
+    Error:
       type: object
-      description: Cursor / time-window pagination controls.
       properties:
-        next:
-          type: string
-        limit:
-          type: integer
-          default: 100
-        oldest:
-          type: string
-          format: date-time
-        newest:
-          type: string
-          format: date-time
-        order:
-          type: string
-          enum:
-          - ascending
-          - descending
-  responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: The requested resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+        detail:
+          oneOf:
+          - type: string
+          - type: object
   securitySchemes:
     ApiKeyAuth:
       type: http

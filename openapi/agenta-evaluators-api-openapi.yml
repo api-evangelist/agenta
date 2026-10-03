@@ -85,30 +85,19 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    Error:
+    EvaluatorTemplate:
       type: object
       properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
-    EvaluatorCreateRequest:
-      type: object
-      required:
-      - evaluator
-      properties:
-        evaluator:
+        key:
+          type: string
+          example: auto_exact_match
+        name:
+          type: string
+        description:
+          type: string
+        settings_schema:
           type: object
-          required:
-          - slug
-          properties:
-            slug:
-              type: string
-            name:
-              type: string
-            data:
-              type: object
-              additionalProperties: true
+          additionalProperties: true
     Evaluator:
       type: object
       properties:
@@ -124,43 +113,6 @@ components:
           additionalProperties: true
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
-    EvaluatorTemplate:
-      type: object
-      properties:
-        key:
-          type: string
-          example: auto_exact_match
-        name:
-          type: string
-        description:
-          type: string
-        settings_schema:
-          type: object
-          additionalProperties: true
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
-    EvaluatorQueryRequest:
-      type: object
-      properties:
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -181,6 +133,54 @@ components:
           enum:
           - ascending
           - descending
+    Lifecycle:
+      type: object
+      description: Audit metadata attached to most Agenta resources.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
+    EvaluatorCreateRequest:
+      type: object
+      required:
+      - evaluator
+      properties:
+        evaluator:
+          type: object
+          required:
+          - slug
+          properties:
+            slug:
+              type: string
+            name:
+              type: string
+            data:
+              type: object
+              additionalProperties: true
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    EvaluatorQueryRequest:
+      type: object
+      properties:
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
   responses:
     Unauthorized:
       description: Missing or invalid API key.

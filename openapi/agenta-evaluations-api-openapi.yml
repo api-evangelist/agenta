@@ -115,29 +115,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
-    EvaluationMetrics:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        run_id:
-          type: string
-          format: uuid
-        evaluator_slug:
-          type: string
-        value:
-          type: number
-        data:
-          type: object
-          additionalProperties: true
     EvaluationRunCreateRequest:
       type: object
       required:
@@ -161,32 +138,6 @@ components:
               items:
                 type: string
                 format: uuid
-    EvaluationResult:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        run_id:
-          type: string
-          format: uuid
-        scenario_id:
-          type: string
-          format: uuid
-        status:
-          type: string
-        outputs:
-          type: object
-          additionalProperties: true
-    EvaluationMetricsQueryRequest:
-      type: object
-      properties:
-        metrics:
-          type: object
-          properties:
-            run_id:
-              type: string
-              format: uuid
     EvaluationResultQueryRequest:
       type: object
       properties:
@@ -212,6 +163,43 @@ components:
           default: false
         windowing:
           $ref: '#/components/schemas/Windowing'
+    EvaluationResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        scenario_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        outputs:
+          type: object
+          additionalProperties: true
+    Windowing:
+      type: object
+      description: Cursor / time-window pagination controls.
+      properties:
+        next:
+          type: string
+        limit:
+          type: integer
+          default: 100
+        oldest:
+          type: string
+          format: date-time
+        newest:
+          type: string
+          format: date-time
+        order:
+          type: string
+          enum:
+          - ascending
+          - descending
     EvaluationRun:
       type: object
       properties:
@@ -249,26 +237,38 @@ components:
         updated_by_id:
           type: string
           format: uuid
-    Windowing:
+    EvaluationMetricsQueryRequest:
       type: object
-      description: Cursor / time-window pagination controls.
       properties:
-        next:
+        metrics:
+          type: object
+          properties:
+            run_id:
+              type: string
+              format: uuid
+    EvaluationMetrics:
+      type: object
+      properties:
+        id:
           type: string
-        limit:
-          type: integer
-          default: 100
-        oldest:
+          format: uuid
+        run_id:
           type: string
-          format: date-time
-        newest:
+          format: uuid
+        evaluator_slug:
           type: string
-          format: date-time
-        order:
-          type: string
-          enum:
-          - ascending
-          - descending
+        value:
+          type: number
+        data:
+          type: object
+          additionalProperties: true
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
   responses:
     Unauthorized:
       description: Missing or invalid API key.
