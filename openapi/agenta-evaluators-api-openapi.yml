@@ -85,19 +85,22 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    EvaluatorTemplate:
+    Lifecycle:
       type: object
+      description: Audit metadata attached to most Agenta resources.
       properties:
-        key:
+        created_at:
           type: string
-          example: auto_exact_match
-        name:
+          format: date-time
+        updated_at:
           type: string
-        description:
+          format: date-time
+        created_by_id:
           type: string
-        settings_schema:
-          type: object
-          additionalProperties: true
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
     Evaluator:
       type: object
       properties:
@@ -113,6 +116,21 @@ components:
           additionalProperties: true
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
+    EvaluatorQueryRequest:
+      type: object
+      properties:
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -133,22 +151,19 @@ components:
           enum:
           - ascending
           - descending
-    Lifecycle:
+    EvaluatorTemplate:
       type: object
-      description: Audit metadata attached to most Agenta resources.
       properties:
-        created_at:
+        key:
           type: string
-          format: date-time
-        updated_at:
+          example: auto_exact_match
+        name:
           type: string
-          format: date-time
-        created_by_id:
+        description:
           type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
+        settings_schema:
+          type: object
+          additionalProperties: true
     EvaluatorCreateRequest:
       type: object
       required:
@@ -166,21 +181,6 @@ components:
             data:
               type: object
               additionalProperties: true
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
-    EvaluatorQueryRequest:
-      type: object
-      properties:
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
   responses:
     Unauthorized:
       description: Missing or invalid API key.

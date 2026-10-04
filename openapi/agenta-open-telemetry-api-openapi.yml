@@ -60,22 +60,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    OtlpExportTraceServiceRequest:
-      type: object
-      description: OTLP ExportTraceServiceRequest payload (resource spans). Mirrors the OpenTelemetry trace protocol; see the OpenTelemetry specification for the full structure.
-      properties:
-        resourceSpans:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
     OtlpExportTraceServiceResponse:
       type: object
       properties:
@@ -86,6 +70,22 @@ components:
               type: integer
             errorMessage:
               type: string
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - type: object
+    OtlpExportTraceServiceRequest:
+      type: object
+      description: OTLP ExportTraceServiceRequest payload (resource spans). Mirrors the OpenTelemetry trace protocol; see the OpenTelemetry specification for the full structure.
+      properties:
+        resourceSpans:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
   responses:
     Unauthorized:
       description: Missing or invalid API key.

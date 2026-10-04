@@ -100,14 +100,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    SpanQueryRequest:
-      type: object
-      properties:
-        filtering:
-          type: object
-          additionalProperties: true
-        windowing:
-          $ref: '#/components/schemas/Windowing'
     Trace:
       type: object
       properties:
@@ -117,24 +109,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Span'
-    AnalyticsQueryRequest:
-      type: object
-      properties:
-        filtering:
-          type: object
-          additionalProperties: true
-        time_range:
-          type: object
-          properties:
-            oldest:
-              type: string
-              format: date-time
-            newest:
-              type: string
-              format: date-time
-        interval:
-          type: string
-          example: 1h
     AnalyticsResponse:
       type: object
       properties:
@@ -154,26 +128,14 @@ components:
                 type: number
               duration_ms:
                 type: number
-    Windowing:
+    SpanQueryRequest:
       type: object
-      description: Cursor / time-window pagination controls.
       properties:
-        next:
-          type: string
-        limit:
-          type: integer
-          default: 100
-        oldest:
-          type: string
-          format: date-time
-        newest:
-          type: string
-          format: date-time
-        order:
-          type: string
-          enum:
-          - ascending
-          - descending
+        filtering:
+          type: object
+          additionalProperties: true
+        windowing:
+          $ref: '#/components/schemas/Windowing'
     Error:
       type: object
       properties:
@@ -203,6 +165,44 @@ components:
         attributes:
           type: object
           additionalProperties: true
+    Windowing:
+      type: object
+      description: Cursor / time-window pagination controls.
+      properties:
+        next:
+          type: string
+        limit:
+          type: integer
+          default: 100
+        oldest:
+          type: string
+          format: date-time
+        newest:
+          type: string
+          format: date-time
+        order:
+          type: string
+          enum:
+          - ascending
+          - descending
+    AnalyticsQueryRequest:
+      type: object
+      properties:
+        filtering:
+          type: object
+          additionalProperties: true
+        time_range:
+          type: object
+          properties:
+            oldest:
+              type: string
+              format: date-time
+            newest:
+              type: string
+              format: date-time
+        interval:
+          type: string
+          example: 1h
   responses:
     Unauthorized:
       description: Missing or invalid API key.
