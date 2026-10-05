@@ -1,0 +1,46 @@
+slug: agenta
+provider: Agenta
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 3
+edges:
+- tag: Evaluations
+  spec_file: agenta-evaluations-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.78
+  evidence: POST /evaluations/runs/  createEvaluationRun  Create an evaluation run; queryEvaluationMetrics  Query
+    aggregated evaluation metrics
+  reason: Creating and querying LLM evaluation runs, results and metrics is model-quality evaluation within
+    the AI/ML lifecycle (MLOps), which BC-610.60 covers.
+- tag: Evaluators
+  spec_file: agenta-evaluators-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.72
+  evidence: POST /evaluators/  createEvaluator  Create an evaluator; GET /evaluators/catalog/templates/  List
+    the built-in evaluator catalog templates
+  reason: Evaluators are the scoring components used to assess LLM outputs — configuration of AI model
+    evaluation machinery, i.e. AI/ML lifecycle management (MLOps).
+- tag: Applications
+  spec_file: agenta-applications-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.7
+  evidence: 'POST /applications/revisions/commit commitApplicationRevision Commit a new revision of an
+    application variant; schemas: PromptConfig, ApplicationVariant, Revision'
+  reason: Manages LLM applications, their variants and versioned prompt configurations on an open-source
+    LLMOps platform — model/prompt lifecycle and MLOps, i.e. Artificial Intelligence Management. Some
+    ambiguity with generic software engineering surfaces, so 0.7.
