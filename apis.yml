@@ -304,6 +304,8 @@ apis:
   - type: APIReference
     url: https://docs.agenta.ai/reference/api/traces
 common:
+- type: Pricing
+  url: https://agenta.ai/pricing
 - type: CapabilityMap
   url: capabilities/agenta-capability-edges.yml
   name: Agenta Business Capability Map
