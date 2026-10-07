@@ -1,251 +1,69 @@
-# Provenance stamped 2026-10-07 (roadmap#943): written by an API Evangelist sweep (dated 2026-06-20 by the file itself), not
-# harvested from the provider. `method: generated` so the economics campaign may replace it with a
-# dated, verbatim transcription; every figure below is unverified until it does.
-method: generated
-generated: '2026-06-20'
-specification: API Commons Plans
-specificationVersion: '0.1'
-schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
-provider: Agenta
-providerId: agenta
-created: '2026-06-20'
-modified: '2026-06-20'
-reconciled: true
-tags:
-- AI
-- LLMOps
-- Prompt Management
-- LLM Evaluation
-- Observability
-- Plans
-description: >-
-  Agenta is open-source and MIT licensed; the full platform can be self-hosted
-  for free. Agenta Cloud is offered as a managed SaaS with a free Hobby tier and
-  paid Pro, Business, and Enterprise tiers. Cloud pricing is seat-based with
-  included monthly trace and evaluation allowances, retention windows, and
-  overage pricing on additional traces. Self-hosting carries no Agenta license
-  fee - you pay only your own infrastructure and the LLM provider costs.
-notes: >-
-  Verify current tiers, seat counts, trace allowances, retention, and overage
-  rates against the Agenta pricing page during reconciliation; SaaS pricing
-  changes frequently.
+# Pricing transcribed from the provider's own page — see provenance. Numbers are quoted, not derived.
+generated: '2026-10-07'
+method: searched
+source: https://agenta.ai/pricing
 sources:
 - https://agenta.ai/pricing
-- https://docs.agenta.ai/
-- https://github.com/Agenta-AI/agenta
+provenance:
+  tool: all/0-working/economics/harvest_pricing.py
+  run: 20261007T112025
+  grounding: every price_text was found verbatim in the fetched page text
+audience: developer-api
+pricing_basis: tiered-subscription
+delivery:
+  delivery: open-core
+  method: page
+  read: '2026-10-07'
+  evidence: Open source The open-source agent workspace, running on your infrastructure. Free forever
+  free_edition: Open source
+  managed_tier: Pro
+published: true
+note: Cloud tiered subscriptions with agent-run allowances plus overage; free open-source self-hosted
+  edition beside paid Enterprise self-hosted (licence name not stated). Model costs not included.
+plan_count: 6
+currency: USD
 plans:
-- id: agenta-open-source
-  name: Open Source (Self-Hosted)
-  type: free
-  description: >-
-    The complete Agenta platform under the MIT license, deployed on your own
-    infrastructure via Docker Compose or Kubernetes. No Agenta license fee; you
-    bear only hosting and LLM provider costs.
-  entries:
-  - label: Self-Hosted Platform
-    name: self_hosted
-    type: flat
-    metric: license
-    limit: -1
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: $0 (MIT license, self-hosted infrastructure costs apply)
-    userMultiplied: false
-  elements:
-  - name: Prompt Management
-  - name: Prompt Playground
-  - name: LLM Evaluation
-  - name: LLM Observability
-  - name: Testsets
-- id: agenta-hobby
-  name: Hobby
-  type: free
-  description: >-
-    Free managed cloud tier for individuals and small projects.
-  entries:
-  - label: Seats
-    name: seats
-    type: flat
-    metric: seats
-    limit: 2
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: included
-    userMultiplied: false
-  - label: Traces
-    name: traces
-    type: usage
-    metric: traces
-    limit: 5000
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: included
-    userMultiplied: false
-  - label: Evaluations
-    name: evaluations
-    type: usage
-    metric: evaluations
-    limit: 20
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: included
-    userMultiplied: false
-  - label: Data Retention
-    name: retention
-    type: flat
-    metric: days
-    limit: 30
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: included
-    userMultiplied: false
-  elements:
-  - name: Unlimited Prompts
-  - name: Prompt Management
-  - name: Evaluation
-  - name: Observability
-- id: agenta-pro
-  name: Pro
-  type: paid
-  description: >-
-    Paid cloud tier for small teams; $49/month base with additional seats and
-    trace overages billed separately.
-  entries:
-  - label: Base Subscription
-    name: base
-    type: flat
-    metric: subscription
-    limit: -1
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: $49 per month
-    userMultiplied: false
-  - label: Seats
-    name: seats
-    type: flat
-    metric: seats
-    limit: 10
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: 3 included; +$20 per additional seat up to 10 total
-    userMultiplied: true
-  - label: Traces
-    name: traces
-    type: usage
-    metric: traces
-    limit: 10000
-    timeFrame: month
-    geo: global
-    unit: 10000
-    price: 10k included; $5 per additional 10k traces
-    userMultiplied: false
-  - label: Evaluations
-    name: evaluations
-    type: usage
-    metric: evaluations
-    limit: -1
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: unlimited
-    userMultiplied: false
-  - label: Data Retention
-    name: retention
-    type: flat
-    metric: days
-    limit: 90
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: included
-    userMultiplied: false
-  elements:
-  - name: In-App Support
-  - name: Unlimited Evaluations
-- id: agenta-business
-  name: Business
-  type: paid
-  description: >-
-    Higher-volume cloud tier; $399/month with unlimited seats, 1M included
-    traces, RBAC, SSO, SOC 2 reports, and a business SLA.
-  entries:
-  - label: Base Subscription
-    name: base
-    type: flat
-    metric: subscription
-    limit: -1
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: $399 per month
-    userMultiplied: false
-  - label: Seats
-    name: seats
-    type: flat
-    metric: seats
-    limit: -1
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: unlimited
-    userMultiplied: false
-  - label: Traces
-    name: traces
-    type: usage
-    metric: traces
-    limit: 1000000
-    timeFrame: month
-    geo: global
-    unit: 10000
-    price: 1M included; $5 per additional 10k traces
-    userMultiplied: false
-  - label: Data Retention
-    name: retention
-    type: flat
-    metric: days
-    limit: 365
-    timeFrame: month
-    geo: global
-    unit: 1
-    price: included
-    userMultiplied: false
-  elements:
-  - name: Role-Based Access Control
-  - name: Enterprise SSO
-  - name: SOC 2 Reports
-  - name: Business SLA
-- id: agenta-enterprise
-  name: Enterprise
-  type: enterprise
-  description: >-
-    Custom-priced tier with volume pricing, audit logs, custom retention,
-    bring-your-own-cloud deployment, dedicated support, security reviews, and
-    custom SLA / DPA. Contact Agenta sales.
-  entries:
-  - label: Enterprise Agreement
-    name: enterprise
-    type: flat
-    metric: contract
-    limit: -1
-    timeFrame: year
-    geo: global
-    unit: 1
-    price: contact sales
-    userMultiplied: false
-  elements:
-  - name: Volume Pricing
-  - name: Audit Logs
-  - name: Custom Retention
-  - name: Bring-Your-Own-Cloud Deployment
-  - name: Dedicated Support
-  - name: Custom SLA and DPA
-maintainers:
-- FN: Kin Lane
-  email: kin@apievangelist.com
+- name: Hobby
+  price_text: $0 forever
+  price: 0
+  currency: USD
+  period: month
+  unit: agent runs
+  included_quota: 2 team members, unlimited projects/agents/workflows, 5,000 agent runs / month, 1-week
+    trace data retention, 20 evaluations per month
+  overage: Hobby stops running agents after 5,000 agent runs in a monthly billing period
+- name: Pro
+  price_text: $29 /month
+  price: 29
+  currency: USD
+  period: month
+  unit: agent runs
+  included_quota: Unlimited team members, 10,000 agent runs / month, unlimited evaluations, 1-month trace
+    data retention
+  overage: $5 per additional 10,000 runs
+- name: Business
+  price_text: $299 /month
+  price: 299
+  currency: USD
+  period: month
+  unit: agent runs
+  included_quota: 10,000 agent runs / month, RBAC, SSO, SOC 2 Type II report, 3-month trace data retention,
+    priority support
+  overage: $5 per additional 10,000 runs
+- name: Enterprise (Cloud)
+  price_text: Custom
+  period: none
+  included_quota: Everything in Business, plus custom usage and retention, audit logs, custom domains,
+    dedicated support, custom SLA
+- name: Open source (self-hosted)
+  price_text: Free forever
+  period: none
+  included_quota: Unlimited users, projects, agents, workflows, schedules, triggers, RBAC, SSO, tracing,
+    evaluations, Docker Compose deployment
+- name: Enterprise (self-hosted)
+  price_text: Custom
+  period: none
+  included_quota: Everything in Open source, plus audit logs, custom domains, deployment and upgrade support,
+    dedicated support, custom SLA
+rate_limit_statements:
+- Hobby stops running agents after 5,000 agent runs in a monthly billing period.
