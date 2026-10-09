@@ -1,17 +1,19 @@
-generated: '2026-07-15'
+generated: '2026-09-23'
 method: generated
-source: openapi/agenta-openapi.yml
+source: openapi/agenta-applications-api-openapi.yml, openapi/agenta-configs-api-openapi.yml,
+  openapi/agenta-evaluations-api-openapi.yml, openapi/agenta-evaluators-api-openapi.yml, openapi/agenta-open-telemetry-api-openapi.yml,
+  openapi/agenta-test-sets-api-openapi.yml, openapi/agenta-traces-api-openapi.yml
 description: Recommended x-agentic-access execution contracts, classified heuristically from
   the OpenAPI. A governance starting point for exposing this API to AI agents — review and bind
   audience per deployment. See research/curity/agentic-governance/.
 summary:
   operations: 25
   by_action_class:
-    acting: 19
-    connected: 6
+    acting: 9
+    connected: 16
   by_consequence:
-    write: 18
-    read: 6
+    write: 8
+    read: 16
     physical: 1
   human_in_the_loop_required: 0
 operations:
@@ -35,18 +37,12 @@ operations:
   method: post
   operationId: querySimpleApplications
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /simple/applications/{application_id}
   method: get
   operationId: fetchSimpleApplication
@@ -77,18 +73,12 @@ operations:
   method: post
   operationId: queryApplicationVariants
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /applications/variants/{application_variant_id}
   method: get
   operationId: fetchApplicationVariant
@@ -137,53 +127,15 @@ operations:
   method: post
   operationId: fetchConfig
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
-- path: /testsets/
+      max-ttl: 3600
+    audit: none
+- path: /evaluations/runs/query
   method: post
-  operationId: createTestset
-  x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
-    token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
-- path: /testsets/query
-  method: post
-  operationId: queryTestsets
-  x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
-    token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
-- path: /testsets/{testset_id}
-  method: get
-  operationId: fetchTestset
+  operationId: queryEvaluationRuns
   x-agentic-access:
     action-class: connected
     consequence: read
@@ -191,9 +143,9 @@ operations:
     token:
       max-ttl: 3600
     audit: none
-- path: /simple/testsets/upload
+- path: /evaluations/runs/
   method: post
-  operationId: createTestsetFromFile
+  operationId: createEvaluationRun
   x-agentic-access:
     action-class: acting
     consequence: write
@@ -207,22 +159,36 @@ operations:
       - abnormal
       - high-value
     audit: required
+- path: /evaluations/results/query
+  method: post
+  operationId: queryEvaluationResults
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /evaluations/metrics/query
+  method: post
+  operationId: queryEvaluationMetrics
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
 - path: /evaluators/query
   method: post
   operationId: queryEvaluators
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /evaluators/
   method: post
   operationId: createEvaluator
@@ -249,9 +215,9 @@ operations:
     token:
       max-ttl: 3600
     audit: none
-- path: /evaluations/runs/query
+- path: /otlp/v1/traces
   method: post
-  operationId: queryEvaluationRuns
+  operationId: ingestOtlpTraces
   x-agentic-access:
     action-class: acting
     consequence: write
@@ -265,9 +231,19 @@ operations:
       - abnormal
       - high-value
     audit: required
-- path: /evaluations/runs/
+- path: /otlp/v1/traces
+  method: get
+  operationId: otlpStatusCheck
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /testsets/
   method: post
-  operationId: createEvaluationRun
+  operationId: createTestset
   x-agentic-access:
     action-class: acting
     consequence: write
@@ -281,25 +257,29 @@ operations:
       - abnormal
       - high-value
     audit: required
-- path: /evaluations/results/query
+- path: /testsets/query
   method: post
-  operationId: queryEvaluationResults
+  operationId: queryTestsets
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
-- path: /evaluations/metrics/query
+      max-ttl: 3600
+    audit: none
+- path: /testsets/{testset_id}
+  method: get
+  operationId: fetchTestset
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /simple/testsets/upload
   method: post
-  operationId: queryEvaluationMetrics
+  operationId: createTestsetFromFile
   x-agentic-access:
     action-class: acting
     consequence: write
@@ -327,53 +307,15 @@ operations:
   method: post
   operationId: querySpans
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /spans/analytics/query
   method: post
   operationId: querySpanAnalytics
-  x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
-    token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
-- path: /otlp/v1/traces
-  method: post
-  operationId: ingestOtlpTraces
-  x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
-    token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
-- path: /otlp/v1/traces
-  method: get
-  operationId: otlpStatusCheck
   x-agentic-access:
     action-class: connected
     consequence: read
