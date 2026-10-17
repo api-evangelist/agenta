@@ -178,26 +178,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    SimpleApplicationCreateRequest:
-      type: object
-      required:
-      - app
-      properties:
-        app:
-          type: object
-          required:
-          - slug
-          properties:
-            slug:
-              type: string
-              description: URL-friendly unique slug for the application.
-            name:
-              type: string
-            description:
-              type: string
-            flags:
-              type: object
-              additionalProperties: true
     PromptConfig:
       type: object
       description: A prompt template plus model and inference parameters.
@@ -243,61 +223,6 @@ components:
               type: array
               items:
                 type: string
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
-    CommitRevisionRequest:
-      type: object
-      required:
-      - revision
-      properties:
-        revision:
-          type: object
-          properties:
-            slug:
-              type: string
-            variant_id:
-              type: string
-              format: uuid
-            message:
-              type: string
-              description: Commit message describing the change.
-            data:
-              $ref: '#/components/schemas/PromptConfig'
-    VariantQueryRequest:
-      type: object
-      properties:
-        variant:
-          type: object
-          properties:
-            application_id:
-              type: string
-              format: uuid
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
-    SimpleApplicationResponse:
-      type: object
-      properties:
-        count:
-          type: integer
-        application:
-          $ref: '#/components/schemas/Application'
     Error:
       type: object
       properties:
@@ -305,6 +230,23 @@ components:
           oneOf:
           - type: string
           - type: object
+    Application:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        flags:
+          type: object
+          additionalProperties: true
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
     Windowing:
       type: object
       description: Cursor / time-window pagination controls.
@@ -325,6 +267,31 @@ components:
           enum:
           - ascending
           - descending
+    SimpleApplicationResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        application:
+          $ref: '#/components/schemas/Application'
+    CommitRevisionRequest:
+      type: object
+      required:
+      - revision
+      properties:
+        revision:
+          type: object
+          properties:
+            slug:
+              type: string
+            variant_id:
+              type: string
+              format: uuid
+            message:
+              type: string
+              description: Commit message describing the change.
+            data:
+              $ref: '#/components/schemas/PromptConfig'
     SimpleApplicationEditRequest:
       type: object
       properties:
@@ -335,6 +302,26 @@ components:
               type: string
             description:
               type: string
+    SimpleApplicationCreateRequest:
+      type: object
+      required:
+      - app
+      properties:
+        app:
+          type: object
+          required:
+          - slug
+          properties:
+            slug:
+              type: string
+              description: URL-friendly unique slug for the application.
+            name:
+              type: string
+            description:
+              type: string
+            flags:
+              type: object
+              additionalProperties: true
     ApplicationQueryRequest:
       type: object
       properties:
@@ -349,38 +336,22 @@ components:
           default: false
         windowing:
           $ref: '#/components/schemas/Windowing'
-    ApplicationVariant:
+    Lifecycle:
       type: object
+      description: Audit metadata attached to most Agenta resources.
       properties:
-        id:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
           type: string
           format: uuid
-        slug:
-          type: string
-        name:
-          type: string
-        application_id:
+        updated_by_id:
           type: string
           format: uuid
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
-    Application:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        flags:
-          type: object
-          additionalProperties: true
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
     Revision:
       type: object
       properties:
@@ -400,6 +371,48 @@ components:
           $ref: '#/components/schemas/PromptConfig'
         lifecycle:
           $ref: '#/components/schemas/Lifecycle'
+    ApplicationVariant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        application_id:
+          type: string
+          format: uuid
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+    VariantQueryRequest:
+      type: object
+      properties:
+        variant:
+          type: object
+          properties:
+            application_id:
+              type: string
+              format: uuid
+        include_archived:
+          type: boolean
+          default: false
+        windowing:
+          $ref: '#/components/schemas/Windowing'
+  responses:
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   parameters:
     ApplicationId:
       name: application_id
@@ -408,19 +421,6 @@ components:
       schema:
         type: string
         format: uuid
-  responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: The requested resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   securitySchemes:
     ApiKeyAuth:
       type: http

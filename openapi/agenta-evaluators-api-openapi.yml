@@ -85,37 +85,23 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    Lifecycle:
+    EvaluatorCreateRequest:
       type: object
-      description: Audit metadata attached to most Agenta resources.
+      required:
+      - evaluator
       properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
-    Evaluator:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        name:
-          type: string
-        data:
+        evaluator:
           type: object
-          additionalProperties: true
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
+          required:
+          - slug
+          properties:
+            slug:
+              type: string
+            name:
+              type: string
+            data:
+              type: object
+              additionalProperties: true
     EvaluatorQueryRequest:
       type: object
       properties:
@@ -164,23 +150,37 @@ components:
         settings_schema:
           type: object
           additionalProperties: true
-    EvaluatorCreateRequest:
+    Lifecycle:
       type: object
-      required:
-      - evaluator
+      description: Audit metadata attached to most Agenta resources.
       properties:
-        evaluator:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_id:
+          type: string
+          format: uuid
+        updated_by_id:
+          type: string
+          format: uuid
+    Evaluator:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        data:
           type: object
-          required:
-          - slug
-          properties:
-            slug:
-              type: string
-            name:
-              type: string
-            data:
-              type: object
-              additionalProperties: true
+          additionalProperties: true
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
   responses:
     Unauthorized:
       description: Missing or invalid API key.
