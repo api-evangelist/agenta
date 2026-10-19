@@ -1,0 +1,1101 @@
+openapi: 3.2.0
+info:
+  title: Agenta Skills API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Skills
+paths:
+  /skills/sources/scan:
+    post:
+      tags:
+      - Skills
+      summary: Scan Skill Source
+      description: 'Preview a repo/marketplace as skill candidates — no writes.
+
+
+        Detects the layout (Claude marketplace manifest, single skill, or a
+
+        multi-skill tree), parses every candidate, and reports per-candidate
+
+        validity, issues, and skipped-file warnings — exactly what the import
+
+        drawer renders.'
+      operationId: scan_skill_source
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillSourceScanRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceScanResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/{skill_id}/updates/check:
+    post:
+      tags:
+      - Skills
+      summary: Check Skill Update
+      description: 'Read-only: compare one imported skill against its upstream origin.
+
+
+        Reports `update_available`, `up_to_date`, `detached` (edited locally —
+
+        never overwritten), `missing_in_source`, or `invalid_in_source`.
+
+        Nothing is written.'
+      operationId: check_skill_update
+      parameters:
+      - name: skill_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Skill Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCheckResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/{skill_id}/updates/apply:
+    post:
+      tags:
+      - Skills
+      summary: Apply Skill Update
+      description: 'Commit the upstream version of one imported skill as a new revision.
+
+
+        The commit uses the current head as its base, so a concurrent edit
+
+        conflicts instead of being overwritten; locally edited skills report
+
+        `detached` and are never touched.'
+      operationId: apply_skill_update
+      parameters:
+      - name: skill_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Skill Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateApplyResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/sources:
+    post:
+      tags:
+      - Skills
+      summary: Import Skill Source
+      description: 'Import selected skills from a repo/marketplace as registry skills.
+
+
+        Each selected valid candidate becomes an ordinary skill workflow
+
+        (v1); provenance is recorded so sync can offer new versions later.
+
+        Snapshot-only — nothing runs from the source.'
+      operationId: import_skill_source
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillSourceImportRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/:
+    post:
+      tags:
+      - Skills
+      summary: Create Skill
+      description: 'Create a registry skill.
+
+
+        The server owns the invariants: the payload validates against the
+
+        SkillTemplate contract, the storage slug is generated (display names
+
+        may collide), and the skill flags + builtin URI are stamped on both
+
+        the artifact and the v1 revision.'
+      operationId: create_skill
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillCreateResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/{skill_id}/revisions/commit:
+    post:
+      tags:
+      - Skills
+      summary: Commit Skill Revision
+      description: 'Commit a new revision of one skill.
+
+
+        Validated server-side; pass `base_revision_id` so a concurrent edit
+
+        answers 409 (`revision_conflict`) instead of being overwritten.'
+      operationId: commit_skill_revision
+      parameters:
+      - name: skill_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Skill Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillCommitRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillCommitResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/{skill_id}/revisions/log:
+    post:
+      tags:
+      - Skills
+      summary: Log Skill Revisions
+      description: The skill's revision history, newest first, with stored content per row.
+      operationId: log_skill_revisions
+      parameters:
+      - name: skill_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Skill Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillRevisionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/{skill_id}/archive:
+    post:
+      tags:
+      - Skills
+      summary: Archive Skill
+      description: Archive a skill (its slug stays reserved; unarchive restores it).
+      operationId: archive_skill
+      parameters:
+      - name: skill_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Skill Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillCreateResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/{skill_id}/unarchive:
+    post:
+      tags:
+      - Skills
+      summary: Unarchive Skill
+      description: Restore an archived skill with its full history.
+      operationId: unarchive_skill
+      parameters:
+      - name: skill_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Skill Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillCreateResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/{skill_id}/referenced-by:
+    get:
+      tags:
+      - Skills
+      summary: List Skill Referenced By
+      description: 'The agents referencing this skill, with `mode` "latest" (follows the
+
+        head) or "pinned" (revision reference with `pinned_version`).'
+      operationId: list_skill_referenced_by
+      parameters:
+      - name: skill_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Skill Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillReferencedByResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /skills/query:
+    post:
+      tags:
+      - Skills
+      summary: Query Registry Skills
+      description: 'List the project''s skill registry.
+
+
+        `skills` is the paginated, database-backed block (head revision per
+
+        skill workflow, filtered in SQL); `builtin` is the code-defined Agenta
+
+        block, returned whole and unpaginated. `search` matches the workflow
+
+        name and description.'
+      operationId: query_registry_skills
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillsQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    SkillRevisionRow:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        workflow_variant_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Id
+        skill:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Skill
+      type: object
+      title: SkillRevisionRow
+    SkippedSkill:
+      properties:
+        path_in_repo:
+          type: string
+          title: Path In Repo
+        issues:
+          items:
+            $ref: '#/components/schemas/SkillIssue'
+          type: array
+          title: Issues
+          default: []
+      type: object
+      required:
+      - path_in_repo
+      title: SkippedSkill
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    SkillsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        skills:
+          items:
+            $ref: '#/components/schemas/SkillRegistryItem'
+          type: array
+          title: Skills
+          default: []
+        builtin:
+          items:
+            $ref: '#/components/schemas/SkillRegistryItem'
+          type: array
+          title: Builtin
+          default: []
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SkillsResponse
+    ScanResult:
+      properties:
+        layout:
+          type: string
+          title: Layout
+          default: none
+        candidates:
+          items:
+            $ref: '#/components/schemas/ScanCandidate'
+          type: array
+          title: Candidates
+          default: []
+        issues:
+          items:
+            $ref: '#/components/schemas/SkillIssue'
+          type: array
+          title: Issues
+          default: []
+      type: object
+      title: ScanResult
+    UpdateCheckResult:
+      properties:
+        workflow_id:
+          type: string
+          title: Workflow Id
+        status:
+          type: string
+          title: Status
+        resolved_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolved Version
+        issues:
+          items:
+            $ref: '#/components/schemas/SkillIssue'
+          type: array
+          title: Issues
+          default: []
+      type: object
+      required:
+      - workflow_id
+      - status
+      title: UpdateCheckResult
+    SourceScanResult:
+      properties:
+        repo_url:
+          type: string
+          title: Repo Url
+        ref:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ref
+        commit_sha:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Commit Sha
+        scan:
+          $ref: '#/components/schemas/ScanResult'
+        already_imported_paths:
+          items:
+            type: string
+          type: array
+          title: Already Imported Paths
+          default: []
+      type: object
+      required:
+      - repo_url
+      - scan
+      title: SourceScanResult
+    UpdateApplyResult:
+      properties:
+        workflow_id:
+          type: string
+          title: Workflow Id
+        status:
+          type: string
+          title: Status
+        revision_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Revision Id
+        resolved_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolved Version
+        issues:
+          items:
+            $ref: '#/components/schemas/SkillIssue'
+          type: array
+          title: Issues
+          default: []
+      type: object
+      required:
+      - workflow_id
+      - status
+      title: UpdateApplyResult
+    SkillIssue:
+      properties:
+        code:
+          type: string
+          title: Code
+        message:
+          type: string
+          title: Message
+        path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      type: object
+      required:
+      - code
+      - message
+      title: SkillIssue
+    SkillCreateResponse:
+      properties:
+        workflow_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        revision_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Revision Id
+      type: object
+      title: SkillCreateResponse
+    SkillCommitResponse:
+      properties:
+        workflow_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Id
+        revision_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Revision Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+      type: object
+      title: SkillCommitResponse
+    SkillRevisionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        revisions:
+          items:
+            $ref: '#/components/schemas/SkillRevisionRow'
+          type: array
+          title: Revisions
+          default: []
+      type: object
+      title: SkillRevisionsResponse
+    SkillSourceScanRequest:
+      properties:
+        repo_url:
+          type: string
+          title: Repo Url
+        ref:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ref
+      type: object
+      required:
+      - repo_url
+      title: SkillSourceScanRequest
+    ParsedSkill:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        body:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Body
+        disable_model_invocation:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Disable Model Invocation
+        files:
+          items:
+            $ref: '#/components/schemas/ParsedSkillFile'
+          type: array
+          title: Files
+          default: []
+      type: object
+      title: ParsedSkill
+    SkillCommitRequest:
+      properties:
+        skill:
+          additionalProperties: true
+          type: object
+          title: Skill
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        base_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Base Revision Id
+      type: object
+      required:
+      - skill
+      title: SkillCommitRequest
+    ImportResult:
+      properties:
+        repo_url:
+          type: string
+          title: Repo Url
+        commit_sha:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Commit Sha
+        imported:
+          items:
+            $ref: '#/components/schemas/ImportedSkill'
+          type: array
+          title: Imported
+          default: []
+        skipped:
+          items:
+            $ref: '#/components/schemas/SkippedSkill'
+          type: array
+          title: Skipped
+          default: []
+      type: object
+      required:
+      - repo_url
+      title: ImportResult
+    SkillSourceImportRequest:
+      properties:
+        repo_url:
+          type: string
+          title: Repo Url
+        ref:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ref
+        paths:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Paths
+      type: object
+      required:
+      - repo_url
+      title: SkillSourceImportRequest
+    SkillCreateRequest:
+      properties:
+        skill:
+          additionalProperties: true
+          type: object
+          title: Skill
+      type: object
+      required:
+      - skill
+      title: SkillCreateRequest
+    ParsedSkillFile:
+      properties:
+        path:
+          type: string
+          title: Path
+        content:
+          type: string
+          title: Content
+        executable:
+          type: boolean
+          title: Executable
+          default: false
+      type: object
+      required:
+      - path
+      - content
+      title: ParsedSkillFile
+    SkillUsageItem:
+      properties:
+        agent_workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Workflow Id
+        agent_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Slug
+        agent_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Name
+        mode:
+          type: string
+          title: Mode
+          default: latest
+        pinned_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pinned Version
+      type: object
+      title: SkillUsageItem
+    SkillsQueryRequest:
+      properties:
+        search:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SkillsQueryRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    SkillOriginInfo:
+      properties:
+        provider:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider
+        repository:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Repository
+        ref:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ref
+        path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+        resolved_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolved Version
+        imported_at_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Imported At Url
+        detached:
+          type: boolean
+          title: Detached
+          default: false
+      type: object
+      title: SkillOriginInfo
+    SkillRegistryItem:
+      properties:
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        head_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Head Revision Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+        archived:
+          type: boolean
+          title: Archived
+          default: false
+        skill_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Skill Name
+        skill_description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Skill Description
+        files_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Files Count
+        used_by_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Used By Count
+        origin:
+          anyOf:
+          - $ref: '#/components/schemas/SkillOriginInfo'
+          - type: 'null'
+      type: object
+      title: SkillRegistryItem
+      description: 'One registry row: the skill''s workflow identity plus its head revision.
+
+
+        `name`/`description` come from the ARTIFACT (the display identity);
+
+        `skill_name`/`skill_description` from the head revision''s skill payload —
+
+        they normally agree, but the artifact is authoritative for display.'
+    SkillReferencedByResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        referenced_by:
+          items:
+            $ref: '#/components/schemas/SkillUsageItem'
+          type: array
+          title: Referenced By
+          default: []
+      type: object
+      title: SkillReferencedByResponse
+    ImportedSkill:
+      properties:
+        path_in_repo:
+          type: string
+          title: Path In Repo
+        workflow_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      type: object
+      required:
+      - path_in_repo
+      title: ImportedSkill
+    ScanCandidate:
+      properties:
+        path_in_repo:
+          type: string
+          title: Path In Repo
+        valid:
+          type: boolean
+          title: Valid
+          default: false
+        skill:
+          anyOf:
+          - $ref: '#/components/schemas/ParsedSkill'
+          - type: 'null'
+        issues:
+          items:
+            $ref: '#/components/schemas/SkillIssue'
+          type: array
+          title: Issues
+          default: []
+        warnings:
+          items:
+            $ref: '#/components/schemas/SkillIssue'
+          type: array
+          title: Warnings
+          default: []
+      type: object
+      required:
+      - path_in_repo
+      title: ScanCandidate
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

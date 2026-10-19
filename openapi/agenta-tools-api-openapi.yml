@@ -1,0 +1,2101 @@
+openapi: 3.2.0
+info:
+  title: Agenta Tools API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Tools
+  description: External tool connections and OAuth integrations available to applications.
+paths:
+  /tools/catalog/providers/:
+    get:
+      tags:
+      - Tools
+      summary: List Providers
+      operationId: list_tool_providers
+      parameters:
+      - name: full_details
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Full Details
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCatalogProvidersResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/catalog/providers/{provider_key}:
+    get:
+      tags:
+      - Tools
+      summary: Get Provider
+      operationId: fetch_tool_provider
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: full_details
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+          title: Full Details
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCatalogProviderResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/catalog/providers/{provider_key}/integrations/:
+    get:
+      tags:
+      - Tools
+      summary: List Integrations
+      operationId: list_tool_integrations
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
+      - name: sort_by
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sort By
+      - name: category
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+      - name: full_details
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Full Details
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCatalogIntegrationsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/catalog/providers/{provider_key}/categories/:
+    get:
+      tags:
+      - Tools
+      summary: List Categories
+      operationId: list_tool_categories
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCatalogCategoriesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/catalog/providers/{provider_key}/integrations/{integration_key}:
+    get:
+      tags:
+      - Tools
+      summary: Get Integration
+      operationId: fetch_tool_integration
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: integration_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Integration Key
+      - name: full_details
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+          title: Full Details
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCatalogIntegrationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/catalog/providers/{provider_key}/integrations/{integration_key}/actions/:
+    get:
+      tags:
+      - Tools
+      summary: List Actions
+      operationId: list_tool_actions
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: integration_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Integration Key
+      - name: query
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Query
+      - name: categories
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Categories
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+      - name: full_details
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Full Details
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCatalogActionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/catalog/providers/{provider_key}/integrations/{integration_key}/actions/{action_key}:
+    get:
+      tags:
+      - Tools
+      summary: Get Action
+      operationId: fetch_tool_action
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: integration_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Integration Key
+      - name: action_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Action Key
+      - name: full_details
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+          title: Full Details
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCatalogActionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/connections/query:
+    post:
+      tags:
+      - Tools
+      summary: Query Connections
+      description: Query connections with optional filtering.
+      operationId: query_tool_connections
+      parameters:
+      - name: provider_key
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider Key
+      - name: integration_key
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolConnectionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/connections/:
+    post:
+      tags:
+      - Tools
+      summary: Create Connection
+      description: Create a new tool connection.
+      operationId: create_tool_connection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolConnectionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/connections/callback:
+    get:
+      tags:
+      - Tools
+      summary: Callback Connection
+      description: Handle OAuth callback from Composio.
+      operationId: callback_tool_connection
+      parameters:
+      - name: connected_account_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Connected Account Id
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+      - name: error_message
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Message
+      - name: state
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: State
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/connections/{connection_id}:
+    get:
+      tags:
+      - Tools
+      summary: Get Connection
+      description: Get a connection by ID.
+      operationId: fetch_tool_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Tools
+      summary: Delete Connection
+      description: Delete a connection by ID.
+      operationId: delete_tool_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/connections/{connection_id}/refresh:
+    post:
+      tags:
+      - Tools
+      summary: Refresh Connection
+      description: Refresh a connection's credentials.
+      operationId: refresh_tool_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      - name: force
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Force
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/connections/{connection_id}/revoke:
+    post:
+      tags:
+      - Tools
+      summary: Revoke Connection
+      description: Mark a connection invalid locally (does not revoke at the provider).
+      operationId: revoke_tool_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/resolve:
+    post:
+      tags:
+      - Tools
+      summary: Resolve Tools
+      description: 'Resolve an agent''s tool references into model-ready specs.
+
+
+        Validates Composio connections up front and enriches each action from the
+
+        catalog, so a running agent (e.g. Pi) gets ``customTools`` whose ``execute``
+
+        routes back through ``POST /tools/call`` — provider keys stay server-side.'
+      operationId: resolve_tools
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolResolveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolResolveResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/discover:
+    post:
+      tags:
+      - Tools
+      summary: Discover Capabilities
+      description: 'Discover the tools that fit a set of use cases, translated to Agenta terms.
+
+
+        Wraps the provider''s semantic search and reports each integration''s connection
+
+        state for the calling project. Read-only; project scope comes from caller auth.
+
+        See ``docs/design/agent-workflows/projects/tool-discovery/design.md``.'
+      operationId: discover_tool_capabilities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapabilitiesQuery'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilitiesResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tools/call:
+    post:
+      tags:
+      - Tools
+      summary: Call Tool
+      description: Call a tool action with a connection.
+      operationId: call_tool
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolCall'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCallResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ToolConnectionState:
+      type: string
+      enum:
+      - ready
+      - needs_auth
+      - needs_input
+      title: ToolConnectionState
+      description: 'The connection state of one integration, derived per the design''s state
+
+        machine. ``ready`` reuses an existing connection; the other two need a human.'
+    ToolResult:
+      properties:
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/Status'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/ToolResultData'
+          - type: 'null'
+      type: object
+      title: ToolResult
+      description: Response envelope with Agenta identity, status, and the OpenAI tool message.
+    ResolvedTool:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        input_schema:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Input Schema
+        call_ref:
+          type: string
+          title: Call Ref
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+      type: object
+      required:
+      - name
+      - call_ref
+      title: ResolvedTool
+      description: 'A runnable reference resolved into a model-ready tool spec.
+
+
+        ``call_ref`` is the ``tools.{provider}.{integration}.{action}.{connection}`` slug
+
+        the execution bridge sends back to ``POST /tools/call``.'
+    GatewayConnectionToolConfig:
+      properties:
+        type:
+          type: string
+          const: gateway_connection
+          title: Type
+          default: gateway_connection
+        connection:
+          $ref: '#/components/schemas/GatewayConnectionRef'
+        policy:
+          $ref: '#/components/schemas/GatewayConnectionPolicy'
+      additionalProperties: false
+      type: object
+      required:
+      - connection
+      title: GatewayConnectionToolConfig
+      description: 'One whole integration, with a policy the SDK compiles into per-tool decisions.
+
+
+        Replaces the one-entry-per-tool :class:`GatewayToolConfig`, which stays readable while
+
+        saved revisions migrate. The entry carries no credentials, provider account IDs, tool
+
+        schemas, or read-only hints: those are resolved data, not authored configuration.
+
+
+        It does not extend :class:`ToolConfigBase`. That base carries a per-tool ``render`` and
+
+        ``permission``, and an entry that covers a whole integration has no single tool to apply
+
+        either to. Every permission here lives in ``policy``, so a top-level one is refused
+
+        instead of accepted and then ignored, which would let an author believe a `deny` applies
+
+        when nothing reads it. The deleted legacy permission spellings are refused here for the
+
+        same reason, rather than dropped in silence as they are on the other arms.'
+    ConnectionRequirement:
+      properties:
+        integration:
+          type: string
+          title: Integration
+        state:
+          $ref: '#/components/schemas/ToolConnectionState'
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        connect:
+          anyOf:
+          - $ref: '#/components/schemas/ConnectAffordance'
+          - type: 'null'
+      type: object
+      required:
+      - integration
+      - state
+      title: ConnectionRequirement
+      description: One integration's connection state, deduped across the result.
+    ToolCatalogActionDetails:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        categories:
+          items:
+            type: string
+          type: array
+          title: Categories
+          default: []
+        logo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo
+        provider_action_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider Action Id
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        scopes:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Scopes
+      type: object
+      required:
+      - key
+      - name
+      title: ToolCatalogActionDetails
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ToolCatalogProvidersResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        providers:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ToolCatalogProvider'
+            - $ref: '#/components/schemas/ToolCatalogProviderDetails'
+          type: array
+          title: Providers
+          default: []
+      type: object
+      title: ToolCatalogProvidersResponse
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    DiscoveredTool:
+      properties:
+        type:
+          type: string
+          const: gateway
+          title: Type
+          default: gateway
+        provider:
+          type: string
+          title: Provider
+          default: composio
+        integration:
+          type: string
+          title: Integration
+        action:
+          type: string
+          title: Action
+        connection:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Connection
+        input_schema:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Input Schema
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        provider_action:
+          type: string
+          title: Provider Action
+      type: object
+      required:
+      - integration
+      - action
+      - provider_action
+      title: DiscoveredTool
+      description: 'A discovered tool, already shaped as a ``GatewayToolConfig`` plus the
+
+        model-facing extras the setup agent needs. ``connection`` is filled only when
+
+        the integration''s state is ``ready``; otherwise the agent resolves it first.'
+    ResolvedGatewayConnection:
+      properties:
+        provider:
+          type: string
+          title: Provider
+        integration:
+          type: string
+          title: Integration
+        connection:
+          type: string
+          title: Connection
+        toolkit_version:
+          type: string
+          title: Toolkit Version
+        tools:
+          items:
+            $ref: '#/components/schemas/ResolvedGatewayTool'
+          type: array
+          title: Tools
+      type: object
+      required:
+      - provider
+      - integration
+      - connection
+      - toolkit_version
+      title: ResolvedGatewayConnection
+      description: 'The catalog slice for one validated connection entry (contracts section 3).
+
+
+        The whole integration is returned in one round trip, so the SDK compiles its
+
+        per-tool policy without asking for each tool separately.'
+    GatewayConnectionPolicy:
+      properties:
+        permissions:
+          $ref: '#/components/schemas/GatewayPermissions'
+      additionalProperties: false
+      type: object
+      title: GatewayConnectionPolicy
+      description: 'The ``policy`` node of the saved entry. It mirrors the saved nesting and holds one
+
+        field on purpose, so a later policy of a different kind has a place to go.'
+    ToolCall:
+      properties:
+        data:
+          $ref: '#/components/schemas/ToolCallData'
+        context:
+          anyOf:
+          - $ref: '#/components/schemas/ToolCallContext'
+          - type: 'null'
+      type: object
+      required:
+      - data
+      title: ToolCall
+      description: Request envelope — wraps the raw OpenAI tool call.
+    BuiltinToolConfig:
+      properties:
+        render:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Render
+        permission:
+          anyOf:
+          - type: string
+            enum:
+            - allow
+            - ask
+            - deny
+          - type: 'null'
+          title: Permission
+        type:
+          type: string
+          const: builtin
+          title: Type
+          default: builtin
+        name:
+          type: string
+          minLength: 1
+          title: Name
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      title: BuiltinToolConfig
+      description: 'Legacy entry, accepted so revisions written before the rework still parse.
+
+
+        Built-in tools are always active and are no longer configured here; the resolver drops
+
+        every entry with a warning. Keep this arm until the dual-read window closes.'
+    ConnectAffordance:
+      properties:
+        endpoint:
+          type: string
+          title: Endpoint
+          default: POST /tools/connections/
+        body:
+          additionalProperties: true
+          type: object
+          title: Body
+      type: object
+      required:
+      - body
+      title: ConnectAffordance
+      description: 'The Agenta create-connection call to run when a connection is missing.
+
+
+        Speaks Agenta, not Composio: it points at ``POST /tools/connections/`` (which
+
+        returns a ``redirect_url``), never at ``COMPOSIO_MANAGE_CONNECTIONS``.'
+    ToolCatalogProviderDetails:
+      properties:
+        key:
+          $ref: '#/components/schemas/ToolProviderKind'
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        integrations_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Integrations Count
+        integrations:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ToolCatalogIntegration'
+            type: array
+          - type: 'null'
+          title: Integrations
+      type: object
+      required:
+      - key
+      - name
+      title: ToolCatalogProviderDetails
+    ToolConnectionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        connection:
+          anyOf:
+          - $ref: '#/components/schemas/ToolConnection'
+          - type: 'null'
+      type: object
+      title: ToolConnectionResponse
+    ToolCatalogProvider:
+      properties:
+        key:
+          $ref: '#/components/schemas/ToolProviderKind'
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        integrations_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Integrations Count
+      type: object
+      required:
+      - key
+      - name
+      title: ToolCatalogProvider
+    GatewayToolConfig:
+      properties:
+        render:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Render
+        permission:
+          anyOf:
+          - type: string
+            enum:
+            - allow
+            - ask
+            - deny
+          - type: 'null'
+          title: Permission
+        type:
+          type: string
+          const: gateway
+          title: Type
+          default: gateway
+        provider:
+          type: string
+          minLength: 1
+          title: Provider
+          default: composio
+        integration:
+          type: string
+          minLength: 1
+          title: Integration
+        action:
+          type: string
+          minLength: 1
+          title: Action
+        connection:
+          type: string
+          minLength: 1
+          title: Connection
+        name:
+          anyOf:
+          - type: string
+            minLength: 1
+          - type: 'null'
+          title: Name
+      additionalProperties: false
+      type: object
+      required:
+      - integration
+      - action
+      - connection
+      title: GatewayToolConfig
+    GatewayPermissions:
+      properties:
+        default:
+          type: string
+          enum:
+          - inherit
+          - allow
+          - ask
+          - deny
+          - allow_reads
+          title: Default
+          default: inherit
+        tools:
+          additionalProperties:
+            type: string
+            enum:
+            - inherit
+            - allow
+            - ask
+            - deny
+            - allow_reads
+          propertyNames:
+            minLength: 1
+          type: object
+          title: Tools
+      additionalProperties: false
+      type: object
+      title: GatewayPermissions
+      description: What the agent may do through one connection, per tool key.
+    ToolCatalogAction:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        categories:
+          items:
+            type: string
+          type: array
+          title: Categories
+          default: []
+        logo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo
+        provider_action_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider Action Id
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+      type: object
+      required:
+      - key
+      - name
+      title: ToolCatalogAction
+    ToolConnectionCreate:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        provider_key:
+          $ref: '#/components/schemas/ToolProviderKind'
+        integration_key:
+          type: string
+          title: Integration Key
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/ToolConnectionCreateData'
+          - type: 'null'
+      type: object
+      required:
+      - provider_key
+      - integration_key
+      title: ToolConnectionCreate
+    ToolCatalogCategory:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - id
+      - name
+      title: ToolCatalogCategory
+    ToolCatalogIntegrationResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        integration:
+          anyOf:
+          - $ref: '#/components/schemas/ToolCatalogIntegration'
+          - $ref: '#/components/schemas/ToolCatalogIntegrationDetails'
+          - type: 'null'
+          title: Integration
+      type: object
+      title: ToolCatalogIntegrationResponse
+    ToolConnectionStatus:
+      properties:
+        redirect_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Redirect Url
+      type: object
+      title: ToolConnectionStatus
+    CapabilityGuidance:
+      properties:
+        plan_steps:
+          items:
+            type: string
+          type: array
+          title: Plan Steps
+        pitfalls:
+          items:
+            type: string
+          type: array
+          title: Pitfalls
+      type: object
+      title: CapabilityGuidance
+      description: 'Structured operating knowledge the setup agent composes into ``agents_md``.
+
+
+        Composio slugs in the text are mapped to the same ``integration.action`` names
+
+        used elsewhere, so nothing Composio leaks.'
+    JsonSchemas-Output:
+      properties:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: JsonSchemas
+    ToolCatalogActionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        total:
+          type: integer
+          title: Total
+          default: 0
+        cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+        actions:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ToolCatalogAction'
+            - $ref: '#/components/schemas/ToolCatalogActionDetails'
+          type: array
+          title: Actions
+          default: []
+      type: object
+      title: ToolCatalogActionsResponse
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    ToolConnection:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        provider_key:
+          $ref: '#/components/schemas/ToolProviderKind'
+        integration_key:
+          type: string
+          title: Integration Key
+        data:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Data
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/ToolConnectionStatus'
+          - type: 'null'
+      type: object
+      required:
+      - provider_key
+      - integration_key
+      title: ToolConnection
+    ToolCatalogIntegrationsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        total:
+          type: integer
+          title: Total
+          default: 0
+        cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+        integrations:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/ToolCatalogIntegration'
+            - $ref: '#/components/schemas/ToolCatalogIntegrationDetails'
+          type: array
+          title: Integrations
+          default: []
+      type: object
+      title: ToolCatalogIntegrationsResponse
+    ToolConnectionCreateData:
+      properties:
+        callback_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Callback Url
+        auth_scheme:
+          anyOf:
+          - $ref: '#/components/schemas/ToolAuthScheme'
+          - type: 'null'
+        connected_account_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Connected Account Id
+        auth_config_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Auth Config Id
+        redirect_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Redirect Url
+        project_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Project Id
+        no_auth:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: No Auth
+      type: object
+      title: ToolConnectionCreateData
+    ToolCallContext:
+      properties:
+        provider:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider
+        integration:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration
+        connection:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Connection
+        tool:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tool
+        toolkit_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Toolkit Version
+        toolkit_versions:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Toolkit Versions
+      type: object
+      title: ToolCallContext
+      description: 'Trusted routing the caller adds beside the model''s arguments (contracts section 6).
+
+
+        The runner reads every field from its private resolved policy, so none of it is
+
+        model input. ``connection`` and ``tool`` are absent for ``gateway.search``. The
+
+        gateway routes refuse a call whose context is missing or incomplete; there is no
+
+        default connection to fall back to.'
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    ToolResolveResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        builtins:
+          items:
+            type: string
+          type: array
+          title: Builtins
+        custom:
+          items:
+            $ref: '#/components/schemas/ResolvedTool'
+          type: array
+          title: Custom
+        gateway_connections:
+          items:
+            $ref: '#/components/schemas/ResolvedGatewayConnection'
+          type: array
+          title: Gateway Connections
+      type: object
+      title: ToolResolveResponse
+    ResolvedGatewayTool:
+      properties:
+        key:
+          type: string
+          title: Key
+        read_only:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Read Only
+      type: object
+      required:
+      - key
+      title: ResolvedGatewayTool
+      description: One catalog tool as the SDK permission compiler reads it (contracts section 2).
+    ToolCallResponse:
+      properties:
+        call:
+          $ref: '#/components/schemas/ToolResult'
+      type: object
+      required:
+      - call
+      title: ToolCallResponse
+    ToolConnectionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        connections:
+          items:
+            $ref: '#/components/schemas/ToolConnection'
+          type: array
+          title: Connections
+          default: []
+      type: object
+      title: ToolConnectionsResponse
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    ToolResolveRequest:
+      properties:
+        tools:
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/BuiltinToolConfig'
+            - $ref: '#/components/schemas/GatewayToolConfig'
+            - $ref: '#/components/schemas/GatewayConnectionToolConfig'
+          type: array
+          title: Tools
+      type: object
+      title: ToolResolveRequest
+    ToolCatalogIntegration:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        categories:
+          items:
+            type: string
+          type: array
+          title: Categories
+          default: []
+        logo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        actions_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Actions Count
+        auth_schemes:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ToolAuthScheme'
+            type: array
+          - type: 'null'
+          title: Auth Schemes
+      type: object
+      required:
+      - key
+      - name
+      title: ToolCatalogIntegration
+    ToolAuthScheme:
+      type: string
+      enum:
+      - oauth
+      - api_key
+      title: ToolAuthScheme
+    ToolProviderKind:
+      type: string
+      enum:
+      - composio
+      - agenta
+      title: ToolProviderKind
+    ToolCatalogIntegrationDetails:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        categories:
+          items:
+            type: string
+          type: array
+          title: Categories
+          default: []
+        logo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        actions_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Actions Count
+        auth_schemes:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ToolAuthScheme'
+            type: array
+          - type: 'null'
+          title: Auth Schemes
+        actions:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ToolCatalogAction'
+            type: array
+          - type: 'null'
+          title: Actions
+      type: object
+      required:
+      - key
+      - name
+      title: ToolCatalogIntegrationDetails
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ToolCatalogCategoriesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        categories:
+          items:
+            $ref: '#/components/schemas/ToolCatalogCategory'
+          type: array
+          title: Categories
+          default: []
+      type: object
+      title: ToolCatalogCategoriesResponse
+    CapabilitiesResult:
+      properties:
+        capabilities:
+          items:
+            $ref: '#/components/schemas/Capability'
+          type: array
+          title: Capabilities
+        connections:
+          items:
+            $ref: '#/components/schemas/ConnectionRequirement'
+          type: array
+          title: Connections
+        guidance:
+          $ref: '#/components/schemas/CapabilityGuidance'
+        ready:
+          type: boolean
+          title: Ready
+          default: false
+        notes:
+          items:
+            type: string
+          type: array
+          title: Notes
+      type: object
+      title: CapabilitiesResult
+      description: The ``discover_tools`` response (Agenta-native).
+    ToolConnectionCreateRequest:
+      properties:
+        connection:
+          $ref: '#/components/schemas/ToolConnectionCreate'
+      type: object
+      required:
+      - connection
+      title: ToolConnectionCreateRequest
+    CapabilityConnection:
+      properties:
+        state:
+          $ref: '#/components/schemas/ToolConnectionState'
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      required:
+      - state
+      title: CapabilityConnection
+      description: The connection state for a capability's primary integration.
+    ToolCallFunction:
+      properties:
+        name:
+          type: string
+          title: Name
+        arguments:
+          title: Arguments
+      type: object
+      required:
+      - name
+      - arguments
+      title: ToolCallFunction
+      description: 'Mirrors OpenAI function call: {name, arguments}.'
+    DiscoveredAlternative:
+      properties:
+        integration:
+          type: string
+          title: Integration
+        action:
+          type: string
+          title: Action
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        provider_action:
+          type: string
+          title: Provider Action
+      type: object
+      required:
+      - integration
+      - action
+      - provider_action
+      title: DiscoveredAlternative
+      description: A companion/prerequisite tool the one-line request omitted (Agenta-shaped).
+    ToolCatalogProviderResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        provider:
+          anyOf:
+          - $ref: '#/components/schemas/ToolCatalogProvider'
+          - $ref: '#/components/schemas/ToolCatalogProviderDetails'
+          - type: 'null'
+          title: Provider
+      type: object
+      title: ToolCatalogProviderResponse
+    GatewayConnectionRef:
+      properties:
+        provider:
+          type: string
+          const: composio
+          title: Provider
+          default: composio
+        integration:
+          type: string
+          minLength: 1
+          title: Integration
+        slug:
+          type: string
+          minLength: 1
+          title: Slug
+      additionalProperties: false
+      type: object
+      required:
+      - integration
+      - slug
+      title: GatewayConnectionRef
+      description: 'The shared project connection a gateway entry points at.
+
+
+        A resource reference, never a credential: the project owns the connection and several
+
+        agents can reuse it, each with its own policy.'
+    ToolResultData:
+      properties:
+        role:
+          type: string
+          title: Role
+          default: tool
+        tool_call_id:
+          type: string
+          title: Tool Call Id
+        content:
+          type: string
+          title: Content
+      type: object
+      required:
+      - tool_call_id
+      - content
+      title: ToolResultData
+      description: OpenAI tool message — passed verbatim back to the LLM.
+    ToolCatalogActionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        action:
+          anyOf:
+          - $ref: '#/components/schemas/ToolCatalogAction'
+          - $ref: '#/components/schemas/ToolCatalogActionDetails'
+          - type: 'null'
+          title: Action
+      type: object
+      title: ToolCatalogActionResponse
+    CapabilitiesQuery:
+      properties:
+        use_cases:
+          items:
+            type: string
+          type: array
+          title: Use Cases
+        provider:
+          type: string
+          title: Provider
+          default: composio
+        limit_alternatives:
+          type: integer
+          minimum: 0.0
+          title: Limit Alternatives
+          default: 3
+      type: object
+      required:
+      - use_cases
+      title: CapabilitiesQuery
+      description: 'Request body for ``POST /tools/discover``.
+
+
+        The response is the core ``CapabilitiesResult`` (see
+
+        ``docs/design/agent-workflows/projects/tool-discovery/design.md``). Project scope
+
+        comes from the caller''s auth, not the body.'
+    ToolCallData:
+      properties:
+        id:
+          type: string
+          title: Id
+        type:
+          type: string
+          title: Type
+          default: function
+        function:
+          $ref: '#/components/schemas/ToolCallFunction'
+      type: object
+      required:
+      - id
+      - function
+      title: ToolCallData
+      description: OpenAI tool_calls array item — passed verbatim from the LLM.
+    Status:
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        stacktrace:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stacktrace
+      type: object
+      title: Status
+    Capability:
+      properties:
+        use_case:
+          type: string
+          title: Use Case
+        integration:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration
+        tool:
+          anyOf:
+          - $ref: '#/components/schemas/DiscoveredTool'
+          - type: 'null'
+        alternatives:
+          items:
+            $ref: '#/components/schemas/DiscoveredAlternative'
+          type: array
+          title: Alternatives
+        connection:
+          anyOf:
+          - $ref: '#/components/schemas/CapabilityConnection'
+          - type: 'null'
+        difficulty:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Difficulty
+        note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Note
+      type: object
+      required:
+      - use_case
+      title: Capability
+      description: One use_case resolved to a best-match tool, alternatives, and its state.
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

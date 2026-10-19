@@ -1,0 +1,4274 @@
+openapi: 3.2.0
+info:
+  title: Agenta Sessions API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Sessions
+  description: Agent sessions — runner coordination (invoke/cancel/steer/attach/detach/heartbeat/liveness), state persistence (durable SDK state and sandbox resume pointer), records, and streams.
+paths:
+  /sessions/tools/current:
+    post:
+      tags:
+      - Sessions
+      summary: Get Current Session
+      operationId: get_current_session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrentSessionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentSessionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/streams/:
+    get:
+      tags:
+      - Sessions
+      summary: Fetch Session Stream
+      operationId: fetch_session_stream
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStreamResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Sessions
+      summary: Set Session Stream
+      operationId: set_session_stream
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionStreamCommandRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStreamCommandResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Sessions
+      summary: Delete Session Stream
+      operationId: delete_session_stream
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Delete Session Stream
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/streams/query:
+    post:
+      tags:
+      - Sessions
+      summary: Query Session Streams
+      operationId: query_session_streams
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionStreamQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStreamsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/streams/detach:
+    post:
+      tags:
+      - Sessions
+      summary: Detach Session Stream
+      operationId: detach_session_stream
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionDetachRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Detach Session Stream
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/streams/heartbeat:
+    post:
+      tags:
+      - Sessions
+      summary: Heartbeat Session Stream
+      operationId: heartbeat_session_stream
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionHeartbeatRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionHeartbeatResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/streams/header:
+    put:
+      tags:
+      - Sessions
+      summary: Set Session Stream Header
+      description: 'Rename a session.
+
+
+        `name_source` says where the name came from: `manual` (the default) is a person
+
+        typing one, and `automatic` is a program proposing one — the agent''s
+
+        `rename_session`, or the browser''s auto-title. An `automatic` edit is refused with
+
+        409 when it would change a name a person controls, unless the body names the exact
+
+        name and revision it replaces.
+
+
+        It is a query parameter rather than a body field on purpose. The `rename_session`
+
+        catalog entry fixes `name_source=automatic` inside its path and the model fills only
+
+        the body, so an agent cannot claim a person chose its name.
+
+
+        `author` is the transitional spelling, hidden from the schema. A warm agent session
+
+        holds the tool descriptors it opened with, so a sandbox that started under an
+
+        earlier build of this change can still execute `?author=auto` after the service has
+
+        moved on. Reading it costs one branch and keeps that call on the guarded path; the
+
+        alternative is a rename that silently claims a person made it. Delete this parameter
+
+        once no such session can still be alive.'
+      operationId: set_session_stream_header
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: name_source
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/SessionNameSource'
+          - type: 'null'
+          title: Name Source
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionStreamHeaderEdit'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStreamResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Sessions
+      summary: Set Session Stream Header
+      description: 'Rename a session.
+
+
+        `name_source` says where the name came from: `manual` (the default) is a person
+
+        typing one, and `automatic` is a program proposing one — the agent''s
+
+        `rename_session`, or the browser''s auto-title. An `automatic` edit is refused with
+
+        409 when it would change a name a person controls, unless the body names the exact
+
+        name and revision it replaces.
+
+
+        It is a query parameter rather than a body field on purpose. The `rename_session`
+
+        catalog entry fixes `name_source=automatic` inside its path and the model fills only
+
+        the body, so an agent cannot claim a person chose its name.
+
+
+        `author` is the transitional spelling, hidden from the schema. A warm agent session
+
+        holds the tool descriptors it opened with, so a sandbox that started under an
+
+        earlier build of this change can still execute `?author=auto` after the service has
+
+        moved on. Reading it costs one branch and keeps that call on the guarded path; the
+
+        alternative is a rename that silently claims a person made it. Delete this parameter
+
+        once no such session can still be alive.'
+      operationId: postSessionsStreamsHeader
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: name_source
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/SessionNameSource'
+          - type: 'null'
+          title: Name Source
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionStreamHeaderEdit'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStreamResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      x-operation-id-source: normalized
+      x-operation-id-original: set_session_stream_header
+  /sessions/streams/watch:
+    get:
+      tags:
+      - Sessions
+      summary: Watch Session Stream
+      description: 'Server-sent events relay for one session (M3 live relay).
+
+
+        Emits change notifications only — never record payloads; clients
+
+        revalidate through the regular query endpoints on each event:
+
+
+        - ``event: records-changed`` — ``{"session_id"}``; new/updated rows
+
+        landed in the record log (published post-DB-commit).
+
+        - ``event: lifecycle`` — ``{"session_id", "state": "running"|"ended"}``.
+
+        - ``event: interaction`` — ``{"session_id", "status": "pending"|"resolved"}``.
+
+        - ``: heartbeat`` comment frames while idle (keep-alive).
+
+
+        Auth is the standard middleware (cookie ``sAccessToken``, ApiKey, or
+
+        Bearer) evaluated once at connect; scope is the credential''s project.
+
+        Browsers authenticate by cookie — ``EventSource`` cannot set headers —
+
+        so a connect landing on an expired access token 401s like any other
+
+        request. There is no interceptor to refresh-and-retry a stream, so the
+
+        client must refresh the session itself and reopen (see the web hooks).
+
+
+        The stream has no replay/cursor semantics — ``EventSource`` reconnects
+
+        and clients revalidate once on every ``open``, which covers any missed
+
+        notifications.
+
+
+        NOTE (spec surface): this route appears in OpenAPI for documentation,
+
+        but Fern does not model SSE — consume it with a native ``EventSource``
+
+        (same-origin ``/api`` + cookie auth needs no custom headers), not the
+
+        generated client.'
+      operationId: watch_session_stream
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/{session_id}/events:
+    get:
+      tags:
+      - Sessions
+      summary: Session Events
+      operationId: watch_session_events
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: after
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: After
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/watch:
+    get:
+      tags:
+      - Sessions
+      summary: Watch Project
+      description: 'Relay low-frequency entity changes for the authorized project.
+
+
+        A caller with only one required view permission cannot open this stream and falls back to
+
+        the lists'' polling behavior.'
+      operationId: watch_project
+      parameters:
+      - name: project_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/interactions/:
+    post:
+      tags:
+      - Sessions
+      summary: Create Interaction
+      operationId: create_interaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionInteractionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionInteractionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/interactions/query:
+    post:
+      tags:
+      - Sessions
+      summary: Query Interactions
+      operationId: query_interactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionInteractionQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionInteractionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/interactions/transition:
+    post:
+      tags:
+      - Sessions
+      summary: Transition Interaction
+      operationId: transition_interaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionInteractionTransitionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionInteractionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/interactions/cancel-stale:
+    post:
+      tags:
+      - Sessions
+      summary: Cancel Stale Interactions
+      operationId: cancel_stale_interactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionInteractionCancelStaleRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Cancel Stale Interactions
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/interactions/{interaction_id}:
+    get:
+      tags:
+      - Sessions
+      summary: Fetch Interaction
+      operationId: fetch_interaction
+      parameters:
+      - name: interaction_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Interaction Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionInteractionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/interactions/{interaction_id}/respond:
+    post:
+      tags:
+      - Sessions
+      summary: Respond Interaction
+      operationId: respond_interaction
+      parameters:
+      - name: interaction_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Interaction Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionInteractionRespondRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                title: Response Respond Interaction
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/attachments:
+    post:
+      tags:
+      - Sessions
+      summary: Create Session Attachment
+      operationId: create_session_attachment
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionAttachmentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/attachments/{attachment_id}/content:
+    get:
+      tags:
+      - Sessions
+      summary: Download Session Attachment Content
+      operationId: download_session_attachment_content
+      parameters:
+      - name: attachment_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Attachment Id
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/attachments/reference:
+    post:
+      tags:
+      - Sessions
+      summary: Reference Session Attachments
+      operationId: reference_session_attachments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionAttachmentReferenceRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionAttachmentsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/mounts/:
+    get:
+      tags:
+      - Sessions
+      summary: Fetch Session Mounts
+      operationId: fetch_session_mounts
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Include Archived
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/mounts/query:
+    post:
+      tags:
+      - Sessions
+      summary: Query Session Mounts
+      operationId: query_session_mounts
+      parameters:
+      - name: session_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Include Archived
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionMountQueryRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/mounts/sign:
+    post:
+      tags:
+      - Sessions
+      summary: Sign Session Mount Credentials
+      operationId: sign_session_mount_credentials
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+          description: Which session-scoped mount to sign, e.g. 'cwd' (default) or a per-harness transcript dir mount (e.g. 'claude-projects', 'pi-sessions'). Each name is its own mount row / durable prefix.
+          default: cwd
+          title: Name
+        description: Which session-scoped mount to sign, e.g. 'cwd' (default) or a per-harness transcript dir mount (e.g. 'claude-projects', 'pi-sessions'). Each name is its own mount row / durable prefix.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountCredentialsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/mounts/files/upload:
+    post:
+      tags:
+      - Sessions
+      summary: Upload Session Cwd File
+      description: 'Write a file into the session''s working directory, creating that mount if needed.
+
+
+        The composer uses this for files over the attachment cap. A session that has not run
+
+        yet has no working-directory mount, and the only other route that creates one also
+
+        signs storage credentials, which the browser must never receive.'
+      operationId: upload_session_cwd_file
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: path
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_session_cwd_file'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountFileWrittenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/mounts/{mount_id}/files/upload:
+    post:
+      tags:
+      - Sessions
+      summary: Upload Session Mount File
+      operationId: upload_session_mount_file
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      - name: path
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_session_mount_file'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountFileWrittenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/mounts/{mount_id}/files/download:
+    get:
+      tags:
+      - Sessions
+      summary: Download Session Mount File
+      operationId: download_session_mount_file
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/records/query:
+    post:
+      tags:
+      - Sessions
+      summary: Query Records
+      operationId: query_records
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionRecordQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionRecordsQueryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/records/{record_id}:
+    get:
+      tags:
+      - Sessions
+      summary: Get Record Event
+      operationId: get_record_event
+      parameters:
+      - name: record_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Record Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionRecordResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/records/ingest:
+    post:
+      tags:
+      - Sessions
+      summary: Ingest Record Event
+      operationId: ingest_record
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/SessionRecordIngestRequest'
+              - items:
+                  $ref: '#/components/schemas/SessionRecordIngestRequest'
+                type: array
+                minItems: 1
+              title: Body
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Ingest Record
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/records/incomplete:
+    post:
+      tags:
+      - Sessions
+      summary: Mark Records Incomplete
+      operationId: mark_records_incomplete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionRecordsIncompleteRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Mark Records Incomplete
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/turns/:
+    post:
+      tags:
+      - Sessions
+      summary: Append Turn
+      operationId: append_turn
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionTurnAppendRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTurnResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/turns/complete:
+    post:
+      tags:
+      - Sessions
+      summary: Complete Turn
+      operationId: complete_turn
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionTurnCompleteRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTurnResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/turns/query:
+    post:
+      tags:
+      - Sessions
+      summary: Query Turns
+      operationId: query_turns
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionTurnQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTurnsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/turns/{turn_id}:
+    get:
+      tags:
+      - Sessions
+      summary: Fetch Turn
+      operationId: fetch_turn
+      parameters:
+      - name: turn_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Turn Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTurnResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/query:
+    post:
+      tags:
+      - Sessions
+      summary: Query Sessions
+      operationId: query_sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/:
+    delete:
+      tags:
+      - Sessions
+      summary: Delete Session
+      operationId: delete_session
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Delete Session
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/{session_id}/inputs/{input_id}:
+    patch:
+      tags:
+      - Sessions
+      summary: Update Pending Input
+      operationId: update_pending_session_input
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: input_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Input Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PendingInputUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingInputResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Sessions
+      summary: Remove Pending Input
+      operationId: remove_pending_session_input
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: input_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Input Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingInputResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/archive:
+    post:
+      tags:
+      - Sessions
+      summary: Archive Session
+      operationId: archive_session
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/unarchive:
+    post:
+      tags:
+      - Sessions
+      summary: Unarchive Session
+      operationId: unarchive_session
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/{session_id}:
+    get:
+      tags:
+      - Sessions
+      summary: Get Session Snapshot
+      operationId: get_session_snapshot
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionSnapshotResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/{session_id}/cancel:
+    post:
+      tags:
+      - Sessions
+      summary: Cancel Session Execution
+      operationId: cancel_session_execution
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/SessionCancelRequest'
+              - type: 'null'
+              title: Payload
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/{session_id}/continuations/resume:
+    post:
+      tags:
+      - Sessions
+      summary: Resume Session Continuation
+      operationId: resume_session_continuation
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionContinuationResumeResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sessions/{session_id}/inputs/{input_id}/send-now:
+    post:
+      tags:
+      - Sessions
+      summary: Send Pending Input Now
+      operationId: send_pending_session_input_now
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Session Id
+      - name: input_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Input Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingInputAdmissionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    SessionRecordResponse:
+      properties:
+        record:
+          anyOf:
+          - $ref: '#/components/schemas/SessionRecord'
+          - type: 'null'
+      type: object
+      title: SessionRecordResponse
+    SessionStream:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        session_id:
+          type: string
+          title: Session Id
+        flags:
+          $ref: '#/components/schemas/SessionStreamFlags'
+          default:
+            is_alive: false
+            is_running: false
+            is_attached: false
+        capabilities:
+          $ref: '#/components/schemas/oss__src__core__sessions__streams__dtos__SessionCapabilities'
+          default:
+            shared_reader: false
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        turn_started_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Turn Started At
+        stopping_turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stopping Turn Id
+        references:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionReference'
+            type: array
+          - type: 'null'
+          title: References
+        archived_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Archived At
+        origin:
+          anyOf:
+          - $ref: '#/components/schemas/SessionOrigin'
+          - type: 'null'
+        trigger:
+          anyOf:
+          - $ref: '#/components/schemas/SessionTrigger'
+          - type: 'null'
+        delivery:
+          anyOf:
+          - $ref: '#/components/schemas/SessionDelivery'
+          - type: 'null'
+      type: object
+      required:
+      - project_id
+      - session_id
+      title: SessionStream
+    SessionInteractionKind:
+      type: string
+      enum:
+      - user_approval
+      - user_input
+      - client_tool
+      title: SessionInteractionKind
+    SessionInteractionCreateRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        token:
+          type: string
+          title: Token
+        kind:
+          $ref: '#/components/schemas/SessionInteractionKind'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteractionData'
+          - type: 'null'
+        flags:
+          $ref: '#/components/schemas/SessionInteractionFlags'
+          default:
+            delivered_in_band: false
+            delivered_webhook: false
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+      type: object
+      required:
+      - session_id
+      - token
+      - kind
+      title: SessionInteractionCreateRequest
+    SessionTurnAppendRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        turn_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Turn Id
+        stream_id:
+          type: string
+          format: uuid
+          title: Stream Id
+        turn_index:
+          type: integer
+          title: Turn Index
+        harness_kind:
+          $ref: '#/components/schemas/HarnessKind'
+        agent_session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Session Id
+        sandbox_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sandbox Id
+        references:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionReference'
+            type: array
+          - type: 'null'
+          title: References
+        trace_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Trace Id
+        span_id:
+          anyOf:
+          - type: string
+            pattern: ^[0-9a-fA-F]{16}$
+          - type: 'null'
+          title: Span Id
+        start_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start Time
+        end_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: End Time
+      type: object
+      required:
+      - session_id
+      - stream_id
+      - turn_index
+      - harness_kind
+      title: SessionTurnAppendRequest
+    SessionInteractionCancelStaleRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        turn_id:
+          type: string
+          title: Turn Id
+        tokens:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Tokens
+      type: object
+      required:
+      - session_id
+      - turn_id
+      title: SessionInteractionCancelStaleRequest
+    SessionListItem:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        session_id:
+          type: string
+          title: Session Id
+        flags:
+          $ref: '#/components/schemas/SessionStreamFlags'
+          default:
+            is_alive: false
+            is_running: false
+            is_attached: false
+        capabilities:
+          $ref: '#/components/schemas/oss__src__core__sessions__streams__dtos__SessionCapabilities'
+          default:
+            shared_reader: false
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        turn_started_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Turn Started At
+        stopping_turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stopping Turn Id
+        references:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionReference'
+            type: array
+          - type: 'null'
+          title: References
+        archived_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Archived At
+        origin:
+          anyOf:
+          - $ref: '#/components/schemas/SessionOrigin'
+          - type: 'null'
+        trigger:
+          anyOf:
+          - $ref: '#/components/schemas/SessionTrigger'
+          - type: 'null'
+        delivery:
+          anyOf:
+          - $ref: '#/components/schemas/SessionDelivery'
+          - type: 'null'
+        last_message:
+          anyOf:
+          - $ref: '#/components/schemas/SessionMessagePreview'
+          - type: 'null'
+      type: object
+      required:
+      - project_id
+      - session_id
+      title: SessionListItem
+      description: 'A `/sessions/query` row, enriched at READ time with the session''s last message.
+
+
+        `references` prefers the stream row''s own (filled once at run time) and falls back to
+
+        the HIGHEST `turn_index` turn''s — the agent/workflow that produced the latest turn.
+
+        The fallback is what keeps rows written before the stream column existed openable.
+
+        Both enrichments are batch lookups keyed on the whole page; never one call per row.
+
+
+        Hydrated by `SessionsService.query_sessions`.'
+    SessionTranscriptWindowing:
+      properties:
+        offset:
+          type: integer
+          minimum: 0.0
+          title: Offset
+          default: 0
+        limit:
+          type: integer
+          maximum: 200.0
+          minimum: 1.0
+          title: Limit
+          default: 100
+        through_sequence:
+          type: integer
+          minimum: 0.0
+          title: Through Sequence
+      type: object
+      required:
+      - through_sequence
+      title: SessionTranscriptWindowing
+      description: 'Deliberate exception to the shared cursor `Windowing`.
+
+
+        `through_sequence` pins the snapshot, so offset paging over an append-only log inside that
+
+        bound is stable: a concurrent append raises `latest_sequence`, never the page contents. The
+
+        transcript reader also needs to seek within one pinned snapshot, which a forward-only cursor
+
+        cannot express.'
+    SessionInteractionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        interactions:
+          items:
+            $ref: '#/components/schemas/SessionInteraction'
+          type: array
+          title: Interactions
+      type: object
+      title: SessionInteractionsResponse
+    SessionTurnQueryRequest:
+      properties:
+        query:
+          anyOf:
+          - $ref: '#/components/schemas/SessionTurnQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SessionTurnQueryRequest
+    SessionTurnResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        turn:
+          anyOf:
+          - $ref: '#/components/schemas/SessionTurn'
+          - type: 'null'
+      type: object
+      title: SessionTurnResponse
+    SessionDetachRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        watcher_id:
+          type: string
+          title: Watcher Id
+      type: object
+      required:
+      - session_id
+      - watcher_id
+      title: SessionDetachRequest
+    SessionContinuationResumeResponse:
+      properties:
+        resumed:
+          type: boolean
+          title: Resumed
+      type: object
+      required:
+      - resumed
+      title: SessionContinuationResumeResponse
+    SessionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        session:
+          anyOf:
+          - $ref: '#/components/schemas/SessionStream'
+          - type: 'null'
+      type: object
+      title: SessionResponse
+    SessionAttachmentResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        attachment:
+          $ref: '#/components/schemas/SessionAttachment'
+      type: object
+      required:
+      - attachment
+      title: SessionAttachmentResponse
+    SessionExecutionSnapshot:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        state:
+          type: string
+          enum:
+          - idle
+          - running
+          - stopping
+          title: State
+          default: idle
+      type: object
+      title: SessionExecutionSnapshot
+    PendingInputUpdateRequest:
+      properties:
+        text:
+          type: string
+          title: Text
+        attachments:
+          items:
+            $ref: '#/components/schemas/PendingInputAttachment'
+          type: array
+          title: Attachments
+      additionalProperties: false
+      type: object
+      required:
+      - text
+      title: PendingInputUpdateRequest
+    CurrentSessionRequest:
+      properties:
+        session_id:
+          type: string
+          maxLength: 128
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_\-]+$
+          title: Session Id
+      additionalProperties: false
+      type: object
+      required:
+      - session_id
+      title: CurrentSessionRequest
+    SessionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        total:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Total
+        sessions:
+          items:
+            $ref: '#/components/schemas/SessionListItem'
+          type: array
+          title: Sessions
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SessionsResponse
+    SessionInteractionQueryRequest:
+      properties:
+        query:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteractionQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SessionInteractionQueryRequest
+    SessionStreamQueryRequest:
+      properties:
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        is_alive:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Alive
+        is_running:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Running
+      type: object
+      title: SessionStreamQueryRequest
+    SessionPredicatesRequest:
+      properties:
+        search:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
+        liveness:
+          anyOf:
+          - $ref: '#/components/schemas/SessionStreamQueryFlags'
+          - type: 'null'
+        origins:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionOrigin'
+            type: array
+          - type: 'null'
+          title: Origins
+      additionalProperties: false
+      type: object
+      title: SessionPredicatesRequest
+    CurrentSessionResponse:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        url_unavailable_reason:
+          anyOf:
+          - type: string
+            enum:
+            - agent_reference_missing
+            - workspace_missing
+            - web_url_unavailable
+          - type: 'null'
+          title: Url Unavailable Reason
+      type: object
+      required:
+      - session_id
+      title: CurrentSessionResponse
+    SessionMount:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        session_id:
+          type: string
+          title: Session Id
+        agent_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Id
+        purpose:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Purpose
+        data:
+          $ref: '#/components/schemas/MountData'
+        flags:
+          $ref: '#/components/schemas/MountFlags'
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+      type: object
+      required:
+      - project_id
+      - session_id
+      title: SessionMount
+    SessionStreamResponse:
+      properties:
+        stream:
+          anyOf:
+          - $ref: '#/components/schemas/SessionStream'
+          - type: 'null'
+        capabilities:
+          $ref: '#/components/schemas/oss__src__apis__fastapi__sessions__models__SessionCapabilities'
+        runner_address:
+          type: string
+          title: Runner Address
+          description: The address of the runner pod that ran the stream's last turn. Filled only for a caller that proves it is runner infrastructure; empty when unknown. A routing hint, not proof that the pod is alive.
+          default: ''
+        runner_replica_id:
+          type: string
+          title: Runner Replica Id
+          description: The replica id of the runner pod at runner_address. The caller checks it against the pod's health answer before it uses the address, because a dead pod's IP can pass to another pod. Filled under the same condition as runner_address; empty when unknown.
+          default: ''
+      type: object
+      title: SessionStreamResponse
+    Selector:
+      properties:
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+        path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      type: object
+      title: Selector
+      description: "Selector for extracting specific data from entities.\n\nPlaced alongside Reference for data extraction from referenced entities.\n\nFields:\n- **key**: For environment revisions only. Navigates to data.references.<key>,\n  follows the entity pointer found there (e.g. workflow_revision), fetches that\n  entity, then applies path against its data.\n- **path**: Dot notation path into the resolved entity's data.\n  If key is set, path applies to the secondary entity's data.\n  If key is not set, path applies directly to the referenced entity's data."
+    SessionInteraction:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        session_id:
+          type: string
+          title: Session Id
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        token:
+          type: string
+          title: Token
+        kind:
+          $ref: '#/components/schemas/SessionInteractionKind'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteractionStatus'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteractionData'
+          - type: 'null'
+        flags:
+          $ref: '#/components/schemas/SessionInteractionFlags'
+          default:
+            delivered_in_band: false
+            delivered_webhook: false
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+      type: object
+      required:
+      - session_id
+      - token
+      - kind
+      title: SessionInteraction
+    SessionInteractionQueryFlags:
+      properties:
+        delivered_in_band:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Delivered In Band
+        delivered_webhook:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Delivered Webhook
+      type: object
+      title: SessionInteractionQueryFlags
+    SessionTurn:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        session_id:
+          type: string
+          title: Session Id
+        turn_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Turn Id
+        stream_id:
+          type: string
+          format: uuid
+          title: Stream Id
+        turn_index:
+          type: integer
+          title: Turn Index
+        harness_kind:
+          $ref: '#/components/schemas/HarnessKind'
+        agent_session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Session Id
+        sandbox_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sandbox Id
+        references:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionReference'
+            type: array
+          - type: 'null'
+          title: References
+        trace_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Trace Id
+        span_id:
+          anyOf:
+          - type: string
+            pattern: ^[0-9a-fA-F]{16}$
+          - type: 'null'
+          title: Span Id
+        start_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start Time
+        end_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: End Time
+      type: object
+      required:
+      - project_id
+      - session_id
+      - stream_id
+      - turn_index
+      - harness_kind
+      title: SessionTurn
+    MountData:
+      properties: {}
+      type: object
+      title: MountData
+    SessionHeartbeatResult:
+      properties:
+        stream:
+          anyOf:
+          - $ref: '#/components/schemas/SessionStream'
+          - type: 'null'
+        replica_id:
+          type: string
+          title: Replica Id
+        is_current_turn:
+          type: boolean
+          title: Is Current Turn
+          default: true
+      type: object
+      required:
+      - replica_id
+      title: SessionHeartbeatResult
+      description: 'A heartbeat''s outcome: the reconciled stream and whether this turn is still current.
+
+
+        `replica_id` echoes the caller''s own id. A runner of the previous release reads it, so it
+
+        stays for one release.
+
+
+        `stream` is None when a refused beat names a session that has no row yet: it may not
+
+        create or stamp one, since that row belongs to the turn''s own runner.
+
+
+        `is_current_turn` (W7.4) is False when this turn_id''s alive/running lock was gone or
+
+        reassigned at the moment of this beat — i.e. a cancel/steer/kill interrupted this turn
+
+        since the last heartbeat. The runner''s watchdog reads this to abort the in-flight run;
+
+        without it a cancel that raced a heartbeat''s nx=True re-acquire would silently re-arm the
+
+        SAME lock under the SAME turn_id and the interruption would never surface. It is also
+
+        False when the turn is bound to another runner pod.'
+    SessionStreamCommandRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRequestData'
+          - type: 'null'
+        force:
+          type: boolean
+          title: Force
+          default: false
+        detached:
+          type: boolean
+          title: Detached
+          default: false
+        expected_execution_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Expected Execution Id
+      type: object
+      required:
+      - session_id
+      title: SessionStreamCommandRequest
+      description: 'The set_session_stream edit: a state mutation over the lock/row nest.
+
+
+        Runs nothing itself — the runner (execution plane) is the only thing that runs.
+
+        `data` mirrors the workflow-invoke shape (`WorkflowServiceRequestData`, keyed on
+
+        `.inputs`) so the discriminator aligns with `WorkflowInvokeRequest.data.inputs`
+
+        rather than a bespoke `prompt` string.'
+    SessionOrigin:
+      type: string
+      enum:
+      - manual
+      - trigger
+      title: SessionOrigin
+    HarnessKind:
+      type: string
+      enum:
+      - pi_core
+      - claude
+      - codex
+      - mock
+      title: HarnessKind
+      description: 'The coding agent program a run drives. A backend declares which it supports.
+
+
+        ``pi_core`` is Pi; ``claude`` drives Claude Code; ``codex`` drives Codex.
+
+        ``mock`` drives no real coding agent at all: it is a deterministic, LLM-free, network-free
+
+        stand-in for testing, selecting a named behavior the runner resolves in-process.'
+    MountFlags:
+      properties: {}
+      type: object
+      title: MountFlags
+    SessionSnapshotResponse:
+      properties:
+        session:
+          anyOf:
+          - $ref: '#/components/schemas/SessionStream'
+          - type: 'null'
+        execution:
+          anyOf:
+          - $ref: '#/components/schemas/SessionTurn'
+          - type: 'null'
+        execution_state:
+          $ref: '#/components/schemas/SessionExecutionSnapshot'
+        pending:
+          $ref: '#/components/schemas/SessionSnapshotPending'
+        read:
+          anyOf:
+          - $ref: '#/components/schemas/SessionRecordsReadState'
+          - type: 'null'
+        capabilities:
+          $ref: '#/components/schemas/oss__src__apis__fastapi__sessions__models__SessionCapabilities'
+      type: object
+      required:
+      - pending
+      title: SessionSnapshotResponse
+      description: 'One snapshot for every reader of an open session.
+
+
+        `session`, `execution` and `read` are the nullable reconnect half: the stream row, the
+
+        latest turn (whose `end_time` says whether that turn is still live), and the durable
+
+        sequence watermark a reader replays from. They are absent when the shared reader is off or
+
+        before a fresh session has a stream row.
+
+
+        `execution_state` and `pending.inputs` are the queue half. `execution_state` is the
+
+        session''s CURRENT lifecycle derived from the stream row, which is a different question from
+
+        `execution`: that names the last turn, this says whether anything is running right now.
+
+        `capabilities` reports the same flags the streams endpoint reports, from the same helper, so
+
+        a client never sees the two disagree.'
+    oss__src__apis__fastapi__sessions__models__SessionCapabilities:
+      properties:
+        durable_approvals:
+          type: boolean
+          title: Durable Approvals
+          default: true
+        queue:
+          type: boolean
+          title: Queue
+          default: true
+        steer:
+          type: boolean
+          title: Steer
+          default: true
+      type: object
+      title: SessionCapabilities
+    SessionRecordIngestRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        kind:
+          anyOf:
+          - type: string
+            const: frame
+          - type: 'null'
+          title: Kind
+        record_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Record Id
+        record_index:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Record Index
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        record_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Record Type
+        record_source:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Record Source
+        attributes:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Attributes
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        span_id:
+          anyOf:
+          - type: string
+            pattern: ^[0-9a-fA-F]{16}$
+          - type: 'null'
+          title: Span Id
+        version:
+          anyOf:
+          - type: integer
+            const: 1
+          - type: 'null'
+          title: Version
+        execution_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Execution Id
+        frame_or_event_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Frame Or Event Id
+        frame_index:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Frame Index
+        entity_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Entity Id
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        payload:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Payload
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+      type: object
+      required:
+      - session_id
+      title: SessionRecordIngestRequest
+    SessionTriggerKind:
+      type: string
+      enum:
+      - schedule
+      - subscription
+      title: SessionTriggerKind
+    SessionInteractionQuery:
+      properties:
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        kind:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteractionKind'
+          - type: 'null'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteractionStatus'
+          - type: 'null'
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteractionQueryFlags'
+          - type: 'null'
+        actionable_only:
+          type: boolean
+          title: Actionable Only
+          default: false
+      type: object
+      title: SessionInteractionQuery
+    PendingInputAdmissionResponse:
+      properties:
+        action:
+          type: string
+          enum:
+          - execute
+          - pending
+          title: Action
+        input:
+          anyOf:
+          - $ref: '#/components/schemas/PendingInput'
+          - type: 'null'
+        execution_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Execution Id
+      type: object
+      required:
+      - action
+      title: PendingInputAdmissionResponse
+    SessionInteractionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        interaction:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteraction'
+          - type: 'null'
+      type: object
+      title: SessionInteractionResponse
+    SessionExpansion:
+      type: string
+      enum:
+      - last_message
+      - trigger
+      title: SessionExpansion
+    SessionMountQueryRequest:
+      properties:
+        mount:
+          anyOf:
+          - $ref: '#/components/schemas/SessionMountQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SessionMountQueryRequest
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    SessionRecordsIncompleteRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+      type: object
+      required:
+      - session_id
+      title: SessionRecordsIncompleteRequest
+    MountCredentialsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        mount:
+          anyOf:
+          - $ref: '#/components/schemas/Mount'
+          - type: 'null'
+        credentials:
+          anyOf:
+          - $ref: '#/components/schemas/MountCredentials'
+          - type: 'null'
+      type: object
+      title: MountCredentialsResponse
+    SessionInteractionRespondRequest:
+      properties:
+        answer:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Answer
+        answers:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionInteractionAnswerRequest'
+            type: array
+            maxItems: 100
+            minItems: 1
+          - type: 'null'
+          title: Answers
+        expected_execution_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Expected Execution Id
+      type: object
+      title: SessionInteractionRespondRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    MountFileWrittenResponse:
+      properties:
+        path:
+          type: string
+          title: Path
+        size:
+          type: integer
+          title: Size
+          default: 0
+        etag:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Etag
+      type: object
+      required:
+      - path
+      title: MountFileWrittenResponse
+    SessionAttachment:
+      properties:
+        attachment_id:
+          type: string
+          format: uuid
+          title: Attachment Id
+        filename:
+          type: string
+          title: Filename
+        media_type:
+          type: string
+          title: Media Type
+        size:
+          type: integer
+          title: Size
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - attachment_id
+      - filename
+      - media_type
+      - size
+      - created_at
+      title: SessionAttachment
+    SessionNameSource:
+      type: string
+      enum:
+      - manual
+      - automatic
+      title: SessionNameSource
+      description: 'Where a session''s name came from: a person, or a program.
+
+
+        It governs the name only, never the description, and it is not caller identity — both
+
+        kinds of request run under the same user credential. ``manual`` is a person typing a
+
+        name. ``automatic`` is a program proposing one: the agent''s own ``rename_session``, or
+
+        the browser''s auto-title from a first message.
+
+
+        It travels as a query parameter, never in the body, so a model cannot claim a person
+
+        chose its name: the ``rename_session`` catalog entry fixes ``name_source=automatic``
+
+        inside its own path and the model only ever fills the body.
+
+
+        ``manual`` is the default, which is a real trade rather than a free win. An unmarked
+
+        caller (a script, a service running an older SDK during a rolling deploy) is read as a
+
+        person, so an automatic name it writes is remembered as person-chosen and the next
+
+        agent rename of that session is refused until a person renames it. That is the
+
+        recoverable direction. The other default loses a person''s name instead.'
+    SessionTrigger:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        kind:
+          $ref: '#/components/schemas/SessionTriggerKind'
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      type: object
+      required:
+      - id
+      - kind
+      title: SessionTrigger
+    SessionCancelRequest:
+      properties:
+        expected_execution_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Expected Execution Id
+          description: Optional stale-request guard honored only in cancel mode; ignored for send, steer, and attach.
+      additionalProperties: false
+      type: object
+      title: SessionCancelRequest
+    SessionStreamHeaderEdit:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        replacing_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Replacing Name
+        replacing_revision:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Replacing Revision
+      type: object
+      title: SessionStreamHeaderEdit
+      description: 'The rename edit: a full-PUT of the header fields only.
+
+
+        Distinct from SessionStreamEdit (used by the flag-mirror/heartbeat paths) so the
+
+        liveness-only writes can never carry name/description, and vice versa. The one
+
+        other header writer is the heartbeat''s fill-once proposal, which goes through the
+
+        DAO''s NULL-guarded `fill_missing` and so cannot overwrite this edit.
+
+
+        ``name`` may be omitted/``None`` (no change) or an empty string (the explicit
+
+        clear-title action the chat rail''s rename path uses), but a NON-empty name must
+
+        contain a non-whitespace character: storing ``"   "`` clears the visible title
+
+        while the row still holds a value, a state no caller ever means. The LLM-facing
+
+        ``rename_session`` schema already rejects both; this closes the direct-API hole.'
+    SessionRecordsQueryResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+        records:
+          items:
+            $ref: '#/components/schemas/SessionRecord'
+          type: array
+          title: Records
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/SessionTranscriptWindowing'
+          - type: 'null'
+        records_incomplete:
+          type: boolean
+          title: Records Incomplete
+          default: false
+      type: object
+      required:
+      - count
+      - records
+      title: SessionRecordsQueryResponse
+    SessionStreamFlags:
+      properties:
+        is_alive:
+          type: boolean
+          title: Is Alive
+          default: false
+        is_running:
+          type: boolean
+          title: Is Running
+          default: false
+        is_attached:
+          type: boolean
+          title: Is Attached
+          default: false
+      type: object
+      title: SessionStreamFlags
+      description: 'The nest as primitive bools (alive ⊇ running ⊇ attached).
+
+
+        resumable (alive & !running) and reattachable (running & !attached) are
+
+        derived client-side, never stored.'
+    WorkflowRequestData:
+      properties:
+        revision:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Revision
+        parameters:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Parameters
+        testcase:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Testcase
+        inputs:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Inputs
+        trace:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Trace
+        outputs:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: WorkflowRequestData
+    PendingInputState:
+      type: string
+      enum:
+      - pending
+      - promoted
+      - removed
+      title: PendingInputState
+    SessionSnapshotPending:
+      properties:
+        inputs:
+          items:
+            $ref: '#/components/schemas/PendingInput'
+          type: array
+          title: Inputs
+        interactions:
+          items:
+            $ref: '#/components/schemas/SessionInteraction'
+          type: array
+          title: Interactions
+      type: object
+      title: SessionSnapshotPending
+    PendingInput:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        session_id:
+          type: string
+          title: Session Id
+        content:
+          additionalProperties: true
+          type: object
+          title: Content
+        position:
+          type: integer
+          title: Position
+        state:
+          $ref: '#/components/schemas/PendingInputState'
+        policy:
+          type: string
+          enum:
+          - queue
+          - steer
+          title: Policy
+        idempotency_key:
+          type: string
+          title: Idempotency Key
+        request_fingerprint:
+          type: string
+          title: Request Fingerprint
+        promoted_execution_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Promoted Execution Id
+      type: object
+      required:
+      - project_id
+      - session_id
+      - content
+      - position
+      - state
+      - policy
+      - idempotency_key
+      - request_fingerprint
+      title: PendingInput
+    Reference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Reference
+    SessionInteractionTransitionRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        token:
+          type: string
+          title: Token
+        status:
+          $ref: '#/components/schemas/SessionInteractionStatus'
+        resolution:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Resolution
+      type: object
+      required:
+      - session_id
+      - token
+      - status
+      title: SessionInteractionTransitionRequest
+    oss__src__core__sessions__streams__dtos__SessionCapabilities:
+      properties:
+        shared_reader:
+          type: boolean
+          title: Shared Reader
+          description: Deployment-wide shared-reader switch; version one has no project allowlist.
+          default: false
+      type: object
+      title: SessionCapabilities
+    Body_upload_session_cwd_file:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_upload_session_cwd_file
+    SessionTurnCompleteRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        turn_index:
+          type: integer
+          title: Turn Index
+        agent_session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Session Id
+        end_time:
+          type: string
+          format: date-time
+          title: End Time
+      type: object
+      required:
+      - session_id
+      - turn_index
+      - end_time
+      title: SessionTurnCompleteRequest
+    Body_upload_session_mount_file:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_upload_session_mount_file
+    SessionHeartbeatRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        replica_id:
+          type: string
+          maxLength: 128
+          minLength: 1
+          pattern: ^[^\x00-\x1f\x7f]+$
+          title: Replica Id
+        replica_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Replica Address
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        is_running:
+          type: boolean
+          title: Is Running
+          default: true
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        references:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionReference'
+            type: array
+          - type: 'null'
+          title: References
+      type: object
+      required:
+      - session_id
+      - replica_id
+      title: SessionHeartbeatRequest
+      description: 'A beat, plus what this run knows about the session that nothing else records.
+
+
+        ``name`` and ``references`` are PROPOSALS, not edits: the service writes each only
+
+        onto a NULL column (see `SessionStreamsService.heartbeat`). The runner is the only
+
+        component present on every execution path — browser, headless invoke, scheduled
+
+        trigger — so it is the only one that can title and attribute a session that no
+
+        browser will ever render.'
+    SessionInteractionData:
+      properties:
+        request:
+          anyOf:
+          - $ref: '#/components/schemas/SessionInteractionRequest'
+          - type: 'null'
+        references:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: References
+        selector:
+          anyOf:
+          - $ref: '#/components/schemas/Selector'
+          - type: 'null'
+        resolution:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Resolution
+        parameters:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Parameters
+      type: object
+      title: SessionInteractionData
+    SessionMountsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        mounts:
+          items:
+            $ref: '#/components/schemas/SessionMount'
+          type: array
+          title: Mounts
+      type: object
+      title: SessionMountsResponse
+    SessionMountQuery:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        agent_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Id
+        include_archived:
+          type: boolean
+          title: Include Archived
+          default: false
+      type: object
+      required:
+      - session_id
+      title: SessionMountQuery
+    SessionInteractionStatus:
+      type: string
+      enum:
+      - pending
+      - responded
+      - resolved
+      - cancelled
+      title: SessionInteractionStatus
+    SessionReference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+      type: object
+      title: SessionReference
+      description: 'A reference element that carries its own family.
+
+
+        Sessions persist references as a flat list (`session_turns.references`,
+
+        `session_streams.references`), so the map key that named the family upstream is
+
+        gone by the time a reader sees the row — leaving "first UUID in the list" as the
+
+        only way to guess which element is the workflow.
+
+
+        ``key`` is the name `evaluation_runs.references` already uses for the same flat-list
+
+        discriminator (`dbs/postgres/evaluations/utils.py`), and the same one tracing carries
+
+        in `OTelReference.attributes["key"]`.
+
+
+        It is a plain string rather than ``ReferenceKey`` on purpose: a turn append is
+
+        fire-and-forget, so rejecting an unrecognized family would drop the whole turn, which
+
+        is the failure this field exists to prevent. Producers inside the API use
+
+        ``ReferenceKey``; readers treat anything else as untyped.'
+    SessionMessagePreview:
+      properties:
+        text:
+          type: string
+          maxLength: 240
+          title: Text
+        source:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+      type: object
+      required:
+      - text
+      title: SessionMessagePreview
+      description: 'The last thing said in a session, for a list row.
+
+
+        A session row carried a title and a timestamp, so deciding whether a session was worth
+
+        reopening meant opening it. Only `message` records are considered: `done`/`usage` are
+
+        bookkeeping, `thought` is not addressed to anyone, and a `tool_call` says what the agent
+
+        reached for rather than what it concluded.'
+    SessionRecord:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        record_id:
+          type: string
+          format: uuid
+          title: Record Id
+        session_id:
+          type: string
+          title: Session Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        sequence:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Sequence
+        record_index:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Record Index
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        record_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Record Type
+        record_source:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Record Source
+        attributes:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Attributes
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        span_id:
+          anyOf:
+          - type: string
+            pattern: ^[0-9a-fA-F]{16}$
+          - type: 'null'
+          title: Span Id
+        quarantined_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Quarantined At
+      type: object
+      required:
+      - record_id
+      - session_id
+      - project_id
+      title: SessionRecord
+    SessionTurnQuery:
+      properties:
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        stream_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Stream Id
+        harness_kind:
+          anyOf:
+          - $ref: '#/components/schemas/HarnessKind'
+          - type: 'null'
+        references:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionReference'
+            type: array
+          - type: 'null'
+          title: References
+      type: object
+      title: SessionTurnQuery
+    SessionStreamQueryFlags:
+      properties:
+        is_alive:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Alive
+        is_running:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Running
+        is_attached:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Attached
+      type: object
+      title: SessionStreamQueryFlags
+    SessionInteractionFlags:
+      properties:
+        delivered_in_band:
+          type: boolean
+          title: Delivered In Band
+          default: false
+        delivered_webhook:
+          type: boolean
+          title: Delivered Webhook
+          default: false
+      type: object
+      title: SessionInteractionFlags
+    SessionExcludeRequest:
+      properties:
+        origins:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionOrigin'
+            type: array
+          - type: 'null'
+          title: Origins
+        session_ids:
+          anyOf:
+          - items:
+              type: string
+              maxLength: 128
+              minLength: 1
+              pattern: ^[a-zA-Z0-9_\-]+$
+            type: array
+            maxItems: 500
+          - type: 'null'
+          title: Session Ids
+      additionalProperties: false
+      type: object
+      title: SessionExcludeRequest
+    MountCredentials:
+      properties:
+        endpoint:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Endpoint
+        region:
+          type: string
+          title: Region
+          default: us-east-1
+        bucket:
+          type: string
+          title: Bucket
+        prefix:
+          type: string
+          title: Prefix
+        access_key:
+          type: string
+          title: Access Key
+        secret_key:
+          type: string
+          title: Secret Key
+        session_token:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Token
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+      type: object
+      required:
+      - bucket
+      - prefix
+      - access_key
+      - secret_key
+      title: MountCredentials
+      description: 'Short-lived, prefix-scoped credentials for a single mount.
+
+
+        Signed API-side from the store''s STS endpoint; the master key never leaves the
+
+        API. Scoped to `<bucket>/<project_id>/<mount_id>/*` and expires within minutes,
+
+        so a leak grants only this mount''s prefix for a short window.'
+    Mount:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        agent_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Id
+        purpose:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Purpose
+        data:
+          $ref: '#/components/schemas/MountData'
+        flags:
+          $ref: '#/components/schemas/MountFlags'
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+      type: object
+      required:
+      - project_id
+      title: Mount
+    SessionInteractionAnswerRequest:
+      properties:
+        interaction_id:
+          type: string
+          format: uuid
+          title: Interaction Id
+        answer:
+          additionalProperties: true
+          type: object
+          title: Answer
+      additionalProperties: false
+      type: object
+      required:
+      - interaction_id
+      - answer
+      title: SessionInteractionAnswerRequest
+    SessionRecordQueryRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/SessionTranscriptWindowing'
+          - type: 'null'
+      type: object
+      required:
+      - session_id
+      title: SessionRecordQueryRequest
+    SessionInteractionRequest:
+      properties:
+        tool:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tool
+        args:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Args
+        tool_call_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tool Call Id
+      additionalProperties: true
+      type: object
+      title: SessionInteractionRequest
+    CommandMode:
+      type: string
+      enum:
+      - send
+      - steer
+      - cancel
+      - attach
+      title: CommandMode
+      description: Derived from the inputs/data × force matrix.
+    SessionTurnsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        turns:
+          items:
+            $ref: '#/components/schemas/SessionTurn'
+          type: array
+          title: Turns
+      type: object
+      title: SessionTurnsResponse
+    SessionAttachmentReferenceRequest:
+      properties:
+        session_id:
+          type: string
+          title: Session Id
+        attachment_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          maxItems: 100
+          title: Attachment Ids
+      type: object
+      required:
+      - session_id
+      - attachment_ids
+      title: SessionAttachmentReferenceRequest
+    SessionQueryRequest:
+      properties:
+        session:
+          anyOf:
+          - $ref: '#/components/schemas/SessionPredicatesRequest'
+          - type: 'null'
+        session_ids:
+          anyOf:
+          - items:
+              type: string
+              maxLength: 128
+              minLength: 1
+              pattern: ^[a-zA-Z0-9_\-]+$
+            type: array
+            maxItems: 500
+          - type: 'null'
+          title: Session Ids
+        exclude:
+          anyOf:
+          - $ref: '#/components/schemas/SessionExcludeRequest'
+          - type: 'null'
+        turn_references:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionReference'
+            type: array
+          - type: 'null'
+          title: Turn References
+        include_ended:
+          type: boolean
+          title: Include Ended
+          default: false
+        include_archived:
+          type: boolean
+          title: Include Archived
+          default: false
+        archived_only:
+          type: boolean
+          title: Archived Only
+          default: false
+        include_total:
+          type: boolean
+          title: Include Total
+          default: false
+        expand:
+          items:
+            $ref: '#/components/schemas/SessionExpansion'
+          type: array
+          title: Expand
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+        references:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/SessionReference'
+            type: array
+          - type: 'null'
+          title: References
+        search:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SessionStreamQueryFlags'
+          - type: 'null'
+        exclude_session_ids:
+          anyOf:
+          - items:
+              type: string
+              maxLength: 128
+              minLength: 1
+              pattern: ^[a-zA-Z0-9_\-]+$
+            type: array
+            maxItems: 500
+          - type: 'null'
+          title: Exclude Session Ids
+        origin:
+          anyOf:
+          - $ref: '#/components/schemas/SessionOrigin'
+          - type: 'null'
+        exclude_origin:
+          anyOf:
+          - $ref: '#/components/schemas/SessionOrigin'
+          - type: 'null'
+      additionalProperties: false
+      type: object
+      title: SessionQueryRequest
+    SessionDelivery:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+      type: object
+      required:
+      - id
+      title: SessionDelivery
+    PendingInputAttachment:
+      properties:
+        uri:
+          type: string
+          minLength: 1
+          title: Uri
+        mime_type:
+          type: string
+          minLength: 1
+          title: Mime Type
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+        attachment_id:
+          anyOf:
+          - type: string
+            minLength: 1
+          - type: 'null'
+          title: Attachment Id
+      additionalProperties: false
+      type: object
+      required:
+      - uri
+      - mime_type
+      title: PendingInputAttachment
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    PendingInputResponse:
+      properties:
+        input:
+          $ref: '#/components/schemas/PendingInput'
+      type: object
+      required:
+      - input
+      title: PendingInputResponse
+    SessionStreamsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+        streams:
+          items:
+            $ref: '#/components/schemas/SessionStream'
+          type: array
+          title: Streams
+      type: object
+      required:
+      - count
+      - streams
+      title: SessionStreamsResponse
+    SessionAttachmentsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        attachments:
+          items:
+            $ref: '#/components/schemas/SessionAttachment'
+          type: array
+          title: Attachments
+      type: object
+      title: SessionAttachmentsResponse
+    SessionRecordsReadState:
+      properties:
+        latest_sequence:
+          type: integer
+          minimum: 0.0
+          title: Latest Sequence
+        history_complete:
+          type: boolean
+          title: History Complete
+      type: object
+      required:
+      - latest_sequence
+      - history_complete
+      title: SessionRecordsReadState
+    SessionStreamCommandResponse:
+      properties:
+        mode:
+          $ref: '#/components/schemas/CommandMode'
+        session_id:
+          type: string
+          title: Session Id
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        watcher_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Watcher Id
+        detached:
+          type: boolean
+          title: Detached
+          default: false
+        cancelled_turn_ids:
+          items:
+            type: string
+          type: array
+          title: Cancelled Turn Ids
+      type: object
+      required:
+      - mode
+      - session_id
+      title: SessionStreamCommandResponse
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

@@ -1,33 +1,1280 @@
 openapi: 3.2.0
 info:
   title: Agenta Applications API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
-  termsOfService: https://agenta.ai/terms
+  description: Agenta API
   contact:
-    name: Agenta Support
+    name: Agenta
     url: https://agenta.ai/
     email: team@agenta.ai
-  license:
-    name: MIT
-    url: https://github.com/Agenta-AI/agenta/blob/main/LICENSE
-  version: '1.0'
+  version: 0.1.0
 servers:
-- url: https://cloud.agenta.ai/api
-  description: Agenta Cloud (US)
+- url: /api
 - url: https://eu.cloud.agenta.ai/api
-  description: Agenta Cloud (EU)
 security:
-- ApiKeyAuth: []
+- APIKeyHeader: []
 tags:
 - name: Applications
-  description: Create and manage LLM applications and their variants.
+  description: LLM applications — create, update, list, and delete apps.
 paths:
-  /simple/applications/:
-    post:
-      operationId: createSimpleApplication
+  /applications/catalog/types/:
+    get:
       tags:
       - Applications
-      summary: Create a new application
+      summary: List Application Catalog Types
+      description: 'List shared catalog types.
+
+
+        Catalog types are reusable JSON-Schema building blocks referenced from
+
+        template schemas (for example `message`, `prompt-template`). Types are
+
+        read-only and version with the product.
+
+        See the Applications guide.'
+      operationId: list_application_catalog_types
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationCatalogTypesResponse'
+  /applications/catalog/templates/:
+    get:
+      tags:
+      - Applications
+      summary: List Application Catalog Templates
+      description: 'List application templates available in the catalog.
+
+
+        Templates describe the handler (`uri`) and JSON schemas used to create
+
+        a new application. Pass `include_archived=true` to include retired
+
+        templates (useful when editing applications created from an old
+
+        template). Templates are global and read-only.'
+      operationId: list_application_catalog_templates
+      parameters:
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationCatalogTemplatesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/catalog/templates/{template_key}:
+    get:
+      tags:
+      - Applications
+      summary: Fetch Application Catalog Template
+      description: 'Fetch one application template by key.
+
+
+        Use this to inspect the exact `uri`, `data`, and JSON Schemas for a
+
+        template before creating an application from it. `template_key` comes
+
+        from the `key` field of a template returned by the list endpoint
+
+        (for example `completion`, `chat`, `hook`).'
+      operationId: fetch_application_catalog_template
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationCatalogTemplateResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/catalog/templates/{template_key}/presets/:
+    get:
+      tags:
+      - Applications
+      summary: List Application Catalog Presets
+      description: 'List presets scoped to a template.
+
+
+        Presets are named parameter sets (for example a curated prompt +
+
+        model combination) that scaffold the first revision when creating an
+
+        application from a template. Pass `include_archived=true` to include
+
+        retired presets.'
+      operationId: list_application_catalog_presets
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationCatalogPresetsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/catalog/templates/{template_key}/presets/{preset_key}:
+    get:
+      tags:
+      - Applications
+      summary: Fetch Application Catalog Preset
+      description: 'Fetch one preset by key within a template.
+
+
+        Returns the preset''s `data` so clients can use it as the payload for a
+
+        first revision when creating an application from a template.'
+      operationId: fetch_application_catalog_preset
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      - name: preset_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Preset Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationCatalogPresetResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/:
+    post:
+      tags:
+      - Applications
+      summary: Create Application
+      description: 'Create an application artifact only.
+
+
+        Returns an empty application without any variants or revisions.
+
+        Most callers should use `POST /simple/applications/` instead — it
+
+        creates the artifact, a default variant, and a first committed
+
+        revision in one request.
+
+        See the Applications guide.'
+      operationId: create_application
+      parameters:
+      - name: application_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/{application_id}:
+    get:
+      tags:
+      - Applications
+      summary: Fetch Application
+      description: 'Fetch one application artifact by ID.
+
+
+        Returns artifact-level fields only. To get the current variant,
+
+        revision, and `data` in a single call, use
+
+        `GET /simple/applications/{application_id}`.'
+      operationId: fetch_application
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Applications
+      summary: Edit Application
+      description: 'Edit artifact-level fields on an application.
+
+
+        Editable fields: `description`, `flags`, `tags`, `meta`. Editing `name`
+
+        is currently disabled and returns `400`. Prompt or model-parameter
+
+        changes go through `POST /applications/revisions/commit`, not this
+
+        endpoint.'
+      operationId: edit_application
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/{application_id}/archive:
+    post:
+      tags:
+      - Applications
+      summary: Archive Application
+      description: 'Soft-delete an application.
+
+
+        Archiving sets `deleted_at` on the application and hides it from
+
+        queries that don''t set `include_archived: true`. Its variants and
+
+        revisions become unreachable from listing but their IDs remain
+
+        resolvable so historical traces stay intact.
+
+        See Versioning.'
+      operationId: archive_application
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/{application_id}/unarchive:
+    post:
+      tags:
+      - Applications
+      summary: Unarchive Application
+      description: 'Restore a previously archived application.
+
+
+        Clears `deleted_at` and makes the application visible to standard
+
+        queries again. Safe to call on an already-active application; it is a
+
+        no-op in that case.'
+      operationId: unarchive_application
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/query:
+    post:
+      tags:
+      - Applications
+      summary: Query Applications
+      description: 'Query application artifacts.
+
+
+        Returns only artifact-level fields; the variant, revision, and `data`
+
+        payload are not included. For one row per application with those
+
+        merged in, use `POST /simple/applications/query`.
+
+        See Query Pattern.'
+      operationId: query_applications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/variants/:
+    post:
+      tags:
+      - Applications
+      summary: Create Application Variant
+      description: 'Create a new variant on an existing application.
+
+
+        A variant is an independent branch of the application''s history. The
+
+        new variant starts empty — call `POST /applications/revisions/commit`
+
+        to add its first revision. Use `POST /applications/variants/fork` when
+
+        you want the new variant to inherit an existing revision history.'
+      operationId: create_application_variant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationVariantCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/variants/{application_variant_id}:
+    get:
+      tags:
+      - Applications
+      summary: Fetch Application Variant
+      description: 'Fetch one variant by ID.
+
+
+        Returns variant-level fields. To get the variant''s tip revision and
+
+        its `data`, call `POST /applications/revisions/retrieve` with
+
+        `application_variant_ref`.'
+      operationId: fetch_application_variant
+      parameters:
+      - name: application_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Applications
+      summary: Edit Application Variant
+      description: 'Edit a variant''s header fields (`name`, `description`, `tags`, `meta`).
+
+
+        Configuration changes go through a new commit via
+
+        `POST /applications/revisions/commit`. This endpoint only touches
+
+        variant-level metadata.'
+      operationId: edit_application_variant
+      parameters:
+      - name: application_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Variant Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationVariantEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/variants/{application_variant_id}/archive:
+    post:
+      tags:
+      - Applications
+      summary: Archive Application Variant
+      description: 'Soft-delete a variant.
+
+
+        The variant and its revisions are hidden from queries unless
+
+        `include_archived: true` is sent. Revision IDs remain resolvable so
+
+        historical traces are preserved.'
+      operationId: archive_application_variant
+      parameters:
+      - name: application_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/variants/{application_variant_id}/unarchive:
+    post:
+      tags:
+      - Applications
+      summary: Unarchive Application Variant
+      description: Restore a previously archived variant.
+      operationId: unarchive_application_variant
+      parameters:
+      - name: application_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/variants/query:
+    post:
+      tags:
+      - Applications
+      summary: Query Application Variants
+      description: 'Query variants across one or more applications.
+
+
+        Filters are parsed from both query-string parameters and the request
+
+        body; body values take precedence. Use `application_refs` to scope to
+
+        specific applications, `application_variant_refs` to narrow to
+
+        specific variants.
+
+        See Query Pattern.'
+      operationId: query_application_variants
+      parameters:
+      - name: application_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+      - name: application_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Application Ids
+      - name: application_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Application Slug
+      - name: application_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Application Slugs
+      - name: application_variant_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Variant Id
+      - name: application_variant_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Application Variant Ids
+      - name: application_variant_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Application Variant Slug
+      - name: application_variant_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Application Variant Slugs
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - name: description
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - name: flags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Flags
+      - name: tags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tags
+      - name: meta
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Meta
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      - name: next
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+      - name: newest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+      - name: oldest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: order
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - ascending
+            - descending
+            type: string
+          - type: 'null'
+          title: Order
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationVariantsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/variants/fork:
+    post:
+      tags:
+      - Applications
+      summary: Fork Application Variant
+      description: 'Fork an existing variant into a new variant on the same application.
+
+
+        Use this to experiment without touching the source variant''s history.
+
+        The fork copies the source variant''s revisions up to the specified
+
+        revision (or tip) into the new variant, then commits the supplied
+
+        `revision` object on top. Both `variant` and `revision` sub-objects
+
+        in the request must be present; the server returns `count: 0` when
+
+        either is missing. Returns `400 Bad Request` if the fork target is
+
+        invalid (for example, the source variant or revision cannot be
+
+        located in this application''s lineage).'
+      operationId: fork_application_variant
+      parameters:
+      - name: application_variant_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Variant Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationVariantForkRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/retrieve:
+    post:
+      tags:
+      - Applications
+      summary: Retrieve Application Revision
+      description: 'Retrieve one application revision by reference.
+
+
+        Accepts application / variant / revision references for direct lookup,
+
+        or an environment reference (with optional `key`) to resolve the
+
+        currently-deployed revision in that environment. Returns the revision
+
+        including its `data` payload (URL, parameters, schemas), which clients
+
+        use to invoke the application.
+
+        Set `resolve: true` to inline embedded references inside `data`.'
+      operationId: retrieve_application_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRevisionRetrieveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/deploy:
+    post:
+      tags:
+      - Applications
+      summary: Deploy Application Revision
+      description: 'Deploy an application revision to an environment.
+
+
+        Writes a reference from the environment revision to the application
+
+        revision under `key` (default: `{application_slug}.revision`). Clients
+
+        that subsequently call `/applications/revisions/retrieve` with the
+
+        same `environment_ref` and `key` resolve to this revision.
+
+        See the Applications guide.'
+      operationId: deploy_application_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRevisionDeployRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/:
+    post:
+      tags:
+      - Applications
+      summary: Create Application Revision
+      description: 'Create and commit the initial revision for an application variant.
+
+
+        Advanced use only. For normal development loops prefer
+
+        `POST /applications/revisions/commit`, which commits the new revision
+
+        as the variant''s tip and assigns a version number.'
+      operationId: create_application_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRevisionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/{application_revision_id}:
+    get:
+      tags:
+      - Applications
+      summary: Fetch Application Revision
+      description: 'Fetch one revision by its ID.
+
+
+        Returns the revision including its `data` payload. For lookup by
+
+        variant slug or environment, use `POST /applications/revisions/retrieve`.'
+      operationId: fetch_application_revision
+      parameters:
+      - name: application_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Applications
+      summary: Edit Application Revision
+      description: 'Edit a revision''s header fields only.
+
+
+        Revisions are immutable snapshots; `data`, `author`, `date`, and
+
+        `message` cannot be changed. This endpoint updates header fields such
+
+        as `description` and `tags`. To change configuration, commit a new
+
+        revision with `POST /applications/revisions/commit`.'
+      operationId: edit_application_revision
+      parameters:
+      - name: application_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Revision Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRevisionEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/{application_revision_id}/archive:
+    post:
+      tags:
+      - Applications
+      summary: Archive Application Revision
+      description: 'Soft-delete a revision.
+
+
+        Archived revisions are hidden from `/query` and `/log` responses
+
+        unless `include_archived: true` is set. The ID remains resolvable for
+
+        traces and deployed environment references.'
+      operationId: archive_application_revision
+      parameters:
+      - name: application_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/{application_revision_id}/unarchive:
+    post:
+      tags:
+      - Applications
+      summary: Unarchive Application Revision
+      description: Restore a previously archived revision.
+      operationId: unarchive_application_revision
+      parameters:
+      - name: application_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/query:
+    post:
+      tags:
+      - Applications
+      summary: Query Application Revisions
+      description: 'Query revisions across one or more applications or variants.
+
+
+        Use `application_refs` / `application_variant_refs` to scope the
+
+        query, or filter on commit metadata (`author`, `date`, `message`) via
+
+        the `application_revision` object. For the ordered history of a
+
+        single variant, `POST /applications/revisions/log` is more direct.'
+      operationId: query_application_revisions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRevisionQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/commit:
+    post:
+      tags:
+      - Applications
+      summary: Commit Application Revision
+      description: 'Commit a new revision on a variant.
+
+
+        The new revision becomes the variant''s tip and is assigned the next
+
+        `version` number. Revisions are immutable once committed; to change
+
+        configuration, commit a new revision.
+
+        See Versioning.'
+      operationId: commit_application_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRevisionCommitRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/log:
+    post:
+      tags:
+      - Applications
+      summary: Log Application Revisions
+      description: 'Return the ordered revision log for a variant.
+
+
+        Pass `application_variant_id` to list the full history of that
+
+        variant; optionally pass `application_revision_id` + `depth` to walk
+
+        back a bounded number of commits from a specific revision. Entries
+
+        are returned newest-first and include the full revision record.'
+      operationId: log_application_revisions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRevisionsLogRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /applications/revisions/resolve:
+    post:
+      tags:
+      - Applications
+      summary: Resolve Application Revision
+      description: 'Fetch a revision with embedded references inlined.
+
+
+        When a revision''s `data` carries references to other entities
+
+        (snippets, linked revisions), this endpoint resolves them in place and
+
+        returns the fully-inlined configuration along with `resolution_info`
+
+        describing what was substituted. Use it when clients need a
+
+        self-contained configuration for invocation or export.'
+      operationId: resolve_application_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRevisionResolveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRevisionResolveResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/applications/:
+    post:
+      tags:
+      - Applications
+      summary: Create Simple Application
+      description: 'Create an application end-to-end.
+
+
+        Creates the application artifact, a default variant, and a first
+
+        committed revision whose `data` comes from the request. This is the
+
+        recommended entry point for "spin up a new application from a
+
+        template". For more control over variant and revision creation, use
+
+        the structured endpoints under `/applications/`.
+
+        See Simple Endpoints.'
+      operationId: create_simple_application
+      parameters:
+      - name: application_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
       requestBody:
         required: true
         content:
@@ -36,62 +1283,116 @@ paths:
               $ref: '#/components/schemas/SimpleApplicationCreateRequest'
       responses:
         '200':
-          description: The created application.
+          description: Successful Response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SimpleApplicationResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /simple/applications/query:
     post:
-      operationId: querySimpleApplications
       tags:
       - Applications
-      summary: List and filter applications
+      summary: Query Simple Applications
+      description: 'Query applications with variant, revision, and `data` merged per row.
+
+
+        This is the shape most clients want for dashboards or invocation
+
+        pickers: each row carries `variant_id`, `revision_id`, and `data`
+
+        (URL, parameters, schemas) alongside the artifact fields. For the
+
+        structured query that returns artifacts only, use
+
+        `POST /applications/query`.'
+      operationId: query_simple_applications
       requestBody:
-        required: false
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationQueryRequest'
+              $ref: '#/components/schemas/SimpleApplicationQueryRequest'
+        required: true
       responses:
         '200':
-          description: A list of applications.
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SimpleApplicationResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: '#/components/schemas/SimpleApplicationsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /simple/applications/{application_id}:
     get:
-      operationId: fetchSimpleApplication
       tags:
       - Applications
-      summary: Fetch a single application by id
+      summary: Fetch Simple Application
+      description: 'Fetch one application with its current variant, revision, and `data` merged.
+
+
+        The returned `data` includes the invocation `url`, the `parameters`
+
+        the revision was committed with, and the JSON `schemas` for inputs,
+
+        outputs, and parameters.'
+      operationId: fetch_simple_application
       parameters:
-      - $ref: '#/components/parameters/ApplicationId'
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Id
       responses:
         '200':
-          description: The requested application.
+          description: Successful Response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SimpleApplicationResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
     put:
-      operationId: editSimpleApplication
       tags:
       - Applications
-      summary: Edit an application by id
+      summary: Edit Simple Application
+      description: 'Edit an application and commit a new revision if configuration changed.
+
+
+        Fields other than `id` in the request body are treated as changes and
+
+        produce a new committed revision. Supplying `data` changes the
+
+        configuration; supplying only header fields (`flags`, `tags`, `meta`)
+
+        still produces a new revision with the updated header but the
+
+        existing `data`. Editing the application `name` is currently
+
+        disabled and returns `400`.'
+      operationId: edit_simple_application
       parameters:
-      - $ref: '#/components/parameters/ApplicationId'
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Application Id
       requestBody:
         required: true
         content:
@@ -100,329 +1401,3402 @@ paths:
               $ref: '#/components/schemas/SimpleApplicationEditRequest'
       responses:
         '200':
-          description: The updated application.
+          description: Successful Response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SimpleApplicationResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /applications/variants/query:
-    post:
-      operationId: queryApplicationVariants
-      tags:
-      - Applications
-      summary: List and filter application variants
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VariantQueryRequest'
-      responses:
-        '200':
-          description: A list of application variants.
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ApplicationVariant'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /applications/variants/{application_variant_id}:
-    get:
-      operationId: fetchApplicationVariant
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/applications/{application_id}/archive:
+    post:
       tags:
       - Applications
-      summary: Fetch a single application variant by id
+      summary: Archive Simple Application
+      description: 'Archive an application through the simple endpoint layer.
+
+
+        Equivalent to `POST /applications/{application_id}/archive`; returns
+
+        the archived application in the simple shape (with its last known
+
+        variant, revision, and `data`).'
+      operationId: archive_simple_application
       parameters:
-      - name: application_variant_id
+      - name: application_id
         in: path
         required: true
         schema:
           type: string
           format: uuid
+          title: Application Id
       responses:
         '200':
-          description: The requested variant.
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationVariant'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-  /applications/revisions/commit:
+                $ref: '#/components/schemas/SimpleApplicationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/applications/{application_id}/unarchive:
     post:
-      operationId: commitApplicationRevision
       tags:
       - Applications
-      summary: Commit a new revision of an application variant
-      description: Commits the supplied prompt and parameter configuration as a new, immutable revision of a variant. This is how new prompt versions are published in Agenta's prompt management workflow.
-      requestBody:
+      summary: Unarchive Simple Application
+      description: 'Unarchive an application through the simple endpoint layer.
+
+
+        Equivalent to `POST /applications/{application_id}/unarchive`, with
+
+        the response shape of `/simple/applications/`.'
+      operationId: unarchive_simple_application
+      parameters:
+      - name: application_id
+        in: path
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CommitRevisionRequest'
+        schema:
+          type: string
+          format: uuid
+          title: Application Id
       responses:
         '200':
-          description: The committed revision.
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Revision'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: '#/components/schemas/SimpleApplicationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    PromptConfig:
-      type: object
-      description: A prompt template plus model and inference parameters.
+    SimpleApplicationEditRequest:
       properties:
-        prompt:
-          type: object
-          properties:
-            messages:
-              type: array
-              items:
-                type: object
-                properties:
-                  role:
-                    type: string
-                    enum:
-                    - system
-                    - user
-                    - assistant
-                  content:
-                    type: string
-            llm_config:
-              type: object
-              properties:
-                model:
-                  type: string
-                  example: gpt-4o
-                temperature:
-                  type: number
-                  format: float
-                max_tokens:
-                  type: integer
-                top_p:
-                  type: number
-                  format: float
-            template_format:
-              type: string
-              enum:
-              - fstring
-              - jinja2
-              - curly
-              default: fstring
-            input_keys:
-              type: array
-              items:
-                type: string
-    Error:
+        application:
+          $ref: '#/components/schemas/SimpleApplicationEdit'
+          description: Fields to change. `id` must match the path. Supplying `data` commits a new revision with that configuration; supplying `flags`/`tags`/`meta` commits a revision with the updated header but the existing `data`.
       type: object
+      required:
+      - application
+      title: SimpleApplicationEditRequest
+      description: 'Request body for `PUT /simple/applications/{application_id}`.
+
+
+        Commits a new revision on the application''s variant whenever fields other
+
+        than `id` are present. If only `id` is sent, the current state is returned
+
+        without committing.'
+    ApplicationRevisionDeployRequest:
       properties:
-        detail:
-          oneOf:
+        application_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Application reference. If provided, the latest revision of the default variant is deployed.
+        application_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Variant reference. Its latest revision is deployed.
+        application_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Revision reference. The exact revision is deployed.
+        environment_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: 'Target environment (for example `{"slug": "production"}`).'
+        environment_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Target environment variant.
+        environment_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Target environment revision; advanced use only.
+        key:
+          anyOf:
           - type: string
-          - type: object
-    Application:
+          - type: 'null'
+          title: Key
+          description: Deployment key inside the environment revision. Defaults to `{application_slug}.revision`.
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+          description: Optional commit message attached to the environment revision.
       type: object
+      title: ApplicationRevisionDeployRequest
+      description: 'Request body for `POST /applications/revisions/deploy`.
+
+
+        Attaches an application revision to an environment under a key. Subsequent
+
+        calls to `/applications/revisions/retrieve` with the matching
+
+        `environment_ref` resolve to this revision.
+
+        See the [Applications guide](/reference/api-guide/applications#deployment).'
+    ApplicationEditRequest:
       properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
+        application:
+          $ref: '#/components/schemas/ApplicationEdit'
+          description: Artifact fields to update. The `id` must match the `application_id` in the URL path.
+      type: object
+      required:
+      - application
+      title: ApplicationEditRequest
+      description: 'Request body for editing an application artifact.
+
+
+        Only artifact-level fields (flags, tags, meta) can be edited here. Editing
+
+        the `name` is currently disabled. To change the prompt or model parameters,
+
+        commit a new revision on a variant with `/applications/revisions/commit`.'
+    ApplicationCatalogTemplate:
+      properties:
         name:
-          type: string
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
         description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
           type: string
+          title: Key
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        categories:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Categories
         flags:
-          type: object
-          additionalProperties: true
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
-    Windowing:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogFlags'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Output'
+          - type: 'null'
       type: object
-      description: Cursor / time-window pagination controls.
+      required:
+      - key
+      title: ApplicationCatalogTemplate
+    ApplicationFlags:
       properties:
-        next:
-          type: string
-        limit:
-          type: integer
-          default: 100
-        oldest:
-          type: string
-          format: date-time
-        newest:
-          type: string
-          format: date-time
-        order:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+      type: object
+      title: ApplicationFlags
+      description: Legacy full application flag set.
+    ApplicationVariantEditRequest:
+      properties:
+        application_variant:
+          $ref: '#/components/schemas/ApplicationVariantEdit'
+          description: Full variant body. Edit replaces the artifact-level fields in a single PUT, so include every editable field even if its value is unchanged. `id` must match the `application_variant_id` in the URL path; `slug` is immutable. Configuration changes (prompt, model parameters) go through `/applications/revisions/commit`, not this endpoint.
+      type: object
+      required:
+      - application_variant
+      title: ApplicationVariantEditRequest
+      description: Request body for editing a variant's artifact-level fields.
+    ApplicationRevisionEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: ApplicationRevisionEdit
+    ApplicationVariantFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+      type: object
+      title: ApplicationVariantFlags
+    WorkflowRevisionOperation:
+      properties:
+        operation:
           type: string
           enum:
-          - ascending
-          - descending
-    SimpleApplicationResponse:
+          - set
+          - merge
+          - remove
+          - edit_text
+          - add_item
+          - replace_item
+          - remove_item
+          title: Operation
+        target:
+          items: {}
+          type: array
+          title: Target
+        value:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Value
+        edits:
+          anyOf:
+          - items:
+              additionalProperties:
+                type: string
+              type: object
+            type: array
+          - type: 'null'
+          title: Edits
+        match_mode:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - exact
+          - type: 'null'
+          title: Match Mode
+      additionalProperties: false
       type: object
+      required:
+      - operation
+      - target
+      title: WorkflowRevisionOperation
+      description: 'One ordered operation. The new delta arm (agent-config-editing, contract 3.2).
+
+
+        ``extra="forbid"`` applies to this NEW model only. The legacy ``set``/``remove`` arm
+
+        stays permissive on purpose: tightening it would reject payloads that shipped
+
+        playbooks send today and that the server has always ignored.'
+    ApplicationCreateRequest:
+      properties:
+        application:
+          $ref: '#/components/schemas/ApplicationCreate'
+          description: 'Artifact-level fields for the new application: `slug`, `name`, `description`, `flags`, `tags`, `meta`. The `slug` must be unique within the project.'
+      type: object
+      required:
+      - application
+      title: ApplicationCreateRequest
+      description: 'Request body for creating an application artifact.
+
+
+        Applications are versioned resources; creating one produces an empty artifact.
+
+        Use `POST /simple/applications/` if you want to create the artifact, a default
+
+        variant, and a first committed revision in a single call.
+
+        See the [Applications guide](/reference/api-guide/applications).'
+    ApplicationCatalogTypesResponse:
       properties:
         count:
           type: integer
-        application:
-          $ref: '#/components/schemas/Application'
-    CommitRevisionRequest:
+          title: Count
+          description: Number of types returned.
+          default: 0
+        types:
+          items:
+            $ref: '#/components/schemas/ApplicationCatalogType'
+          type: array
+          title: Types
+          description: Shared JSON Schema building blocks referenced by templates (for example `message`, `prompt-template`).
       type: object
-      required:
-      - revision
+      title: ApplicationCatalogTypesResponse
+      description: List of catalog types.
+    ApplicationRevisionFlags:
       properties:
-        revision:
-          type: object
-          properties:
-            slug:
-              type: string
-            variant_id:
-              type: string
-              format: uuid
-            message:
-              type: string
-              description: Commit message describing the change.
-            data:
-              $ref: '#/components/schemas/PromptConfig'
-    SimpleApplicationEditRequest:
-      type: object
-      properties:
-        app:
-          type: object
-          properties:
-            name:
-              type: string
-            description:
-              type: string
-    SimpleApplicationCreateRequest:
-      type: object
-      required:
-      - app
-      properties:
-        app:
-          type: object
-          required:
-          - slug
-          properties:
-            slug:
-              type: string
-              description: URL-friendly unique slug for the application.
-            name:
-              type: string
-            description:
-              type: string
-            flags:
-              type: object
-              additionalProperties: true
-    ApplicationQueryRequest:
-      type: object
-      properties:
-        application:
-          type: object
-          properties:
-            flags:
-              type: object
-              additionalProperties: true
-        include_archived:
+        is_application:
           type: boolean
+          title: Is Application
           default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
-    Lifecycle:
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
       type: object
-      description: Audit metadata attached to most Agenta resources.
+      title: ApplicationRevisionFlags
+    ErrorPolicy:
+      type: string
+      enum:
+      - exception
+      - placeholder
+      - keep
+      title: ErrorPolicy
+    ApplicationRevisionResponse:
       properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
-    Revision:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a revision was found, `0` otherwise.'
+          default: 0
+        application_revision:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevision-Output'
+          - type: 'null'
+          description: The application revision, including its `data` payload (prompt, model parameters, schemas, URL).
+        resolution_info:
+          anyOf:
+          - $ref: '#/components/schemas/ResolutionInfo'
+          - type: 'null'
+          description: 'Present only when the request set `resolve: true`. Describes which embedded references were resolved and any errors that occurred.'
+        retrieval_info:
+          anyOf:
+          - $ref: '#/components/schemas/RetrievalInfo'
+          - type: 'null'
+          description: References used to retrieve the top-level revision.
       type: object
+      title: ApplicationRevisionResponse
+      description: Single-revision response envelope.
+    JsonSchemas-Input:
       properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        version:
-          type: string
-        variant_id:
-          type: string
-          format: uuid
-        message:
-          type: string
-        data:
-          $ref: '#/components/schemas/PromptConfig'
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
-    ApplicationVariant:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Outputs
       type: object
+      title: JsonSchemas
+    PlaygroundBuildKitContext:
       properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
+        op_access:
+          additionalProperties:
+            type: string
+            enum:
+            - read
+            - write
+          type: object
+          title: Op Access
+        agent_template_overlay:
+          anyOf:
+          - $ref: '#/components/schemas/AgentTemplateOverlay'
+          - type: 'null'
+          description: Partial `parameters.agent` overlay applied by the playground only.
+      type: object
+      title: PlaygroundBuildKitContext
+      description: Read-only playground build-kit context for one inspect/fetch response.
+    WorkflowRevisionDelta:
+      properties:
+        set:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Set
+        remove:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Remove
+        operations:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/WorkflowRevisionOperation'
+            type: array
+          - type: 'null'
+          title: Operations
+      type: object
+      title: WorkflowRevisionDelta
+      description: "Delta operations on a workflow revision's data tree.\n\nTwo forms, never mixed (contract 3):\n\n- **legacy** — ``set``: a partial data tree deep-merged onto the base revision's data\n  (nested dicts merge; scalars and lists replace); ``remove``: dotted key paths to\n  delete (e.g. ``parameters.agent.tools``).\n- **ordered** — ``operations``: the seven verbs, applied in array order, all or\n  nothing.\n\nThe engine enforces the exclusivity and every operation rule; this model only carries\nthe shapes.\n\nUnknown keys beside ``set``/``remove``/``operations`` are refused on the ORDERED arm\nonly, so a caller cannot believe it sent an operation modifier the server never saw.\nA pure-legacy envelope keeps its shipped tolerance: the server has always ignored\nstray keys there, and playbooks in the field send them. Neither rule reaches the tree\ninside ``set``, which stays free-form."
+    ResolutionInfo:
+      properties:
+        references_used:
+          items:
+            additionalProperties:
+              $ref: '#/components/schemas/Reference'
+            type: object
+          type: array
+          title: References Used
+        depth_reached:
+          type: integer
+          title: Depth Reached
+        embeds_resolved:
+          type: integer
+          title: Embeds Resolved
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+      type: object
+      required:
+      - references_used
+      - depth_reached
+      - embeds_resolved
+      title: ResolutionInfo
+    ApplicationCatalogType:
+      properties:
         name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
           type: string
-        application_id:
-          type: string
-          format: uuid
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
-    VariantQueryRequest:
-      type: object
-      properties:
-        variant:
+          title: Key
+        json_schema:
+          additionalProperties:
+            $ref: '#/components/schemas/FullJson-Output'
           type: object
-          properties:
-            application_id:
-              type: string
-              format: uuid
-        include_archived:
+          title: Json Schema
+      type: object
+      required:
+      - key
+      - json_schema
+      title: ApplicationCatalogType
+    ApplicationCreate:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: ApplicationCreate
+    SimpleApplicationFlags:
+      properties:
+        is_application:
           type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+      type: object
+      title: SimpleApplicationFlags
+    SimpleApplicationsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of applications in this page.
+          default: 0
+        applications:
+          items:
+            $ref: '#/components/schemas/SimpleApplication'
+          type: array
+          title: Applications
+          description: Applications with their current variant, revision, and `data` merged in.
+      type: object
+      title: SimpleApplicationsResponse
+      description: Paginated list of simple-application rows.
+    ApplicationRevisionsLogRequest:
+      properties:
+        application_revisions:
+          $ref: '#/components/schemas/ApplicationRevisionsLog'
+          description: Filter for the log. Typically set `application_variant_id` to list the revision history of a single variant; optionally set `application_revision_id` + `depth` to walk back a bounded number of commits from a specific revision.
+      type: object
+      required:
+      - application_revisions
+      title: ApplicationRevisionsLogRequest
+      description: 'Request body for `POST /applications/revisions/log`.
+
+
+        Returns the ordered list of revisions committed to a variant, newest first.
+
+        Each entry carries commit metadata and the full revision record.'
+    ApplicationVariantFork:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: ApplicationVariantFork
+    SimpleApplicationQueryRequest:
+      properties:
+        application:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationQuery'
+          - type: 'null'
+          description: Attribute filter. Supports `slug`, `slugs`, `flags`, and `meta`. `flags` filter both artifact flags (`is_application`, etc.) and revision flags (`is_chat`, `has_url`, etc.).
+        application_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Application Refs
+          description: Restrict to specific applications by `id` or `slug`.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When `true`, include archived applications. Defaults to `false`.
           default: false
         windowing:
-          $ref: '#/components/schemas/Windowing'
-  responses:
-    NotFound:
-      description: The requested resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  parameters:
-    ApplicationId:
-      name: application_id
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor pagination and time-range controls.
+      type: object
+      title: SimpleApplicationQueryRequest
+      description: 'Request body for `POST /simple/applications/query`.
+
+
+        Returns one row per application with the currently resolved variant,
+
+        revision, and `data` merged in — the shape most clients want when listing
+
+        applications for a dashboard or invocation picker.'
+    ApplicationVariantResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a variant was found, `0` otherwise.'
+          default: 0
+        application_variant:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationVariant'
+          - type: 'null'
+          description: The application variant, or `null`.
+      type: object
+      title: ApplicationVariantResponse
+      description: Single-variant response envelope.
+    ApplicationCatalogPresetsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of presets returned.
+          default: 0
+        presets:
+          items:
+            $ref: '#/components/schemas/ApplicationCatalogPreset'
+          type: array
+          title: Presets
+          description: Named parameter sets for the template. Use a preset's `data` as the first revision when creating an application from a template.
+      type: object
+      title: ApplicationCatalogPresetsResponse
+      description: List of catalog presets scoped to one template.
+    AgentTemplateOverlay:
+      properties:
+        tools:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Tools
+          description: Platform tool configs and `@ag.embed` tool references.
+        skills:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Skills
+          description: '`@ag.embed` references to authoring skills.'
+        sandbox:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Sandbox
+          description: 'Sandbox section overlay, e.g. `{permissions: {...}}`.'
+      type: object
+      title: AgentTemplateOverlay
+      description: 'A documented subset of the `parameters.agent` authoring shape.
+
+
+        Carries the platform-owned tools, authoring skills, and sandbox elevation the playground
+
+        layers on top of the draft for the build kit. Entries are intentionally open (platform-op
+
+        configs and `@ag.embed` references), so they are typed loosely: the full `parameters.agent`
+
+        authoring template has no shared Pydantic model today (it rides as free-form
+
+        `data.parameters`), and the SDK''s runtime `AgentTemplate` is the flattened parse with
+
+        different field names, so neither can be reused 1:1 to type this overlay.'
+    RevisionGrouping:
+      properties:
+        by:
+          type: string
+          enum:
+          - artifact
+          - variant
+          title: By
+        get:
+          type: string
+          const: latest
+          title: Get
+      type: object
+      required:
+      - by
+      - get
+      title: RevisionGrouping
+    ApplicationEdit:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: ApplicationEdit
+    ApplicationVariantForkRequest:
+      properties:
+        application_variant:
+          $ref: '#/components/schemas/ApplicationVariantFork'
+          description: Config for the new variant (slug, name, description, flags).
+        application_variant_ref:
+          $ref: '#/components/schemas/Reference'
+          description: Source variant to fork from.
+        application_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Pin the fork to this revision; defaults to the source variant's head.
+      type: object
+      required:
+      - application_variant
+      - application_variant_ref
+      title: ApplicationVariantForkRequest
+    SimpleApplicationQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        slugs:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Slugs
+      type: object
+      title: SimpleApplicationQuery
+    ApplicationsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of applications in this page.
+          default: 0
+        applications:
+          items:
+            $ref: '#/components/schemas/Application'
+          type: array
+          title: Applications
+          description: Application artifacts matching the query.
+      type: object
+      title: ApplicationsResponse
+      description: Paginated list of application artifacts.
+    ApplicationRevisionResolveRequest:
+      properties:
+        application_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Application reference.
+        application_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Variant reference; resolves the latest revision on it.
+        application_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Revision reference; resolves that exact revision.
+        application_revision:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevision-Input'
+          - type: 'null'
+          description: Resolve the references embedded in this revision payload directly, without fetching it first. Only `data` is used; id and metadata are ignored.
+        max_depth:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Depth
+          description: Maximum nesting depth for embedded references. Protects against runaway recursion. Defaults to `10`.
+          default: 10
+        max_embeds:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Embeds
+          description: Maximum total number of embedded references to follow. Defaults to `100`.
+          default: 100
+        error_policy:
+          anyOf:
+          - $ref: '#/components/schemas/ErrorPolicy'
+          - type: 'null'
+          description: How to handle resolution errors. `exception` (default) aborts; `placeholder` substitutes a marker; `keep` leaves the original reference untouched.
+          default: exception
+      type: object
+      title: ApplicationRevisionResolveRequest
+      description: 'Request body for `POST /applications/revisions/resolve`.
+
+
+        Fetches a revision and resolves any embedded references (snippets, linked
+
+        revisions) inside its `data`. Use when clients need the fully-inlined
+
+        configuration instead of the raw stored form.'
+    ApplicationRevisionData-Input:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Input'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: ApplicationRevisionData
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    ApplicationCatalogTemplateResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when found, `0` otherwise.'
+          default: 0
+        template:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationCatalogTemplate'
+          - type: 'null'
+          description: Catalog template definition.
+      type: object
+      title: ApplicationCatalogTemplateResponse
+      description: Single template response envelope.
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    SimpleApplicationCreateRequest:
+      properties:
+        application:
+          $ref: '#/components/schemas/SimpleApplicationCreate'
+          description: Application fields plus `data` for the first revision. `data.uri` selects the template (for example `agenta:builtin:completion:v0`); `data.parameters` carries the prompt and model config.
+      type: object
+      required:
+      - application
+      title: SimpleApplicationCreateRequest
+      description: 'Request body for `POST /simple/applications/`.
+
+
+        Creates the application artifact, a default variant, and a first committed
+
+        revision whose `data` comes from the request. Use this for the common case
+
+        of "spin up a new application from a template".
+
+        See [Simple Endpoints](/reference/api-guide/simple-endpoints).'
+    ApplicationVariant:
+      properties:
+        application_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Application Slug
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        application_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationVariantFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: ApplicationVariant
+    ApplicationRevisionRetrieveRequest:
+      properties:
+        application_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Application artifact to look up. Identifies the artifact by `id` or `slug` (both project-unique). When no variant_ref or revision_ref is provided, returns the latest revision of the application's default variant.
+        application_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Application variant to look up. Identifies the variant by `id` or `slug` (both project-unique). When no revision_ref is provided, returns the latest revision of this variant.
+        application_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Application revision to look up. `id` alone identifies a revision (project-unique). `slug` alone identifies a revision (project-unique). `version` alone is a per-variant sequence number and is **not** sufficient on its own; it must be combined with an `application_variant_ref`. Sending only `version` without a variant ref returns HTTP 400.
+        environment_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Environment reference. Returns the revision currently deployed to that environment under the given `key`.
+        environment_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Environment variant reference; used together with `environment_ref`.
+        environment_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Environment revision reference; used to pin to a specific environment commit instead of the current tip.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Deployment key inside the environment revision. When omitted and `application_ref` is supplied, the server derives it as `{application_slug}.revision`.
+        resolve:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Resolve
+          description: When `true`, resolve embedded references in the returned revision's `data` (for example, snippet references).
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When false, an archived application, variant, or revision resolves to nothing.
+      type: object
+      title: ApplicationRevisionRetrieveRequest
+      description: 'Request body for `POST /applications/revisions/retrieve`.
+
+
+        Resolves to a single revision by one or more reference types. Every
+
+        reference supplied must agree with the resolved revision; contradictions
+
+        return HTTP 400. See the [Applications guide](/reference/api-guide/applications#invocation).'
+    WorkflowCatalogFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_archived:
+          type: boolean
+          title: Is Archived
+          default: false
+        is_recommended:
+          type: boolean
+          title: Is Recommended
+          default: false
+      type: object
+      title: WorkflowCatalogFlags
+    ApplicationVariantsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of variants in this page.
+          default: 0
+        application_variants:
+          items:
+            $ref: '#/components/schemas/ApplicationVariant'
+          type: array
+          title: Application Variants
+          description: Application variants matching the query.
+      type: object
+      title: ApplicationVariantsResponse
+      description: Paginated list of application variants.
+    ApplicationResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when the application was found, `0` otherwise.'
+          default: 0
+        application:
+          anyOf:
+          - $ref: '#/components/schemas/Application'
+          - type: 'null'
+          description: The application artifact, or `null` if not found.
+      type: object
+      title: ApplicationResponse
+      description: Single-application response envelope.
+    SimpleApplicationCreate:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationData-Input'
+          - type: 'null'
+      type: object
+      title: SimpleApplicationCreate
+    ApplicationArtifactQueryFlags:
+      properties:
+        is_application:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+        is_evaluator:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+        is_snippet:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
+      type: object
+      title: ApplicationArtifactQueryFlags
+      description: Application query flags - filter for is_application=True.
+    ApplicationRevisionCreateRequest:
+      properties:
+        application_revision:
+          $ref: '#/components/schemas/ApplicationRevisionCreate'
+          description: Revision fields. Must reference the parent variant.
+      type: object
+      required:
+      - application_revision
+      title: ApplicationRevisionCreateRequest
+      description: 'Request body for creating a revision row without committing it.
+
+
+        Prefer `POST /applications/revisions/commit` for normal use — commit creates
+
+        a revision and advances the variant''s tip. The plain create endpoint exists
+
+        for advanced workflows that populate revision rows out of band.'
+    ApplicationQueryRequest:
+      properties:
+        application:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationQuery'
+          - type: 'null'
+          description: Attribute filter. Accepts `slug`, `slugs`, `flags`, `tags`, `meta`. All fields are AND-ed.
+        application_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Application Refs
+          description: Restrict the query to specific applications by `id` or `slug`. Combined with the `application` filter with AND semantics.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When `true`, include soft-deleted applications. Defaults to `false`.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor pagination and time-range controls.
+      type: object
+      title: ApplicationQueryRequest
+      description: 'Request body for `POST /applications/query`.
+
+
+        Returns artifact rows only. For rows that include the currently resolved
+
+        variant, revision, and `data` payload merged in, use
+
+        `POST /simple/applications/query`.
+
+        See [Query Pattern](/reference/api-guide/query-pattern).'
+    ApplicationCatalogPresetResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when found, `0` otherwise.'
+          default: 0
+        preset:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationCatalogPreset'
+          - type: 'null'
+          description: Catalog preset definition.
+      type: object
+      title: ApplicationCatalogPresetResponse
+      description: Single preset response envelope.
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    ApplicationRevisionData-Output:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: ApplicationRevisionData
+    ApplicationRevisionEditRequest:
+      properties:
+        application_revision:
+          $ref: '#/components/schemas/ApplicationRevisionEdit'
+          description: Full revision body. Edit replaces the editable fields in a single PUT, so include every editable field even if its value is unchanged. `id` must match the `application_revision_id` in the URL path. `data`, `author`, `date`, and `message` are immutable.
+      type: object
+      required:
+      - application_revision
+      title: ApplicationRevisionEditRequest
+      description: 'Request body for editing a revision''s header fields.
+
+
+        Revisions are immutable snapshots of the application''s configuration;
+
+        `data`, `author`, `date`, and `message` cannot be edited. Use this only to
+
+        correct metadata such as `description` or `tags`.'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ApplicationVariantEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: ApplicationVariantEdit
+    RetrievalInfo:
+      properties:
+        references:
+          additionalProperties:
+            $ref: '#/components/schemas/Reference'
+          type: object
+          title: References
+        selector:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Selector
+      type: object
+      title: RetrievalInfo
+      description: 'References actually used to retrieve a revision.
+
+
+        For direct retrievals, `references` carries the artifact / variant / revision
+
+        that was fetched. For environment-backed retrievals, it additionally carries
+
+        the environment + environment_variant + environment_revision used to look
+
+        the target up, and `selector` is {the key: path} map inside the environment''s
+
+        references map that selected the target.'
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    ApplicationRevisionQueryFlags:
+      properties:
+        is_application:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+        is_evaluator:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+        is_snippet:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
+        is_managed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Managed
+        is_custom:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Custom
+        is_llm:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Llm
+        is_hook:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Hook
+        is_code:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Code
+        is_match:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Match
+        is_feedback:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Feedback
+        is_agent:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Agent
+        is_skill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Skill
+        is_chat:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Chat
+        has_url:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Url
+        has_script:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Script
+        has_handler:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Handler
+        is_static:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Static
+      type: object
+      title: ApplicationRevisionQueryFlags
+    ApplicationRevisionQueryRequest:
+      properties:
+        application_revision:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevisionQuery'
+          - type: 'null'
+          description: Attribute filter. Includes standard fields (`slug`, `slugs`, `flags`) plus revision-specific ones (`author`, `authors`, `date`, `dates`, `message`).
+        application_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Application Refs
+          description: Scope to revisions belonging to these applications.
+        application_variant_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Application Variant Refs
+          description: Scope to revisions belonging to these variants.
+        application_revision_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Application Revision Refs
+          description: Restrict to specific revisions by `id` or by `slug` + `version`.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When `true`, include archived revisions. Defaults to `false`.
+        grouping:
+          anyOf:
+          - $ref: '#/components/schemas/RevisionGrouping'
+          - type: 'null'
+          description: Divide matching revisions by artifact or variant and select one revision from each group.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor pagination and time-range controls.
+      type: object
+      title: ApplicationRevisionQueryRequest
+      description: 'Request body for `POST /applications/revisions/query`.
+
+
+        Returns committed revisions across one or more variants. For the ordered
+
+        log of a single variant, use `POST /applications/revisions/log`.'
+    SimpleApplicationEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationData-Input'
+          - type: 'null'
+      type: object
+      title: SimpleApplicationEdit
+    SimpleApplicationQueryFlags:
+      properties:
+        is_application:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+        is_evaluator:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+        is_snippet:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
+        is_managed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Managed
+        is_custom:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Custom
+        is_llm:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Llm
+        is_hook:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Hook
+        is_code:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Code
+        is_match:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Match
+        is_feedback:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Feedback
+        is_agent:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Agent
+        is_skill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Skill
+        is_chat:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Chat
+        has_url:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Url
+        has_script:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Script
+        has_handler:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Handler
+        is_static:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Static
+      type: object
+      title: SimpleApplicationQueryFlags
+    ApplicationVariantCreateRequest:
+      properties:
+        application_variant:
+          $ref: '#/components/schemas/ApplicationVariantCreate'
+          description: Variant fields. Must include `application_id` (the artifact the variant belongs to) and a `slug` unique within the project.
+      type: object
+      required:
+      - application_variant
+      title: ApplicationVariantCreateRequest
+      description: Request body for creating a variant on an existing application.
+    Reference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Reference
+    ApplicationVariantCreate:
+      properties:
+        application_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: ApplicationVariantCreate
+    SimpleApplicationData-Output:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: SimpleApplicationData
+    ApplicationCatalogPreset:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
+          type: string
+          title: Key
+        categories:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Categories
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogFlags'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Output'
+          - type: 'null'
+      type: object
+      required:
+      - key
+      title: ApplicationCatalogPreset
+    SimpleApplicationData-Input:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Input'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: SimpleApplicationData
+    SimpleApplicationAdditionalContext:
+      properties:
+        playground_build_kit:
+          anyOf:
+          - $ref: '#/components/schemas/PlaygroundBuildKitContext'
+          - type: 'null'
+          description: Playground-only build kit data that is never persisted on the app.
+      type: object
+      title: SimpleApplicationAdditionalContext
+      description: Platform-supplied read-only context for a simple-application response.
+    ApplicationRevisionCommitRequest:
+      properties:
+        application_revision:
+          $ref: '#/components/schemas/ApplicationRevisionCommit'
+          description: Commit payload. Must include `application_variant_id` and `data`. `message` is a human-readable commit message. `slug` is optional; if omitted, the server generates one.
+      type: object
+      required:
+      - application_revision
+      title: ApplicationRevisionCommitRequest
+      description: 'Request body for committing a new revision on a variant.
+
+
+        The commit becomes the variant''s new tip. Revisions are immutable once
+
+        committed; to change behavior, commit another revision.
+
+        See [Versioning](/reference/api-guide/versioning#committing-a-revision).'
+    ApplicationRevisionResolveResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a revision was resolved, `0` otherwise.'
+          default: 0
+        application_revision:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevision-Output'
+          - type: 'null'
+          description: The revision with embedded references inlined into `data`.
+        resolution_info:
+          anyOf:
+          - $ref: '#/components/schemas/ResolutionInfo'
+          - type: 'null'
+          description: Diagnostic info about which references were resolved.
+        retrieval_info:
+          anyOf:
+          - $ref: '#/components/schemas/RetrievalInfo'
+          - type: 'null'
+          description: References (artifact / variant / revision) actually used to retrieve this revision.
+      type: object
+      title: ApplicationRevisionResolveResponse
+      description: Response for `POST /applications/revisions/resolve`.
+    ApplicationRevision-Output:
+      properties:
+        application_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Application Variant Slug
+        workflow_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Slug
+        application_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Application Slug
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        application_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        application_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Variant Slug
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevisionFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevisionData-Output'
+          - type: 'null'
+      type: object
+      title: ApplicationRevision
+    ApplicationRevisionsLog:
+      properties:
+        application_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Revision Id
+        workflow_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Revision Id
+        application_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        application_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        depth:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Depth
+      type: object
+      title: ApplicationRevisionsLog
+    ApplicationRevisionCreate:
+      properties:
+        application_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        application_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: ApplicationRevisionCreate
+    ApplicationRevision-Input:
+      properties:
+        application_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Application Variant Slug
+        workflow_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Slug
+        application_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Application Slug
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        application_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        application_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Variant Slug
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevisionFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevisionData-Input'
+          - type: 'null'
+      type: object
+      title: ApplicationRevision
+    ApplicationRevisionQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevisionQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        slugs:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Slugs
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        authors:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Authors
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        dates:
+          anyOf:
+          - items:
+              type: string
+              format: date-time
+            type: array
+          - type: 'null'
+          title: Dates
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+      type: object
+      title: ApplicationRevisionQuery
+    ApplicationRevisionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of revisions in this page.
+          default: 0
+        application_revisions:
+          items:
+            $ref: '#/components/schemas/ApplicationRevision-Output'
+          type: array
+          title: Application Revisions
+          description: Application revisions matching the query or log.
+      type: object
+      title: ApplicationRevisionsResponse
+      description: Paginated list of application revisions.
+    ApplicationQuery:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationArtifactQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        slugs:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Slugs
+      type: object
+      title: ApplicationQuery
+    JsonSchemas-Output:
+      properties:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: JsonSchemas
+    ApplicationRevisionCommit:
+      properties:
+        application_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        application_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Application Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationRevisionData-Input'
+          - type: 'null'
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+        delta:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionDelta'
+          - type: 'null'
+        base_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Base Revision Id
+          description: 'The revision this change was built on. Omit it to keep today''s last-write-wins behavior. Send it on a legacy delta and the commit is refused with `409` when the variant''s head has moved since: sending the field is how a caller asks for that check. An ordered delta requires it.'
+      type: object
+      title: ApplicationRevisionCommit
+    ApplicationArtifactFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+      type: object
+      title: ApplicationArtifactFlags
+      description: Application flags - is_application=True; other booleans use their normal defaults unless explicitly set.
+    SimpleApplicationResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when the application was found, `0` otherwise.'
+          default: 0
+        application:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplication'
+          - type: 'null'
+          description: The application with `variant_id`, `revision_id`, and the revision's `data` merged. `data.url` is the invocation URL.
+        additional_context:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationAdditionalContext'
+          - type: 'null'
+          description: Read-only platform context derived for this response.
+      type: object
+      title: SimpleApplicationResponse
+      description: Simple-application single-row response envelope.
+    SimpleApplication:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleApplicationData-Output'
+          - type: 'null'
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+      type: object
+      title: SimpleApplication
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    Application:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ApplicationArtifactFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Application
+    ApplicationCatalogTemplatesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of templates returned.
+          default: 0
+        templates:
+          items:
+            $ref: '#/components/schemas/ApplicationCatalogTemplate'
+          type: array
+          title: Templates
+          description: Built-in and custom templates an application can be created from. Each template carries a `key`, a `uri`, and the JSON Schemas that applications of that type expose.
+      type: object
+      title: ApplicationCatalogTemplatesResponse
+      description: List of catalog templates.
+    WorkflowRevisionData-Output:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: WorkflowRevisionData
   securitySchemes:
-    ApiKeyAuth:
-      type: http
-      scheme: bearer
-      description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>` (Bearer-style header credential).'
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

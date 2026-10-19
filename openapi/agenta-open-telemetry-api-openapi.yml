@@ -1,100 +1,118 @@
 openapi: 3.2.0
 info:
   title: Agenta Open Telemetry API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
-  termsOfService: https://agenta.ai/terms
+  description: Agenta API
   contact:
-    name: Agenta Support
+    name: Agenta
     url: https://agenta.ai/
     email: team@agenta.ai
-  license:
-    name: MIT
-    url: https://github.com/Agenta-AI/agenta/blob/main/LICENSE
-  version: '1.0'
+  version: 0.1.0
 servers:
-- url: https://cloud.agenta.ai/api
-  description: Agenta Cloud (US)
+- url: /api
 - url: https://eu.cloud.agenta.ai/api
-  description: Agenta Cloud (EU)
 security:
-- ApiKeyAuth: []
+- APIKeyHeader: []
 tags:
 - name: Open Telemetry
-  description: Ingest LLM telemetry over OTLP/HTTP.
+  description: OTLP-compatible endpoints for ingesting traces directly from OpenTelemetry-instrumented services.
 paths:
   /otlp/v1/traces:
-    post:
-      operationId: ingestOtlpTraces
+    get:
       tags:
       - Open Telemetry
-      summary: Ingest traces via OpenTelemetry OTLP/HTTP
-      description: OpenTelemetry OTLP/HTTP trace ingestion endpoint. Send OTLP-formatted spans (typically protobuf or JSON over HTTP) here to record LLM telemetry. This is the recommended way to push observability data from instrumented applications and OpenTelemetry exporters.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OtlpExportTraceServiceRequest'
-          application/x-protobuf:
-            schema:
-              type: string
-              format: binary
+      summary: Status check for OTLP
+      description: 'Return the OTLP endpoint liveness status.
+
+
+        Lightweight readiness probe. Returns `{"status": "ready"}` when
+
+        the router is mounted. Intended for health checks from OTel
+
+        collectors before they start exporting traces.'
+      operationId: otlp_status
       responses:
         '200':
-          description: Export accepted.
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OtlpExportTraceServiceResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-    get:
-      operationId: otlpStatusCheck
+                $ref: '#/components/schemas/CollectStatusResponse'
+    post:
       tags:
       - Open Telemetry
-      summary: Status check for the OTLP traces endpoint
+      summary: Ingest traces via OTLP
+      description: 'Ingest traces via the OTLP/HTTP protobuf protocol.
+
+
+        This endpoint accepts a serialized
+
+        `ExportTraceServiceRequest` protobuf. Point any OTLP/HTTP
+
+        collector or SDK at `POST /otlp/v1/traces` and spans will flow
+
+        into the same ingest stream as the Agenta-native endpoints.
+
+
+        Use this when you already have OTel instrumentation emitting
+
+        OTLP. For new integrations that don''t need raw OTLP, prefer
+
+        `POST /tracing/spans/ingest` — it takes JSON, accepts Agenta''s
+
+        nested shape directly, and surfaces parse failures immediately.
+
+
+        ## Content-Type and size limit
+
+
+        Binary protobuf only (`Content-Type: application/x-protobuf`).
+
+        JSON OTLP is not accepted. Requests larger than the configured
+
+        batch limit (default 10 MB, see `AGENTA_OTLP_MAX_BATCH_BYTES`) return
+
+        `413 Request Entity Too Large`.
+
+
+        ## Response
+
+
+        Successful ingest returns `200 OK` with a serialized
+
+        `ExportTraceServiceResponse` protobuf. Parse failures on the
+
+        request body return `400`; malformed spans return `500`; quota
+
+        exhaustion returns `403`. Like the native ingest paths, spans
+
+        are queued on a Redis stream and persisted asynchronously — see
+
+        Tracing — Async write
+
+        contract.'
+      operationId: otlp_ingest
       responses:
         '200':
-          description: The endpoint is available.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectStatusResponse'
 components:
   schemas:
-    OtlpExportTraceServiceRequest:
-      type: object
-      description: OTLP ExportTraceServiceRequest payload (resource spans). Mirrors the OpenTelemetry trace protocol; see the OpenTelemetry specification for the full structure.
+    CollectStatusResponse:
       properties:
-        resourceSpans:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-    Error:
+        status:
+          type: string
+          title: Status
+          description: Readiness string. `ready` means the router is mounted and accepts OTLP ingest.
       type: object
-      properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
-    OtlpExportTraceServiceResponse:
-      type: object
-      properties:
-        partialSuccess:
-          type: object
-          properties:
-            rejectedSpans:
-              type: integer
-            errorMessage:
-              type: string
-  responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+      required:
+      - status
+      title: CollectStatusResponse
+      description: OTLP endpoint readiness response.
   securitySchemes:
-    ApiKeyAuth:
-      type: http
-      scheme: bearer
-      description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>` (Bearer-style header credential).'
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

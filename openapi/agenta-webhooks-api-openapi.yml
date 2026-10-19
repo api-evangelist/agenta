@@ -1,0 +1,1086 @@
+openapi: 3.2.0
+info:
+  title: Agenta Webhooks API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Webhooks
+  description: Register and manage webhooks that fire on platform events.
+paths:
+  /webhooks/subscriptions/:
+    post:
+      tags:
+      - Webhooks
+      summary: Create Subscription
+      operationId: create_webhook_subscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookSubscriptionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/subscriptions/test:
+    post:
+      tags:
+      - Webhooks
+      summary: Test Subscription
+      operationId: test_webhook_subscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookSubscriptionTestRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDeliveryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/subscriptions/{subscription_id}:
+    get:
+      tags:
+      - Webhooks
+      summary: Fetch Subscription
+      operationId: fetch_webhook_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Webhooks
+      summary: Edit Subscription
+      operationId: edit_webhook_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookSubscriptionEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Webhooks
+      summary: Delete Subscription
+      operationId: delete_webhook_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/subscriptions/query:
+    post:
+      tags:
+      - Webhooks
+      summary: Query Subscriptions
+      operationId: query_webhook_subscriptions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookSubscriptionQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscriptionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/subscriptions/{subscription_id}/start:
+    post:
+      tags:
+      - Webhooks
+      summary: Start Subscription
+      operationId: start_webhook_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/subscriptions/{subscription_id}/stop:
+    post:
+      tags:
+      - Webhooks
+      summary: Stop Subscription
+      operationId: stop_webhook_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/deliveries:
+    post:
+      tags:
+      - Webhooks
+      summary: Create Delivery
+      operationId: create_webhook_delivery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookDeliveryCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDeliveryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/deliveries/{delivery_id}:
+    get:
+      tags:
+      - Webhooks
+      summary: Fetch Delivery
+      operationId: fetch_webhook_delivery
+      parameters:
+      - name: delivery_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Delivery Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDeliveryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/deliveries/query:
+    post:
+      tags:
+      - Webhooks
+      summary: Query Deliveries
+      operationId: query_webhook_deliveries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookDeliveryQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDeliveriesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    WebhookSubscriptionEditRequest:
+      properties:
+        subscription:
+          $ref: '#/components/schemas/WebhookSubscriptionEdit'
+      type: object
+      required:
+      - subscription
+      title: WebhookSubscriptionEditRequest
+    WebhookDeliveryData:
+      properties:
+        event_type:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookEventType'
+          - type: 'null'
+        url:
+          type: string
+          maxLength: 2083
+          minLength: 1
+          format: uri
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Headers
+        payload:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Payload
+        response:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookDeliveryResponseInfo'
+          - type: 'null'
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - url
+      title: WebhookDeliveryData
+    WebhookDeliveryCreateRequest:
+      properties:
+        delivery:
+          $ref: '#/components/schemas/WebhookDeliveryCreate'
+      type: object
+      required:
+      - delivery
+      title: WebhookDeliveryCreateRequest
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    WebhookDeliveryQueryRequest:
+      properties:
+        delivery:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookDeliveryQuery'
+          - type: 'null'
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: WebhookDeliveryQueryRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    WebhookDeliveryCreate:
+      properties:
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        status:
+          $ref: '#/components/schemas/Status'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookDeliveryData'
+          - type: 'null'
+        subscription_id:
+          type: string
+          format: uuid
+          title: Subscription Id
+        event_id:
+          type: string
+          format: uuid
+          title: Event Id
+      type: object
+      required:
+      - status
+      - subscription_id
+      - event_id
+      title: WebhookDeliveryCreate
+    WebhookDelivery:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        status:
+          $ref: '#/components/schemas/Status'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookDeliveryData'
+          - type: 'null'
+        subscription_id:
+          type: string
+          format: uuid
+          title: Subscription Id
+        event_id:
+          type: string
+          format: uuid
+          title: Event Id
+      type: object
+      required:
+      - status
+      - subscription_id
+      - event_id
+      title: WebhookDelivery
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    WebhookDeliveriesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+        deliveries:
+          items:
+            $ref: '#/components/schemas/WebhookDelivery'
+          type: array
+          title: Deliveries
+          default: []
+      type: object
+      required:
+      - count
+      title: WebhookDeliveriesResponse
+    WebhookSubscription:
+      properties:
+        flags:
+          $ref: '#/components/schemas/WebhookSubscriptionFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          $ref: '#/components/schemas/WebhookSubscriptionData'
+        secret_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Secret Id
+        secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Secret
+      type: object
+      required:
+      - data
+      title: WebhookSubscription
+    WebhookSubscriptionCreateRequest:
+      properties:
+        subscription:
+          $ref: '#/components/schemas/WebhookSubscriptionCreate'
+      type: object
+      required:
+      - subscription
+      title: WebhookSubscriptionCreateRequest
+    WebhookSubscriptionFlags:
+      properties:
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+      type: object
+      title: WebhookSubscriptionFlags
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    WebhookDeliveryResponseInfo:
+      properties:
+        status_code:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Status Code
+        body:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Body
+      type: object
+      title: WebhookDeliveryResponseInfo
+    WebhookSubscriptionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+        subscriptions:
+          items:
+            $ref: '#/components/schemas/WebhookSubscription'
+          type: array
+          title: Subscriptions
+          default: []
+      type: object
+      required:
+      - count
+      title: WebhookSubscriptionsResponse
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    WebhookSubscriptionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        subscription:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookSubscription'
+          - type: 'null'
+      type: object
+      title: WebhookSubscriptionResponse
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    WebhookSubscriptionEdit:
+      properties:
+        flags:
+          $ref: '#/components/schemas/WebhookSubscriptionFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          $ref: '#/components/schemas/WebhookSubscriptionData'
+        secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Secret
+      type: object
+      required:
+      - data
+      title: WebhookSubscriptionEdit
+    WebhookSubscriptionData:
+      properties:
+        url:
+          type: string
+          maxLength: 2083
+          minLength: 1
+          format: uri
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Headers
+        payload_fields:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Payload Fields
+        auth_mode:
+          anyOf:
+          - type: string
+            enum:
+            - signature
+            - authorization
+          - type: 'null'
+          title: Auth Mode
+        event_types:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/WebhookEventType'
+            type: array
+          - type: 'null'
+          title: Event Types
+      type: object
+      required:
+      - url
+      title: WebhookSubscriptionData
+    WebhookSubscriptionCreate:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        data:
+          $ref: '#/components/schemas/WebhookSubscriptionData'
+        secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Secret
+      type: object
+      required:
+      - data
+      title: WebhookSubscriptionCreate
+    WebhookDeliveryResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        delivery:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookDelivery'
+          - type: 'null'
+      type: object
+      title: WebhookDeliveryResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    WebhookSubscriptionTestRequest:
+      properties:
+        subscription_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Subscription Id
+        subscription:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookSubscriptionEdit'
+          - $ref: '#/components/schemas/WebhookSubscriptionCreate'
+          - type: 'null'
+          title: Subscription
+      type: object
+      title: WebhookSubscriptionTestRequest
+    WebhookDeliveryQuery:
+      properties:
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/Status'
+          - type: 'null'
+        subscription_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Subscription Id
+        event_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Event Id
+      type: object
+      title: WebhookDeliveryQuery
+    WebhookEventType:
+      type: string
+      enum:
+      - webhooks.subscriptions.tested
+      - traces.fetched
+      - traces.queried
+      - queries.revisions.retrieved
+      - queries.revisions.fetched
+      - queries.revisions.queried
+      - queries.revisions.logged
+      - queries.revisions.committed
+      - testcases.fetched
+      - testcases.queried
+      - testsets.revisions.retrieved
+      - testsets.revisions.fetched
+      - testsets.revisions.queried
+      - testsets.revisions.logged
+      - testsets.revisions.committed
+      - workflows.revisions.retrieved
+      - workflows.revisions.fetched
+      - workflows.revisions.queried
+      - workflows.revisions.logged
+      - workflows.revisions.committed
+      - environments.revisions.retrieved
+      - environments.revisions.fetched
+      - environments.revisions.queried
+      - environments.revisions.logged
+      - environments.revisions.committed
+      title: WebhookEventType
+      description: 'Subscribable event types — a strict subset of EventType.
+
+
+        Values are derived from EventType so the strings stay in sync.
+
+        To add a new subscribable event type, it must first exist in EventType.
+
+        When extending this enum, regenerate Fern clients and update the
+
+        "Available event types" section in `04-webhooks.mdx`.'
+    WebhookSubscriptionQueryRequest:
+      properties:
+        subscription:
+          anyOf:
+          - $ref: '#/components/schemas/WebhookSubscriptionQuery'
+          - type: 'null'
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: WebhookSubscriptionQueryRequest
+    Status:
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        stacktrace:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stacktrace
+      type: object
+      title: Status
+    WebhookSubscriptionQuery:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      title: WebhookSubscriptionQuery
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

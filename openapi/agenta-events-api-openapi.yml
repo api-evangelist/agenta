@@ -1,0 +1,296 @@
+openapi: 3.2.0
+info:
+  title: Agenta Events API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Events
+paths:
+  /events/query:
+    post:
+      tags:
+      - Events
+      summary: Query Events
+      operationId: query_events_rpc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsQueryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    EventType:
+      type: string
+      enum:
+      - unknown
+      - webhooks.subscriptions.tested
+      - gateways.called
+      - traces.fetched
+      - traces.queried
+      - queries.revisions.retrieved
+      - queries.revisions.fetched
+      - queries.revisions.queried
+      - queries.revisions.logged
+      - queries.revisions.committed
+      - testcases.fetched
+      - testcases.queried
+      - testsets.revisions.retrieved
+      - testsets.revisions.fetched
+      - testsets.revisions.queried
+      - testsets.revisions.logged
+      - testsets.revisions.committed
+      - workflows.revisions.retrieved
+      - workflows.revisions.fetched
+      - workflows.revisions.queried
+      - workflows.revisions.logged
+      - workflows.revisions.committed
+      - environments.revisions.retrieved
+      - environments.revisions.fetched
+      - environments.revisions.queried
+      - environments.revisions.logged
+      - environments.revisions.committed
+      title: EventType
+    RequestType:
+      type: string
+      enum:
+      - unknown
+      - router
+      - worker
+      title: RequestType
+    EventsQueryResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+        events:
+          items:
+            $ref: '#/components/schemas/Event'
+          type: array
+          title: Events
+      type: object
+      required:
+      - count
+      - events
+      title: EventsQueryResponse
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    EventQueryRequest:
+      properties:
+        event:
+          anyOf:
+          - $ref: '#/components/schemas/EventQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: EventQueryRequest
+    EventQuery:
+      properties:
+        request_type:
+          anyOf:
+          - $ref: '#/components/schemas/RequestType'
+          - type: 'null'
+        request_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Request Id
+        event_type:
+          anyOf:
+          - $ref: '#/components/schemas/EventType'
+          - type: 'null'
+        event_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Event Id
+      type: object
+      title: EventQuery
+    Event:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        event_id:
+          type: string
+          format: uuid
+          title: Event Id
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        request_type:
+          $ref: '#/components/schemas/RequestType'
+        event_type:
+          $ref: '#/components/schemas/EventType'
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        status_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status Code
+        status_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status Message
+        attributes:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Attributes
+      type: object
+      required:
+      - event_id
+      - request_id
+      - request_type
+      - event_type
+      - timestamp
+      title: Event
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

@@ -1,0 +1,396 @@
+openapi: 3.2.0
+info:
+  title: Agenta Testcases API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Test Cases
+  description: Individual test cases within a testset.
+paths:
+  /testcases/:
+    get:
+      tags:
+      - Test Cases
+      summary: Fetch Testcases
+      operationId: fetch_testcases
+      parameters:
+      - name: testcase_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Testcase Id
+      - name: testcase_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Testcase Ids
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestcasesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /testcases/{testcase_id}:
+    get:
+      tags:
+      - Test Cases
+      summary: Fetch Testcase
+      operationId: fetch_testcase
+      parameters:
+      - name: testcase_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Testcase Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestcaseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /testcases/query:
+    post:
+      tags:
+      - Test Cases
+      summary: Query Testcases
+      operationId: query_testcases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestcasesQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestcasesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    Testcase-Output:
+      properties:
+        testset_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Testset Id
+        set_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Set Id
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        data:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Data
+      type: object
+      title: Testcase
+    TestcasesQueryRequest:
+      properties:
+        testcase_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Testcase Ids
+          description: Explicit list of testcase IDs to fetch. Combine with `testset_id` or testset references to scope the lookup.
+        testset_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Testset Id
+          description: Return all testcases stored in this testset. The testset owns its testcases as a content-addressed bag; a revision references a subset of these.
+        testset_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Testset reference used to resolve the latest revision on the default variant. The revision's ordered testcase IDs are used for the lookup and pagination.
+        testset_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Testset variant reference used to resolve the latest revision on that variant.
+        testset_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Specific testset revision reference. The revision's ordered testcase IDs drive the lookup and cursor pagination.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor-based pagination. When a revision reference is used, the cursor walks the revision's deterministic testcase ID list.
+      type: object
+      title: TestcasesQueryRequest
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    Reference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Reference
+    TestcasesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of testcases returned on this page.
+          default: 0
+        testcases:
+          items:
+            $ref: '#/components/schemas/Testcase-Output'
+          type: array
+          title: Testcases
+          description: Testcase blobs matching the query, in revision-order when scoped by a revision reference.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor for the next page, if more results exist.
+      type: object
+      title: TestcasesResponse
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    TestcaseResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: 1 if a testcase was returned, 0 otherwise.
+          default: 0
+        testcase:
+          anyOf:
+          - $ref: '#/components/schemas/Testcase-Output'
+          - type: 'null'
+          description: The testcase blob. `data` carries the user-defined columns; `testcase_dedup_id` (inside `data`) is the caller-supplied dedup key when present.
+      type: object
+      title: TestcaseResponse
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

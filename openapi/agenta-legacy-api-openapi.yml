@@ -1,0 +1,237 @@
+openapi: 3.2.0
+info:
+  title: Agenta Legacy API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Legacy
+  description: Stable legacy endpoints retained for existing integrations — not deprecated, but new integrations should prefer the canonical surface.
+paths:
+  /tracing/spans/analytics:
+    post:
+      tags:
+      - Legacy
+      summary: Fetch Legacy Analytics
+      description: 'Aggregate span metrics using the fixed legacy schema.
+
+
+        Returns time-bucketed aggregates with a fixed set of fields
+
+        (`count`, `duration`, `costs`, `tokens`) split into `total` and
+
+        `errors`. The shape predates `specs`-driven analytics and is kept
+
+        for the existing observability dashboards that consume it.
+
+
+        New integrations should prefer `POST /tracing/analytics/query`,
+
+        which accepts `specs` and can summarize arbitrary span attributes,
+
+        not just the four fixed metrics.'
+      operationId: fetch_legacy_analytics
+      parameters:
+      - name: focus
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/Focus'
+          - type: 'null'
+          title: Focus
+      - name: format
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/Format'
+          - type: 'null'
+          title: Format
+      - name: oldest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: integer
+          - type: 'null'
+          title: Oldest
+      - name: newest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: integer
+          - type: 'null'
+          title: Newest
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: interval
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+      - name: rate
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      - name: filter
+        in: query
+        required: false
+        schema:
+          title: Filter
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OldAnalyticsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    Focus:
+      type: string
+      enum:
+      - trace
+      - span
+      title: Focus
+    Format:
+      type: string
+      enum:
+      - agenta
+      - opentelemetry
+      title: Format
+    Analytics:
+      properties:
+        count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Count
+          default: 0
+        duration:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Duration
+          default: 0.0
+        costs:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Costs
+          default: 0.0
+        tokens:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Tokens
+          default: 0.0
+      type: object
+      title: Analytics
+    OldAnalyticsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of time buckets returned.
+          default: 0
+        buckets:
+          items:
+            $ref: '#/components/schemas/Bucket'
+          type: array
+          title: Buckets
+          description: Time-bucketed aggregates with fixed fields (`total`, `errors`) holding `count`, `duration`, `costs`, and `tokens`, ordered oldest to newest.
+          default: []
+      type: object
+      title: OldAnalyticsResponse
+      description: Legacy analytics response with a fixed metric schema.
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    Bucket:
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        interval:
+          type: integer
+          title: Interval
+        total:
+          $ref: '#/components/schemas/Analytics'
+        errors:
+          $ref: '#/components/schemas/Analytics'
+      type: object
+      required:
+      - timestamp
+      - interval
+      - total
+      - errors
+      title: Bucket
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

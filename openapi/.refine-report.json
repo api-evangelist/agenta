@@ -1,35 +1,60 @@
 {
   "provider": "agenta",
   "sources": [
-    "_original/agenta-openapi.yml"
+    "_original/agenta-openapi.json"
   ],
   "outputs": [
+    "agenta-access-api-openapi.yml",
+    "agenta-admin-api-openapi.yml",
+    "agenta-annotations-api-openapi.yml",
     "agenta-applications-api-openapi.yml",
-    "agenta-configs-api-openapi.yml",
+    "agenta-billing-api-openapi.yml",
+    "agenta-channels-api-openapi.yml",
+    "agenta-deprecated-api-openapi.yml",
+    "agenta-environments-api-openapi.yml",
     "agenta-evaluations-api-openapi.yml",
     "agenta-evaluators-api-openapi.yml",
+    "agenta-events-api-openapi.yml",
+    "agenta-folders-api-openapi.yml",
+    "agenta-gateway-api-openapi.yml",
+    "agenta-gateway-llm-api-openapi.yml",
+    "agenta-gateway-mcp-api-openapi.yml",
+    "agenta-invocations-api-openapi.yml",
+    "agenta-keys-api-openapi.yml",
+    "agenta-legacy-api-openapi.yml",
+    "agenta-mounts-api-openapi.yml",
     "agenta-opentelemetry-api-openapi.yml",
+    "agenta-organizations-api-openapi.yml",
+    "agenta-projects-api-openapi.yml",
+    "agenta-queries-api-openapi.yml",
+    "agenta-secrets-api-openapi.yml",
+    "agenta-sessions-api-openapi.yml",
+    "agenta-skills-api-openapi.yml",
+    "agenta-status-api-openapi.yml",
+    "agenta-testcases-api-openapi.yml",
     "agenta-testsets-api-openapi.yml",
-    "agenta-traces-api-openapi.yml"
+    "agenta-tools-api-openapi.yml",
+    "agenta-traces-api-openapi.yml",
+    "agenta-triggers-api-openapi.yml",
+    "agenta-users-api-openapi.yml",
+    "agenta-wallets-api-openapi.yml",
+    "agenta-webhooks-api-openapi.yml",
+    "agenta-workflows-api-openapi.yml",
+    "agenta-workspaces-api-openapi.yml"
   ],
-  "archived": [
-    "deleted 2 superseded output(s) from the previous generation"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
-    "agenta-openapi.yml: upgraded openapi 3.0.1 -> OpenAPI 3.2.0",
-    "superseded outputs removed: agenta-open-telemetry-api-openapi.yml, agenta-test-sets-api-openapi.yml",
-    "apis.yml register: written (+2 apis, 7 total)"
+    "agenta-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "agenta-openapi.json: declared missing tag: Events",
+    "agenta-openapi.json: declared missing tag: Gateway",
+    "agenta-openapi.json: declared missing tag: Gateway: LLM",
+    "agenta-openapi.json: declared missing tag: Gateway: MCP",
+    "agenta-openapi.json: declared missing tag: Skills",
+    "agenta-openapi.json: declared missing tag: Wallets",
+    "apis.yml register: written (+33 apis, 37 total)"
   ],
-  "skipped": [
-    "agenta-applications-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "agenta-configs-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "agenta-evaluations-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "agenta-evaluators-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "agenta-open-telemetry-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "agenta-test-sets-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "agenta-traces-api-openapi.yml: previously refined output, superseded by openapi/_original/"
-  ]
+  "skipped": []
 }

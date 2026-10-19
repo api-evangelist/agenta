@@ -1,0 +1,49 @@
+openapi: 3.2.0
+info:
+  title: Agenta Status API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Status
+  description: API server liveness and readiness status.
+paths:
+  /health:
+    get:
+      tags:
+      - Status
+      summary: Health Check
+      operationId: health_check
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /.well-known/jwks.json:
+    get:
+      tags:
+      - Status
+      summary: Store Jwks
+      description: Public JWKS the object store's OIDC IAM fetches to verify our web-identity tokens.
+      operationId: store_jwks
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

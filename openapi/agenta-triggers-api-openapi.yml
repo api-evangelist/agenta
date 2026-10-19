@@ -1,0 +1,2649 @@
+openapi: 3.2.0
+info:
+  title: Agenta Triggers API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Triggers
+  description: Inbound provider event triggers and their watchable event catalog.
+paths:
+  /triggers/composio/events/:
+    post:
+      tags:
+      - Triggers
+      summary: Ingest Composio Event
+      description: 'Receive a Composio provider event; verify, demux, ack-fast, enqueue.
+
+
+        Public (no Agenta auth) — mirrors the Stripe events receiver. Scope and
+
+        attribution are recovered downstream from the resolved subscription row.'
+      operationId: ingest_composio_event
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerEventAck'
+  /triggers/catalog/providers/:
+    get:
+      tags:
+      - Triggers
+      summary: List Providers
+      operationId: list_trigger_providers
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerCatalogProvidersResponse'
+  /triggers/catalog/providers/{provider_key}:
+    get:
+      tags:
+      - Triggers
+      summary: Get Provider
+      operationId: fetch_trigger_provider
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerCatalogProviderResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/catalog/providers/{provider_key}/integrations/:
+    get:
+      tags:
+      - Triggers
+      summary: List Integrations
+      operationId: list_trigger_integrations
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
+      - name: sort_by
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sort By
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerCatalogIntegrationsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/catalog/providers/{provider_key}/integrations/{integration_key}:
+    get:
+      tags:
+      - Triggers
+      summary: Get Integration
+      operationId: fetch_trigger_integration
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: integration_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Integration Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerCatalogIntegrationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/catalog/providers/{provider_key}/integrations/{integration_key}/events/:
+    get:
+      tags:
+      - Triggers
+      summary: List Events
+      operationId: list_trigger_events
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: integration_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Integration Key
+      - name: query
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Query
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerCatalogEventsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/catalog/providers/{provider_key}/integrations/{integration_key}/events/{event_key}:
+    get:
+      tags:
+      - Triggers
+      summary: Get Event
+      operationId: fetch_trigger_event
+      parameters:
+      - name: provider_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Key
+      - name: integration_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Integration Key
+      - name: event_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Event Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerCatalogEventResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/discover:
+    post:
+      tags:
+      - Triggers
+      summary: Discover Triggers
+      operationId: discover_triggers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerDiscoveryQuery'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerCapabilitiesResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/connections/query:
+    post:
+      tags:
+      - Triggers
+      summary: Query Connections
+      operationId: query_trigger_connections
+      parameters:
+      - name: provider_key
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider Key
+      - name: integration_key
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerConnectionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/connections/:
+    post:
+      tags:
+      - Triggers
+      summary: Create Connection
+      operationId: create_trigger_connection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerConnectionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/connections/{connection_id}:
+    get:
+      tags:
+      - Triggers
+      summary: Get Connection
+      operationId: fetch_trigger_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Triggers
+      summary: Delete Connection
+      operationId: delete_trigger_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/connections/{connection_id}/refresh:
+    post:
+      tags:
+      - Triggers
+      summary: Refresh Connection
+      operationId: refresh_trigger_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      - name: force
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Force
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/connections/{connection_id}/revoke:
+    post:
+      tags:
+      - Triggers
+      summary: Revoke Connection
+      operationId: revoke_trigger_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/subscriptions/:
+    get:
+      tags:
+      - Triggers
+      summary: List Subscriptions
+      operationId: list_trigger_subscriptions
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionsResponse'
+    post:
+      tags:
+      - Triggers
+      summary: Create Subscription
+      operationId: create_trigger_subscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerSubscriptionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/subscriptions/query:
+    post:
+      tags:
+      - Triggers
+      summary: Query Subscriptions
+      operationId: query_trigger_subscriptions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerSubscriptionQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/subscriptions/test:
+    post:
+      tags:
+      - Triggers
+      summary: Test Subscription
+      operationId: test_trigger_subscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerSubscriptionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerDeliveryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/subscriptions/{subscription_id}/refresh:
+    post:
+      tags:
+      - Triggers
+      summary: Refresh Subscription
+      operationId: refresh_trigger_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/subscriptions/{subscription_id}/revoke:
+    post:
+      tags:
+      - Triggers
+      summary: Revoke Subscription
+      operationId: revoke_trigger_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/subscriptions/{subscription_id}/start:
+    post:
+      tags:
+      - Triggers
+      summary: Start Subscription
+      operationId: start_trigger_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/subscriptions/{subscription_id}/stop:
+    post:
+      tags:
+      - Triggers
+      summary: Stop Subscription
+      operationId: stop_trigger_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/subscriptions/{subscription_id}:
+    get:
+      tags:
+      - Triggers
+      summary: Fetch Subscription
+      operationId: fetch_trigger_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Triggers
+      summary: Edit Subscription
+      operationId: edit_trigger_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerSubscriptionEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSubscriptionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Triggers
+      summary: Delete Subscription
+      operationId: delete_trigger_subscription
+      parameters:
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Subscription Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/schedules/:
+    get:
+      tags:
+      - Triggers
+      summary: List Schedules
+      operationId: list_trigger_schedules
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSchedulesResponse'
+    post:
+      tags:
+      - Triggers
+      summary: Create Schedule
+      operationId: create_trigger_schedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerScheduleCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerScheduleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/schedules/query:
+    post:
+      tags:
+      - Triggers
+      summary: Query Schedules
+      operationId: query_trigger_schedules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerScheduleQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSchedulesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/schedules/{schedule_id}:
+    get:
+      tags:
+      - Triggers
+      summary: Fetch Schedule
+      operationId: fetch_trigger_schedule
+      parameters:
+      - name: schedule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Schedule Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerScheduleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Triggers
+      summary: Edit Schedule
+      operationId: edit_trigger_schedule
+      parameters:
+      - name: schedule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Schedule Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerScheduleEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerScheduleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Triggers
+      summary: Delete Schedule
+      operationId: delete_trigger_schedule
+      parameters:
+      - name: schedule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Schedule Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/schedules/{schedule_id}/start:
+    post:
+      tags:
+      - Triggers
+      summary: Start Schedule
+      operationId: start_trigger_schedule
+      parameters:
+      - name: schedule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Schedule Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerScheduleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/schedules/{schedule_id}/stop:
+    post:
+      tags:
+      - Triggers
+      summary: Stop Schedule
+      operationId: stop_trigger_schedule
+      parameters:
+      - name: schedule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Schedule Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerScheduleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/deliveries:
+    get:
+      tags:
+      - Triggers
+      summary: List Deliveries
+      operationId: list_trigger_deliveries
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerDeliveriesResponse'
+  /triggers/deliveries/query:
+    post:
+      tags:
+      - Triggers
+      summary: Query Deliveries
+      operationId: query_trigger_deliveries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerDeliveryQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerDeliveriesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /triggers/deliveries/{delivery_id}:
+    get:
+      tags:
+      - Triggers
+      summary: Fetch Delivery
+      operationId: fetch_trigger_delivery
+      parameters:
+      - name: delivery_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Delivery Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerDeliveryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    TriggerSubscription:
+      properties:
+        flags:
+          $ref: '#/components/schemas/TriggerSubscriptionFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        trigger_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Trigger Id
+        data:
+          $ref: '#/components/schemas/TriggerSubscriptionData'
+      type: object
+      required:
+      - connection_id
+      - data
+      title: TriggerSubscription
+    TriggerCatalogEventsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        total:
+          type: integer
+          title: Total
+          default: 0
+        cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+        events:
+          items:
+            $ref: '#/components/schemas/TriggerCatalogEvent'
+          type: array
+          title: Events
+      type: object
+      title: TriggerCatalogEventsResponse
+    TriggerCatalogProvider:
+      properties:
+        key:
+          $ref: '#/components/schemas/TriggerProviderKind'
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        integrations_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Integrations Count
+      type: object
+      required:
+      - key
+      - name
+      title: TriggerCatalogProvider
+    TriggerConnectionCreateData:
+      properties:
+        callback_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Callback Url
+        auth_scheme:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerAuthScheme'
+          - type: 'null'
+        connected_account_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Connected Account Id
+        auth_config_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Auth Config Id
+        redirect_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Redirect Url
+        project_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Project Id
+        no_auth:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: No Auth
+      type: object
+      title: TriggerConnectionCreateData
+    TriggerSubscriptionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        subscriptions:
+          items:
+            $ref: '#/components/schemas/TriggerSubscription'
+          type: array
+          title: Subscriptions
+      type: object
+      title: TriggerSubscriptionsResponse
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    TriggerCapability:
+      properties:
+        use_case:
+          type: string
+          title: Use Case
+        integration:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration
+        event:
+          anyOf:
+          - $ref: '#/components/schemas/DiscoveredTriggerEvent'
+          - type: 'null'
+        alternatives:
+          items:
+            $ref: '#/components/schemas/DiscoveredTriggerAlternative'
+          type: array
+          title: Alternatives
+        connection:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerCapabilityConnection'
+          - type: 'null'
+        note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Note
+      type: object
+      required:
+      - use_case
+      title: TriggerCapability
+    TriggerCatalogProvidersResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        providers:
+          items:
+            $ref: '#/components/schemas/TriggerCatalogProvider'
+          type: array
+          title: Providers
+      type: object
+      title: TriggerCatalogProvidersResponse
+    TriggerSubscriptionCreate:
+      properties:
+        flags:
+          $ref: '#/components/schemas/TriggerSubscriptionFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        data:
+          $ref: '#/components/schemas/TriggerSubscriptionData'
+      type: object
+      required:
+      - connection_id
+      - data
+      title: TriggerSubscriptionCreate
+    TriggerCapabilityConnection:
+      properties:
+        state:
+          $ref: '#/components/schemas/TriggerDiscoveryConnectionState'
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      required:
+      - state
+      title: TriggerCapabilityConnection
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    TriggerConnectionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        connection:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerConnection'
+          - type: 'null'
+      type: object
+      title: TriggerConnectionResponse
+    TriggerScheduleCreate:
+      properties:
+        flags:
+          $ref: '#/components/schemas/TriggerScheduleFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        data:
+          $ref: '#/components/schemas/TriggerScheduleData'
+      type: object
+      required:
+      - data
+      title: TriggerScheduleCreate
+    TriggerSubscriptionCreateRequest:
+      properties:
+        subscription:
+          $ref: '#/components/schemas/TriggerSubscriptionCreate'
+      type: object
+      required:
+      - subscription
+      title: TriggerSubscriptionCreateRequest
+    Selector:
+      properties:
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+        path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      type: object
+      title: Selector
+      description: "Selector for extracting specific data from entities.\n\nPlaced alongside Reference for data extraction from referenced entities.\n\nFields:\n- **key**: For environment revisions only. Navigates to data.references.<key>,\n  follows the entity pointer found there (e.g. workflow_revision), fetches that\n  entity, then applies path against its data.\n- **path**: Dot notation path into the resolved entity's data.\n  If key is set, path applies to the secondary entity's data.\n  If key is not set, path applies directly to the referenced entity's data."
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    TriggerSubscriptionData:
+      properties:
+        event_key:
+          type: string
+          title: Event Key
+        trigger_config:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Trigger Config
+        inputs_fields:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: string
+          - type: 'null'
+          title: Inputs Fields
+        references:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: References
+        selector:
+          anyOf:
+          - $ref: '#/components/schemas/Selector'
+          - type: 'null'
+      type: object
+      required:
+      - event_key
+      title: TriggerSubscriptionData
+    TriggerDeliveriesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        deliveries:
+          items:
+            $ref: '#/components/schemas/TriggerDelivery'
+          type: array
+          title: Deliveries
+      type: object
+      title: TriggerDeliveriesResponse
+    TriggerScheduleEditRequest:
+      properties:
+        schedule:
+          $ref: '#/components/schemas/TriggerScheduleEdit'
+      type: object
+      required:
+      - schedule
+      title: TriggerScheduleEditRequest
+    TriggerScheduleData:
+      properties:
+        event_key:
+          type: string
+          title: Event Key
+        schedule:
+          type: string
+          title: Schedule
+        start_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start Time
+        end_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: End Time
+        inputs_fields:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: string
+          - type: 'null'
+          title: Inputs Fields
+        references:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: References
+        selector:
+          anyOf:
+          - $ref: '#/components/schemas/Selector'
+          - type: 'null'
+      type: object
+      required:
+      - event_key
+      - schedule
+      title: TriggerScheduleData
+    TriggerDiscoveryQuery:
+      properties:
+        use_cases:
+          items:
+            type: string
+          type: array
+          title: Use Cases
+        provider:
+          type: string
+          title: Provider
+          default: composio
+        limit_alternatives:
+          type: integer
+          minimum: 0.0
+          title: Limit Alternatives
+          default: 3
+      type: object
+      required:
+      - use_cases
+      title: TriggerDiscoveryQuery
+      description: Request body for ``POST /triggers/discover``.
+    TriggerDeliveryResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        delivery:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerDelivery'
+          - type: 'null'
+      type: object
+      title: TriggerDeliveryResponse
+    TriggerConnectAffordance:
+      properties:
+        endpoint:
+          type: string
+          title: Endpoint
+          default: POST /triggers/connections/
+        body:
+          additionalProperties: true
+          type: object
+          title: Body
+      type: object
+      required:
+      - body
+      title: TriggerConnectAffordance
+    TriggerCatalogIntegrationResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        integration:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerCatalogIntegration'
+          - type: 'null'
+      type: object
+      title: TriggerCatalogIntegrationResponse
+    TriggerConnectionCreateRequest:
+      properties:
+        connection:
+          $ref: '#/components/schemas/TriggerConnectionCreate'
+      type: object
+      required:
+      - connection
+      title: TriggerConnectionCreateRequest
+    TriggerConnectionCreate:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        provider_key:
+          $ref: '#/components/schemas/TriggerProviderKind'
+        integration_key:
+          type: string
+          title: Integration Key
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerConnectionCreateData'
+          - type: 'null'
+      type: object
+      required:
+      - provider_key
+      - integration_key
+      title: TriggerConnectionCreate
+    TriggerCatalogEventResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        event:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerCatalogEventDetails'
+          - type: 'null'
+      type: object
+      title: TriggerCatalogEventResponse
+    TriggerSubscriptionFlags:
+      properties:
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+        is_valid:
+          type: boolean
+          title: Is Valid
+          default: true
+        is_test:
+          type: boolean
+          title: Is Test
+          default: false
+      type: object
+      title: TriggerSubscriptionFlags
+    DiscoveredTriggerEvent:
+      properties:
+        type:
+          type: string
+          const: trigger
+          title: Type
+          default: trigger
+        provider:
+          type: string
+          title: Provider
+          default: composio
+        integration:
+          type: string
+          title: Integration
+        event_key:
+          type: string
+          title: Event Key
+        trigger_config:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Trigger Config
+        payload:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Payload
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        provider_event:
+          type: string
+          title: Provider Event
+      type: object
+      required:
+      - integration
+      - event_key
+      - provider_event
+      title: DiscoveredTriggerEvent
+    TriggerDelivery:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        status:
+          $ref: '#/components/schemas/Status'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerDeliveryData'
+          - type: 'null'
+        subscription_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Subscription Id
+        schedule_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Schedule Id
+        event_id:
+          type: string
+          title: Event Id
+      type: object
+      required:
+      - status
+      - event_id
+      title: TriggerDelivery
+    TriggerScheduleFlags:
+      properties:
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+      type: object
+      title: TriggerScheduleFlags
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    TriggerSubscriptionEditRequest:
+      properties:
+        subscription:
+          $ref: '#/components/schemas/TriggerSubscriptionEdit'
+      type: object
+      required:
+      - subscription
+      title: TriggerSubscriptionEditRequest
+    TriggerScheduleQuery:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        event_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Key
+      type: object
+      title: TriggerScheduleQuery
+    TriggerScheduleCreateRequest:
+      properties:
+        schedule:
+          $ref: '#/components/schemas/TriggerScheduleCreate'
+      type: object
+      required:
+      - schedule
+      title: TriggerScheduleCreateRequest
+    TriggerCatalogEventDetails:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        provider:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider
+        integration:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration
+        categories:
+          items:
+            type: string
+          type: array
+          title: Categories
+        logo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo
+        trigger_config:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Trigger Config
+        payload:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Payload
+      type: object
+      required:
+      - key
+      - name
+      title: TriggerCatalogEventDetails
+    TriggerSubscriptionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        subscription:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerSubscription'
+          - type: 'null'
+      type: object
+      title: TriggerSubscriptionResponse
+    TriggerCatalogIntegration:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        categories:
+          items:
+            type: string
+          type: array
+          title: Categories
+          default: []
+        logo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        actions_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Actions Count
+        auth_schemes:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TriggerAuthScheme'
+            type: array
+          - type: 'null'
+          title: Auth Schemes
+      type: object
+      required:
+      - key
+      - name
+      title: TriggerCatalogIntegration
+    TriggerDeliveryData:
+      properties:
+        event_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Key
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        references:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: References
+        inputs:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Inputs
+        result:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Result
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+        is_test:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Test
+      type: object
+      title: TriggerDeliveryData
+    TriggerProviderKind:
+      type: string
+      enum:
+      - composio
+      title: TriggerProviderKind
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    Reference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Reference
+    TriggerConnection:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        provider_key:
+          $ref: '#/components/schemas/TriggerProviderKind'
+        integration_key:
+          type: string
+          title: Integration Key
+        data:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Data
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerConnectionStatus'
+          - type: 'null'
+      type: object
+      required:
+      - provider_key
+      - integration_key
+      title: TriggerConnection
+    TriggerConnectionStatus:
+      properties:
+        redirect_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Redirect Url
+      type: object
+      title: TriggerConnectionStatus
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    TriggerSubscriptionQuery:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        connection_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Connection Id
+        event_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Key
+      type: object
+      title: TriggerSubscriptionQuery
+    TriggerDeliveryQuery:
+      properties:
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/Status'
+          - type: 'null'
+        subscription_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Subscription Id
+        schedule_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Schedule Id
+        event_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Event Id
+      type: object
+      title: TriggerDeliveryQuery
+    TriggerDeliveryQueryRequest:
+      properties:
+        delivery:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerDeliveryQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: TriggerDeliveryQueryRequest
+    TriggerScheduleResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        schedule:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerSchedule'
+          - type: 'null'
+      type: object
+      title: TriggerScheduleResponse
+    TriggerCatalogProviderResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        provider:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerCatalogProvider'
+          - type: 'null'
+      type: object
+      title: TriggerCatalogProviderResponse
+    TriggerConnectionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        connections:
+          items:
+            $ref: '#/components/schemas/TriggerConnection'
+          type: array
+          title: Connections
+      type: object
+      title: TriggerConnectionsResponse
+    TriggerConnectionRequirement:
+      properties:
+        integration:
+          type: string
+          title: Integration
+        state:
+          $ref: '#/components/schemas/TriggerDiscoveryConnectionState'
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        connect:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerConnectAffordance'
+          - type: 'null'
+      type: object
+      required:
+      - integration
+      - state
+      title: TriggerConnectionRequirement
+    TriggerScheduleQueryRequest:
+      properties:
+        schedule:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerScheduleQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: TriggerScheduleQueryRequest
+    TriggerSubscriptionEdit:
+      properties:
+        flags:
+          $ref: '#/components/schemas/TriggerSubscriptionFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        data:
+          $ref: '#/components/schemas/TriggerSubscriptionData'
+      type: object
+      required:
+      - connection_id
+      - data
+      title: TriggerSubscriptionEdit
+    TriggerCatalogEvent:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        provider:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider
+        integration:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration
+        categories:
+          items:
+            type: string
+          type: array
+          title: Categories
+        logo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo
+      type: object
+      required:
+      - key
+      - name
+      title: TriggerCatalogEvent
+    TriggerEventAck:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: accepted
+        detail:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Detail
+      type: object
+      title: TriggerEventAck
+    TriggerDiscoveryConnectionState:
+      type: string
+      enum:
+      - ready
+      - needs_auth
+      - needs_input
+      title: TriggerDiscoveryConnectionState
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    TriggerAuthScheme:
+      type: string
+      enum:
+      - oauth
+      - api_key
+      title: TriggerAuthScheme
+    TriggerSchedulesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        schedules:
+          items:
+            $ref: '#/components/schemas/TriggerSchedule'
+          type: array
+          title: Schedules
+      type: object
+      title: TriggerSchedulesResponse
+    TriggerSubscriptionQueryRequest:
+      properties:
+        subscription:
+          anyOf:
+          - $ref: '#/components/schemas/TriggerSubscriptionQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: TriggerSubscriptionQueryRequest
+    TriggerScheduleEdit:
+      properties:
+        flags:
+          $ref: '#/components/schemas/TriggerScheduleFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          $ref: '#/components/schemas/TriggerScheduleData'
+      type: object
+      required:
+      - data
+      title: TriggerScheduleEdit
+    TriggerSchedule:
+      properties:
+        flags:
+          $ref: '#/components/schemas/TriggerScheduleFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          $ref: '#/components/schemas/TriggerScheduleData'
+      type: object
+      required:
+      - data
+      title: TriggerSchedule
+    TriggerDiscoveryGuidance:
+      properties:
+        plan_steps:
+          items:
+            type: string
+          type: array
+          title: Plan Steps
+        pitfalls:
+          items:
+            type: string
+          type: array
+          title: Pitfalls
+      type: object
+      title: TriggerDiscoveryGuidance
+    TriggerCapabilitiesResult:
+      properties:
+        capabilities:
+          items:
+            $ref: '#/components/schemas/TriggerCapability'
+          type: array
+          title: Capabilities
+        connections:
+          items:
+            $ref: '#/components/schemas/TriggerConnectionRequirement'
+          type: array
+          title: Connections
+        guidance:
+          $ref: '#/components/schemas/TriggerDiscoveryGuidance'
+        ready:
+          type: boolean
+          title: Ready
+          default: false
+        notes:
+          items:
+            type: string
+          type: array
+          title: Notes
+      type: object
+      title: TriggerCapabilitiesResult
+    Status:
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        stacktrace:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stacktrace
+      type: object
+      title: Status
+    TriggerCatalogIntegrationsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        total:
+          type: integer
+          title: Total
+          default: 0
+        cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+        integrations:
+          items:
+            $ref: '#/components/schemas/TriggerCatalogIntegration'
+          type: array
+          title: Integrations
+      type: object
+      title: TriggerCatalogIntegrationsResponse
+    DiscoveredTriggerAlternative:
+      properties:
+        integration:
+          type: string
+          title: Integration
+        event_key:
+          type: string
+          title: Event Key
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        provider_event:
+          type: string
+          title: Provider Event
+      type: object
+      required:
+      - integration
+      - event_key
+      - provider_event
+      title: DiscoveredTriggerAlternative
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

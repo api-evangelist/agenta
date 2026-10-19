@@ -1,0 +1,375 @@
+openapi: 3.2.0
+info:
+  title: Agenta Billing API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Billing
+  description: Subscription, plan, and usage endpoints for workspace billing.
+paths:
+  /billing/stripe/events/:
+    post:
+      tags:
+      - Billing
+      summary: Handle Events
+      operationId: handle_events
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /billing/stripe/portals/:
+    post:
+      tags:
+      - Billing
+      summary: Create Portal User Route
+      operationId: create_portal
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /billing/stripe/checkouts/:
+    post:
+      tags:
+      - Billing
+      summary: Create Checkout User Route
+      operationId: create_checkout
+      parameters:
+      - name: plan
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Plan
+      - name: success_url
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Success Url
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /billing/stripe/topups/:
+    post:
+      tags:
+      - Billing
+      summary: Create Top Up Checkout User Route
+      operationId: create_top_up_checkout
+      parameters:
+      - name: pack
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Pack
+      - name: success_url
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Success Url
+      - name: cancel_url
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cancel Url
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /billing/stripe/topups/packs:
+    get:
+      tags:
+      - Billing
+      summary: Fetch Top Up Packs User Route
+      operationId: fetch_top_up_packs
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopUpPacksResponse'
+  /billing/stripe/topups/{checkout_session_id}:
+    get:
+      tags:
+      - Billing
+      summary: Fetch Top Up Purchase User Route
+      operationId: fetch_top_up_purchase
+      parameters:
+      - name: checkout_session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Checkout Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopUpPurchaseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /billing/plans:
+    get:
+      tags:
+      - Billing
+      summary: Fetch Plan User Route
+      operationId: fetch_plans
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /billing/plans/switch:
+    post:
+      tags:
+      - Billing
+      summary: Switch Plans User Route
+      operationId: switch_plans
+      parameters:
+      - name: plan
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Plan
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /billing/subscription:
+    get:
+      tags:
+      - Billing
+      summary: Fetch Subscription User Route
+      operationId: fetch_subscription
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /billing/subscription/cancel:
+    post:
+      tags:
+      - Billing
+      summary: Cancel Subscription User Route
+      operationId: cancel_plan
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /billing/usage:
+    get:
+      tags:
+      - Billing
+      summary: Fetch Usage User Route
+      operationId: fetch_usage
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /billing/catalog:
+    get:
+      tags:
+      - Billing
+      summary: Fetch Catalog
+      description: 'Return the effective billing catalog with pricing merged in.
+
+
+        Each entry carries `title`, `description`, `plan`, `type`, `features`,
+
+        and (when configured) a `price` block sourced from the matching
+
+        `AGENTA_BILLING_PRICING` entry. Pre-joining avoids a client-side
+
+        catalog × pricing merge by slug.'
+      operationId: fetch_billing_catalog
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                type: array
+                title: Response Fetch Billing Catalog
+  /billing/pricing:
+    get:
+      tags:
+      - Billing
+      summary: Fetch Pricing
+      description: 'Return the effective pricing map: plan slug -> normalized pricing.
+
+
+        Includes backend-resolved free/trial fallback markers so clients do
+
+        not need to duplicate billing default rules.'
+      operationId: fetch_billing_pricing
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  additionalProperties: true
+                  type: object
+                type: object
+                title: Response Fetch Billing Pricing
+components:
+  schemas:
+    TopUpPacksResponse:
+      properties:
+        status:
+          type: string
+          enum:
+          - available
+          - paid_plan_required
+          - unavailable
+          title: Status
+        packs:
+          items:
+            $ref: '#/components/schemas/TopUpPackResponse'
+          type: array
+          title: Packs
+      type: object
+      required:
+      - status
+      - packs
+      title: TopUpPacksResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    TopUpPackResponse:
+      properties:
+        code:
+          type: string
+          title: Code
+        credits:
+          type: integer
+          title: Credits
+        price_cents:
+          type: integer
+          title: Price Cents
+        currency:
+          type: string
+          const: usd
+          title: Currency
+          default: usd
+        expires_after_days:
+          type: integer
+          title: Expires After Days
+      type: object
+      required:
+      - code
+      - credits
+      - price_cents
+      - expires_after_days
+      title: TopUpPackResponse
+    TopUpPurchaseResponse:
+      properties:
+        credited:
+          type: boolean
+          title: Credited
+        credits:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Credits
+      type: object
+      required:
+      - credited
+      title: TopUpPurchaseResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

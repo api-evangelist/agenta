@@ -1,0 +1,391 @@
+openapi: 3.2.0
+info:
+  title: Agenta Workspaces API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Workspaces
+  description: Manage workspaces within an organization and their members.
+paths:
+  /workspaces:
+    get:
+      tags:
+      - Workspaces
+      summary: Get Workspace
+      description: 'Get workspace details.
+
+
+        Returns details about the workspace associated with the user''s session.
+
+
+        Returns:
+
+        Workspace: The details of the workspace.
+
+
+        Raises:
+
+        HTTPException: If the user does not have permission to perform this action.'
+      operationId: get_workspace
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Workspace'
+                type: array
+                title: Response Get Workspace
+  /workspaces/roles:
+    get:
+      tags:
+      - Workspaces
+      summary: Get All Workspace Roles
+      description: 'Get all workspace roles.
+
+
+        Returns a list of all available workspace roles.
+
+
+        Returns:
+
+        List[WorkspaceRoleResponse]: A list of DefaultRole objects representing the available workspace roles.
+
+
+        Raises:
+
+        HTTPException: If an error occurs while retrieving the workspace roles.'
+      operationId: get_all_workspace_roles
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties:
+                    type: string
+                  type: object
+                type: array
+                title: Response Get All Workspace Roles
+  /workspaces/permissions:
+    get:
+      tags:
+      - Workspaces
+      summary: Get All Workspace Permissions
+      description: Get all available workspace permissions.
+      operationId: get_all_workspace_permissions
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Permission'
+                type: array
+                title: Response Get All Workspace Permissions
+  /workspaces/{workspace_id}/roles:
+    post:
+      tags:
+      - Workspaces
+      summary: Assign Role To User
+      description: 'Assign a role to a user in a workspace.
+
+
+        Args:
+
+        payload (UserRole): The organization id, user email, and role to assign.
+
+        workspace_id (str): The ID of the workspace.'
+      operationId: assign_role_to_user
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRole'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Workspaces
+      summary: Unassign Role From User
+      description: 'Remove a role assignment from a user in a workspace.
+
+
+        Args:
+
+        email (str): The email of the user.
+
+        organization_id (str): The ID of the organization.
+
+        role (str): The role to remove.
+
+        workspace_id (str): The ID of the workspace.'
+      operationId: unassign_role_from_user
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Email
+      - name: organization_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      - name: role
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Role
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workspaces/{workspace_id}/users:
+    delete:
+      tags:
+      - Workspaces
+      summary: Remove User From Workspace
+      description: 'Remove a user from a workspace.
+
+
+        Args:
+
+        email (str): The email address of the user to be removed
+
+        workspace_id (str): The ID of the workspace.'
+      operationId: remove_user_from_workspace
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Email
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    Permission:
+      type: string
+      enum:
+      - view_applications
+      - edit_application
+      - run_service
+      - view_webhooks
+      - edit_webhooks
+      - view_secret
+      - edit_secret
+      - view_spans
+      - edit_spans
+      - view_folders
+      - edit_folders
+      - view_api_keys
+      - edit_api_keys
+      - view_workspace
+      - edit_workspace
+      - create_workspace
+      - delete_workspace
+      - modify_user_roles
+      - add_new_user_to_workspace
+      - edit_organization
+      - delete_organization
+      - add_new_user_to_organization
+      - reset_password
+      - view_billing
+      - edit_billing
+      - view_workflows
+      - edit_workflows
+      - run_workflows
+      - view_evaluators
+      - edit_evaluators
+      - view_environments
+      - edit_environments
+      - deploy_environments
+      - view_queries
+      - edit_queries
+      - view_testsets
+      - edit_testsets
+      - view_annotations
+      - edit_annotations
+      - view_invocations
+      - edit_invocations
+      - view_evaluation_runs
+      - edit_evaluation_runs
+      - view_evaluation_scenarios
+      - edit_evaluation_scenarios
+      - view_evaluation_results
+      - edit_evaluation_results
+      - view_evaluation_metrics
+      - edit_evaluation_metrics
+      - view_evaluation_queues
+      - edit_evaluation_queues
+      - view_events
+      - view_tools
+      - edit_tools
+      - run_tools
+      - view_triggers
+      - edit_triggers
+      - run_triggers
+      - view_sessions
+      - edit_sessions
+      - run_sessions
+      - view_mounts
+      - edit_mounts
+      - use_mounts
+      - view_channels
+      - edit_channels
+      - run_channels
+      - view_llm_endpoints
+      - edit_llm_endpoints
+      - use_llm_endpoints
+      - view_mcp_endpoints
+      - edit_mcp_endpoints
+      - use_mcp_endpoints
+      title: Permission
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    UserRole:
+      properties:
+        email:
+          type: string
+          title: Email
+        role:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role
+        organization_id:
+          type: string
+          title: Organization Id
+      type: object
+      required:
+      - email
+      - organization_id
+      title: UserRole
+    Workspace:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+      type: object
+      required:
+      - name
+      - type
+      title: Workspace
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

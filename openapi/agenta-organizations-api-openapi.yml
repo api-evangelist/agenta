@@ -1,0 +1,1417 @@
+openapi: 3.2.0
+info:
+  title: Agenta Organizations API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Organizations
+  description: Manage organizations, workspaces, SSO domains, and identity providers.
+paths:
+  /organizations/domains/:
+    get:
+      tags:
+      - Organizations
+      summary: List Domains
+      description: List all domains for the organization.
+      operationId: list_organization_domains
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/OrganizationDomainResponse'
+                type: array
+                title: Response List Organization Domains
+    post:
+      tags:
+      - Organizations
+      summary: Create Domain
+      description: 'Create a new domain for verification.
+
+
+        This endpoint initiates the domain verification process by:
+
+        1. Creating a domain record
+
+        2. Generating a unique verification token
+
+        3. Returning DNS configuration instructions
+
+
+        The user must add a DNS TXT record to verify ownership.'
+      operationId: create_organization_domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDomainCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDomainResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/domains/verify:
+    post:
+      tags:
+      - Organizations
+      summary: Verify Domain
+      description: 'Verify domain ownership via DNS TXT record.
+
+
+        This endpoint checks for the presence of the verification TXT record
+
+        and marks the domain as verified if found.'
+      operationId: verify_organization_domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDomainVerify'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDomainResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/domains/{domain_id}/refresh:
+    post:
+      tags:
+      - Organizations
+      summary: Refresh Domain Token
+      description: 'Refresh the verification token for an unverified domain.
+
+
+        Generates a new token and resets the 48-hour expiry window.
+
+        This is useful when the original token has expired.'
+      operationId: refresh_organization_domain_token
+      parameters:
+      - name: domain_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Domain Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDomainResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/domains/{domain_id}/reset:
+    post:
+      tags:
+      - Organizations
+      summary: Reset Domain
+      description: 'Reset a verified domain to unverified state for re-verification.
+
+
+        Generates a new token and marks the domain as unverified.
+
+        This allows re-verification of already verified domains.'
+      operationId: reset_organization_domain
+      parameters:
+      - name: domain_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Domain Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDomainResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/domains/{domain_id}:
+    delete:
+      tags:
+      - Organizations
+      summary: Delete Domain
+      description: Delete a domain.
+      operationId: delete_organization_domain
+      parameters:
+      - name: domain_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Domain Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/providers/:
+    get:
+      tags:
+      - Organizations
+      summary: List Providers
+      description: List all SSO providers for the organization.
+      operationId: list_organization_providers
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/OrganizationProviderResponse'
+                type: array
+                title: Response List Organization Providers
+    post:
+      tags:
+      - Organizations
+      summary: Create Provider
+      description: 'Create a new SSO provider configuration.
+
+
+        Supported provider types:
+
+        - oidc: OpenID Connect
+
+        - saml: SAML 2.0 (coming soon)'
+      operationId: create_organization_provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationProviderCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationProviderResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/providers/{provider_id}:
+    patch:
+      tags:
+      - Organizations
+      summary: Update Provider
+      description: Update an SSO provider configuration.
+      operationId: update_organization_provider
+      parameters:
+      - name: provider_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationProviderUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationProviderResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Organizations
+      summary: Delete Provider
+      description: Delete an SSO provider configuration.
+      operationId: delete_organization_provider
+      parameters:
+      - name: provider_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/providers/{provider_id}/test:
+    post:
+      tags:
+      - Organizations
+      summary: Test Provider
+      description: 'Test SSO provider connection.
+
+
+        This endpoint tests the OIDC provider configuration by fetching the
+
+        discovery document and validating required endpoints exist.
+
+        If successful, marks the provider as valid (is_valid=true).
+
+        If failed, marks as invalid and deactivates (is_valid=false, is_active=false).'
+      operationId: test_organization_provider
+      parameters:
+      - name: provider_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationProviderResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations:
+    get:
+      tags:
+      - Organizations
+      summary: List Organizations
+      description: 'Returns a list of organizations associated with the user''s session.
+
+
+        Returns:
+
+        list[Organization]: A list of organizations associated with the user''s session.
+
+
+        Raises:
+
+        HTTPException: If there is an error retrieving the organizations from the database.'
+      operationId: list_organizations
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Organization'
+                type: array
+                title: Response List Organizations
+    post:
+      tags:
+      - Organizations
+      summary: Create Organization
+      description: Create a new organization.
+      operationId: create_organization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationPayload'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/{organization_id}:
+    get:
+      tags:
+      - Organizations
+      summary: Fetch Organization Details
+      description: Return the details of the organization.
+      operationId: fetch_organization_details
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDetails'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Organizations
+      summary: Update Organization
+      operationId: patch_organization
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Organizations
+      summary: Update Organization
+      operationId: update_organization
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Organizations
+      summary: Delete Organization
+      description: Delete an organization (owner only).
+      operationId: delete_organization
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/{organization_id}/workspaces/{workspace_id}/invite:
+    post:
+      tags:
+      - Organizations
+      summary: Invite User To Organization
+      description: 'Assigns a role to a user in an organization.
+
+
+        Args:
+
+        organization_id (str): The ID of the organization.
+
+        payload (InviteRequest): The payload containing the organization id, user email, and role to assign.
+
+        workspace_id (str): The ID of the workspace.
+
+
+        Returns:
+
+        bool: True if the role was successfully assigned, False otherwise.
+
+
+        Raises:
+
+        HTTPException: If the user does not have permission to perform this action.
+
+        HTTPException: If there is an error assigning the role to the user.'
+      operationId: invite_user_to_workspace
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/InviteRequest'
+              title: Payload
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/{organization_id}/workspaces/{workspace_id}/invite/resend:
+    post:
+      tags:
+      - Organizations
+      summary: Resend User Invitation To Organization
+      description: 'Resend an invitation to a user to an Organization.
+
+
+        Raises:
+
+        HTTPException: _description_; status_code: 500
+
+        HTTPException: Invitation not found or has expired; status_code: 400
+
+        HTTPException: You already belong to this organization; status_code: 400
+
+
+        Returns:
+
+        JSONResponse: Resent invitation to user; status_code: 200'
+      operationId: resend_invitation
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendInviteRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/{organization_id}/workspaces/{workspace_id}/invite/accept:
+    post:
+      tags:
+      - Organizations
+      summary: Accept Organization Invitation
+      description: 'Accept an invitation to an organization.
+
+
+        Raises:
+
+        HTTPException: _description_; status_code: 500
+
+        HTTPException: Invitation not found or has expired; status_code: 400
+
+        HTTPException: You already belong to this organization; status_code: 400
+
+
+        Returns:
+
+        JSONResponse: Accepted invitation to workspace; status_code: 200'
+      operationId: accept_invitation
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      - name: project_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteToken'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/{organization_id}/transfer/{new_owner_id}:
+    post:
+      tags:
+      - Organizations
+      summary: Transfer Organization Ownership
+      description: Transfer organization ownership to another member.
+      operationId: transfer_organization_ownership
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      - name: new_owner_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: New Owner Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/{organization_id}/workspaces:
+    post:
+      tags:
+      - Organizations
+      summary: Create Workspace
+      description: Create a new workspace in an organization (owner only).
+      operationId: create_workspace
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkspace'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /organizations/{organization_id}/workspaces/{workspace_id}:
+    put:
+      tags:
+      - Organizations
+      summary: Update Workspace
+      description: Update a workspace's details (requires EDIT_WORKSPACE permission).
+      operationId: update_workspace
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkspace'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    OrganizationDomainVerify:
+      properties:
+        domain_id:
+          type: string
+          title: Domain Id
+      type: object
+      required:
+      - domain_id
+      title: OrganizationDomainVerify
+      description: Request model for verifying a domain.
+    Organization:
+      properties:
+        id:
+          type: string
+          title: Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        flags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+        owner_id:
+          type: string
+          title: Owner Id
+        members:
+          items:
+            type: string
+          type: array
+          title: Members
+        invitations:
+          items: {}
+          type: array
+          title: Invitations
+        workspaces:
+          items:
+            type: string
+          type: array
+          title: Workspaces
+      type: object
+      required:
+      - id
+      - owner_id
+      title: Organization
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    CreateOrganizationPayload:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      title: CreateOrganizationPayload
+    OrganizationProviderResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        slug:
+          type: string
+          title: Slug
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        flags:
+          additionalProperties: true
+          type: object
+          title: Flags
+        settings:
+          additionalProperties: true
+          type: object
+          title: Settings
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        organization_id:
+          type: string
+          format: uuid
+          title: Organization Id
+      type: object
+      required:
+      - id
+      - slug
+      - name
+      - description
+      - flags
+      - settings
+      - created_at
+      - updated_at
+      - organization_id
+      title: OrganizationProviderResponse
+      description: Response model for an SSO provider.
+    OrganizationDetails:
+      properties:
+        id:
+          type: string
+          title: Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        flags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+        owner_id:
+          type: string
+          title: Owner Id
+        members:
+          items:
+            type: string
+          type: array
+          title: Members
+        invitations:
+          items: {}
+          type: array
+          title: Invitations
+        workspaces:
+          items:
+            type: string
+          type: array
+          title: Workspaces
+        default_workspace:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Default Workspace
+      type: object
+      required:
+      - id
+      - owner_id
+      title: OrganizationDetails
+    InviteRequest:
+      properties:
+        email:
+          type: string
+          title: Email
+        roles:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Roles
+      type: object
+      required:
+      - email
+      title: InviteRequest
+    OrganizationDomainCreate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        domain:
+          type: string
+          title: Domain
+      type: object
+      required:
+      - domain
+      title: OrganizationDomainCreate
+      description: Request model for creating a domain.
+    OrganizationProviderCreate:
+      properties:
+        slug:
+          type: string
+          pattern: ^[a-z-]+$
+          title: Slug
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        flags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Flags
+        settings:
+          additionalProperties: true
+          type: object
+          title: Settings
+      type: object
+      required:
+      - slug
+      - settings
+      title: OrganizationProviderCreate
+      description: Request model for creating an SSO provider.
+    Permission:
+      type: string
+      enum:
+      - view_applications
+      - edit_application
+      - run_service
+      - view_webhooks
+      - edit_webhooks
+      - view_secret
+      - edit_secret
+      - view_spans
+      - edit_spans
+      - view_folders
+      - edit_folders
+      - view_api_keys
+      - edit_api_keys
+      - view_workspace
+      - edit_workspace
+      - create_workspace
+      - delete_workspace
+      - modify_user_roles
+      - add_new_user_to_workspace
+      - edit_organization
+      - delete_organization
+      - add_new_user_to_organization
+      - reset_password
+      - view_billing
+      - edit_billing
+      - view_workflows
+      - edit_workflows
+      - run_workflows
+      - view_evaluators
+      - edit_evaluators
+      - view_environments
+      - edit_environments
+      - deploy_environments
+      - view_queries
+      - edit_queries
+      - view_testsets
+      - edit_testsets
+      - view_annotations
+      - edit_annotations
+      - view_invocations
+      - edit_invocations
+      - view_evaluation_runs
+      - edit_evaluation_runs
+      - view_evaluation_scenarios
+      - edit_evaluation_scenarios
+      - view_evaluation_results
+      - edit_evaluation_results
+      - view_evaluation_metrics
+      - edit_evaluation_metrics
+      - view_evaluation_queues
+      - edit_evaluation_queues
+      - view_events
+      - view_tools
+      - edit_tools
+      - run_tools
+      - view_triggers
+      - edit_triggers
+      - run_triggers
+      - view_sessions
+      - edit_sessions
+      - run_sessions
+      - view_mounts
+      - edit_mounts
+      - use_mounts
+      - view_channels
+      - edit_channels
+      - run_channels
+      - view_llm_endpoints
+      - edit_llm_endpoints
+      - use_llm_endpoints
+      - view_mcp_endpoints
+      - edit_mcp_endpoints
+      - use_mcp_endpoints
+      title: Permission
+    WorkspacePermission:
+      properties:
+        role_name:
+          type: string
+          title: Role Name
+        role_description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role Description
+        permissions:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Permission'
+            type: array
+          - type: 'null'
+          title: Permissions
+      type: object
+      required:
+      - role_name
+      title: WorkspacePermission
+    InviteToken:
+      properties:
+        token:
+          type: string
+          title: Token
+        email:
+          type: string
+          title: Email
+      type: object
+      required:
+      - token
+      - email
+      title: InviteToken
+    WorkspaceResponse:
+      properties:
+        created_at:
+          type: string
+          title: Created At
+        updated_at:
+          type: string
+          title: Updated At
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        organization:
+          type: string
+          title: Organization
+        members:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/WorkspaceMemberResponse'
+            type: array
+          - type: 'null'
+          title: Members
+      type: object
+      required:
+      - id
+      - name
+      - type
+      - organization
+      title: WorkspaceResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    WorkspaceMemberResponse:
+      properties:
+        user:
+          additionalProperties: true
+          type: object
+          title: User
+        roles:
+          items:
+            $ref: '#/components/schemas/WorkspacePermission'
+          type: array
+          title: Roles
+      type: object
+      required:
+      - user
+      - roles
+      title: WorkspaceMemberResponse
+    UpdateWorkspace:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+      type: object
+      title: UpdateWorkspace
+    OrganizationDomainResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        slug:
+          type: string
+          title: Slug
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        flags:
+          additionalProperties: true
+          type: object
+          title: Flags
+        token:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Token
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        organization_id:
+          type: string
+          format: uuid
+          title: Organization Id
+      type: object
+      required:
+      - id
+      - slug
+      - name
+      - description
+      - flags
+      - token
+      - created_at
+      - updated_at
+      - organization_id
+      title: OrganizationDomainResponse
+      description: Response model for a domain.
+    OrganizationUpdate:
+      properties:
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        flags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Flags
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+      type: object
+      title: OrganizationUpdate
+    ResendInviteRequest:
+      properties:
+        email:
+          type: string
+          title: Email
+      type: object
+      required:
+      - email
+      title: ResendInviteRequest
+    OrganizationProviderUpdate:
+      properties:
+        slug:
+          anyOf:
+          - type: string
+            pattern: ^[a-z-]+$
+          - type: 'null'
+          title: Slug
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        flags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Flags
+        settings:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Settings
+      type: object
+      title: OrganizationProviderUpdate
+      description: Request model for updating an SSO provider.
+    CreateWorkspace:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+      type: object
+      required:
+      - name
+      title: CreateWorkspace
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

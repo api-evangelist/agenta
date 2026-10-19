@@ -1,0 +1,157 @@
+openapi: 3.2.0
+info:
+  title: Agenta Users API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Users
+  description: User profile and account management — view profile, update username, reset password.
+paths:
+  /profile:
+    get:
+      tags:
+      - Users
+      summary: User Profile
+      operationId: fetch_user_profile
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+    delete:
+      tags:
+      - Users
+      summary: Delete User Account
+      description: 'Self-serve deletion of the caller''s own account (EE only).
+
+
+        Requires an interactive SuperTokens session. API keys and service tokens are
+
+        rejected: this is an irreversible destructive action, so a leaked or embedded
+
+        integration key must not be enough to delete the owning account.'
+      operationId: delete_user_account
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /profile/username:
+    put:
+      tags:
+      - Users
+      summary: Update User Username
+      operationId: update_user_username
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /profile/reset-password:
+    post:
+      tags:
+      - Users
+      summary: Reset User Password
+      operationId: reset_user_password
+      parameters:
+      - name: user_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    UserUpdate:
+      properties:
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        updated_at:
+          type: string
+          title: Updated At
+      type: object
+      title: UserUpdate
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

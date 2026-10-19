@@ -1,283 +1,5511 @@
 openapi: 3.2.0
 info:
   title: Agenta Evaluations API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
-  termsOfService: https://agenta.ai/terms
+  description: Agenta API
   contact:
-    name: Agenta Support
+    name: Agenta
     url: https://agenta.ai/
     email: team@agenta.ai
-  license:
-    name: MIT
-    url: https://github.com/Agenta-AI/agenta/blob/main/LICENSE
-  version: '1.0'
+  version: 0.1.0
 servers:
-- url: https://cloud.agenta.ai/api
-  description: Agenta Cloud (US)
+- url: /api
 - url: https://eu.cloud.agenta.ai/api
-  description: Agenta Cloud (EU)
 security:
-- ApiKeyAuth: []
+- APIKeyHeader: []
 tags:
 - name: Evaluations
-  description: Run evaluations of variants against testsets.
+  description: Evaluation runs — execute evaluators against variants and testsets.
 paths:
-  /evaluations/runs/query:
+  /evaluations/runs/:
     post:
-      operationId: queryEvaluationRuns
       tags:
       - Evaluations
-      summary: List and filter evaluation runs
+      summary: Create Runs
+      operationId: create_runs
       requestBody:
-        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRunsCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Runs
+      operationId: delete_runs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRunIdsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunIdsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Edit Runs
+      operationId: edit_runs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRunsEditRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/runs/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Runs
+      operationId: query_runs
+      requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EvaluationRunQueryRequest'
+        required: true
       responses:
         '200':
-          description: A list of evaluation runs.
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EvaluationRun'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /evaluations/runs/:
+                $ref: '#/components/schemas/EvaluationRunsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/runs/close:
     post:
-      operationId: createEvaluationRun
       tags:
       - Evaluations
-      summary: Create an evaluation run
-      description: Starts an evaluation run that executes one or more variants against a testset and scores the outputs with the configured evaluators.
+      summary: Close Runs
+      operationId: close_runs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRunIdsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/runs/open:
+    post:
+      tags:
+      - Evaluations
+      summary: Open Runs
+      operationId: open_runs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRunIdsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/runs/{run_id}:
+    get:
+      tags:
+      - Evaluations
+      summary: Fetch Run
+      operationId: fetch_run
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Edit Run
+      operationId: edit_run
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EvaluationRunCreateRequest'
+              $ref: '#/components/schemas/EvaluationRunEditRequest'
       responses:
         '200':
-          description: The created evaluation run.
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EvaluationRun'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /evaluations/results/query:
-    post:
-      operationId: queryEvaluationResults
+                $ref: '#/components/schemas/EvaluationRunResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
       tags:
       - Evaluations
-      summary: Query evaluation results
-      requestBody:
+      summary: Delete Run
+      operationId: delete_run
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunIdResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/runs/{run_id}/close:
+    post:
+      tags:
+      - Evaluations
+      summary: Close Run
+      operationId: close_run
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
+      - name: status
+        in: query
         required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/runs/{run_id}/open:
+    post:
+      tags:
+      - Evaluations
+      summary: Open Run
+      operationId: open_run
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/runs/{run_id}/queues/default:
+    get:
+      tags:
+      - Evaluations
+      summary: Fetch Default Queue
+      operationId: fetch_default_queue
+      parameters:
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationQueueResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/scenarios/:
+    post:
+      tags:
+      - Evaluations
+      summary: Create Scenarios
+      operationId: create_scenarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationScenariosCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenariosResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Scenarios
+      operationId: delete_scenarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationScenarioIdsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenarioIdsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Edit Scenarios
+      operationId: edit_scenarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationScenariosEditRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenariosResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/scenarios/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Scenarios
+      operationId: query_scenarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationScenarioQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenariosResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/scenarios/{scenario_id}:
+    get:
+      tags:
+      - Evaluations
+      summary: Fetch Scenario
+      operationId: fetch_scenario
+      parameters:
+      - name: scenario_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Scenario Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenarioResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Edit Scenario
+      operationId: edit_scenario
+      parameters:
+      - name: scenario_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Scenario Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationScenarioEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenarioResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Scenario
+      operationId: delete_scenario
+      parameters:
+      - name: scenario_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Scenario Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenarioIdResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/results/:
+    put:
+      tags:
+      - Evaluations
+      summary: Set Results
+      operationId: set_results
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationResultsSetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResultsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Evaluations
+      summary: Set Results
+      operationId: postEvaluationsResults
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationResultsSetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResultsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      x-operation-id-source: normalized
+      x-operation-id-original: set_results
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Results
+      operationId: delete_results
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationResultIdsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResultIdsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Set Results
+      operationId: patchEvaluationsResults
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationResultsSetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResultsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      x-operation-id-source: normalized
+      x-operation-id-original: set_results
+  /evaluations/results/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Results
+      operationId: query_results
+      requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EvaluationResultQueryRequest'
+        required: true
       responses:
         '200':
-          description: A list of evaluation results.
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EvaluationResult'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /evaluations/metrics/query:
-    post:
-      operationId: queryEvaluationMetrics
+                $ref: '#/components/schemas/EvaluationResultsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/results/{result_id}:
+    get:
       tags:
       - Evaluations
-      summary: Query aggregated evaluation metrics
+      summary: Fetch Result
+      operationId: fetch_result
+      parameters:
+      - name: result_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Result Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResultResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Result
+      operationId: delete_result
+      parameters:
+      - name: result_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Result Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResultIdResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/metrics/refresh:
+    post:
+      tags:
+      - Evaluations
+      summary: Refresh Metrics
+      operationId: refresh_metrics
       requestBody:
-        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationMetricsRefreshRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationMetricsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/metrics/:
+    put:
+      tags:
+      - Evaluations
+      summary: Set Metrics
+      operationId: set_metrics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationMetricsSetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationMetricsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Evaluations
+      summary: Set Metrics
+      operationId: postEvaluationsMetrics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationMetricsSetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationMetricsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      x-operation-id-source: normalized
+      x-operation-id-original: set_metrics
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Metrics
+      operationId: delete_metrics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationMetricsIdsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationMetricsIdsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Set Metrics
+      operationId: patchEvaluationsMetrics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationMetricsSetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationMetricsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      x-operation-id-source: normalized
+      x-operation-id-original: set_metrics
+  /evaluations/metrics/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Metrics
+      operationId: query_metrics
+      requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EvaluationMetricsQueryRequest'
+        required: true
       responses:
         '200':
-          description: Aggregated metrics for the matching runs.
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EvaluationMetrics'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: '#/components/schemas/EvaluationMetricsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/metrics/{metrics_id}:
+    get:
+      tags:
+      - Evaluations
+      summary: Fetch Metric
+      operationId: fetch_metric
+      parameters:
+      - name: metrics_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Metrics Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationMetricsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Metric
+      operationId: delete_metric
+      parameters:
+      - name: metrics_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Metrics Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationMetricsIdsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/queues/:
+    post:
+      tags:
+      - Evaluations
+      summary: Create Queues
+      operationId: create_queues
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationQueuesCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationQueuesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Queues
+      operationId: delete_queues
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationQueueIdsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationQueueIdsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Edit Queues
+      operationId: edit_queues
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationQueuesEditRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationQueuesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/queues/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Queues
+      operationId: query_queues
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationQueueQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationQueuesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/queues/{queue_id}:
+    get:
+      tags:
+      - Evaluations
+      summary: Fetch Queue
+      operationId: fetch_queue
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationQueueResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Edit Queue
+      operationId: edit_queue
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationQueueEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationQueueResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Queue
+      operationId: delete_queue
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationQueueIdResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluations/queues/{queue_id}/scenarios/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Queue Scenarios
+      operationId: query_evaluation_queue_scenarios
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationQueueScenariosQueryRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenariosResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/:
+    post:
+      tags:
+      - Evaluations
+      summary: Create Evaluation
+      operationId: create_simple_evaluation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleEvaluationCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Evaluations
+      operationId: query_simple_evaluations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleEvaluationQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}:
+    get:
+      tags:
+      - Evaluations
+      summary: Fetch Evaluation
+      operationId: fetch_simple_evaluation
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Evaluations
+      summary: Edit Evaluation
+      operationId: edit_simple_evaluation
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleEvaluationEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Evaluation
+      operationId: delete_simple_evaluation
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationIdResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/start:
+    post:
+      tags:
+      - Evaluations
+      summary: Start Evaluation
+      operationId: start_simple_evaluation
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/stop:
+    post:
+      tags:
+      - Evaluations
+      summary: Stop Evaluation
+      operationId: stop_simple_evaluation
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/close:
+    post:
+      tags:
+      - Evaluations
+      summary: Close Evaluation
+      operationId: close_simple_evaluation
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/open:
+    post:
+      tags:
+      - Evaluations
+      summary: Open Evaluation
+      operationId: open_simple_evaluation
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/populate:
+    post:
+      tags:
+      - Evaluations
+      summary: Populate Evaluation Slice
+      operationId: populate_slice
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PopulateSliceRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResultsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/process:
+    post:
+      tags:
+      - Evaluations
+      summary: Process Evaluation Slice
+      operationId: process_slice
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessSliceRequest'
+      responses:
+        '202':
+          description: Accepted.
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/probe:
+    post:
+      tags:
+      - Evaluations
+      summary: Probe Evaluation Slice
+      operationId: probe_slice
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProbeSliceRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResultsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/prune:
+    post:
+      tags:
+      - Evaluations
+      summary: Prune Evaluation Slice
+      operationId: prune_slice
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PruneSliceRequest'
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/refresh:
+    post:
+      tags:
+      - Evaluations
+      summary: Refresh Evaluation Slice
+      operationId: refresh_slice
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshSliceRequest'
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/scenarios/add:
+    post:
+      tags:
+      - Evaluations
+      summary: Add Evaluation Scenarios
+      operationId: add_scenarios
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddScenariosRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationScenariosResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/scenarios/remove:
+    post:
+      tags:
+      - Evaluations
+      summary: Remove Evaluation Scenarios
+      operationId: remove_scenarios
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveScenariosRequest'
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/steps/add:
+    post:
+      tags:
+      - Evaluations
+      summary: Add Evaluation Steps
+      operationId: add_steps
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddStepsRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/steps/remove:
+    post:
+      tags:
+      - Evaluations
+      summary: Remove Evaluation Steps
+      operationId: remove_steps
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveStepsRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluations/{evaluation_id}/repeats/set:
+    post:
+      tags:
+      - Evaluations
+      summary: Set Evaluation Repeats
+      operationId: set_repeats
+      parameters:
+      - name: evaluation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluation Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetRepeatsRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/queues/:
+    post:
+      tags:
+      - Evaluations
+      summary: Create Simple Queue
+      operationId: create_simple_queue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleQueueCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleQueueResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Simple Queues
+      operationId: delete_simple_queues
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleQueueIdsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleQueueIdsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/queues/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Simple Queues
+      operationId: query_simple_queues
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleQueueQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleQueuesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/queues/{queue_id}:
+    get:
+      tags:
+      - Evaluations
+      summary: Fetch Simple Queue
+      operationId: fetch_simple_queue
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleQueueResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Evaluations
+      summary: Delete Simple Queue
+      operationId: delete_simple_queue
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleQueueIdResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/queues/{queue_id}/scenarios/query:
+    post:
+      tags:
+      - Evaluations
+      summary: Query Simple Queue Scenarios
+      operationId: query_simple_queue_scenarios
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleQueueScenariosQueryRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleQueueScenariosResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/queues/{queue_id}/traces/:
+    post:
+      tags:
+      - Evaluations
+      summary: Add Simple Queue Traces
+      operationId: add_simple_queue_traces
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleQueueTracesCreateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleQueueIdResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/queues/{queue_id}/testcases/:
+    post:
+      tags:
+      - Evaluations
+      summary: Add Simple Queue Testcases
+      operationId: add_simple_queue_testcases
+      parameters:
+      - name: queue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Queue Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleQueueTestcasesCreateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleQueueIdResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    EvaluationRun:
-      type: object
+    SimpleQueueQuery:
       properties:
-        id:
-          type: string
-          format: uuid
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
         name:
-          type: string
-        status:
-          type: string
-          enum:
-          - pending
-          - running
-          - finished
-          - failed
-          - cancelled
-        testset_id:
-          type: string
-          format: uuid
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
-    Error:
-      type: object
-      properties:
-        detail:
-          oneOf:
+          anyOf:
           - type: string
-          - type: object
-    EvaluationRunQueryRequest:
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        kind:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleQueueKind'
+          - type: 'null'
+        user_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: User Id
+        user_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: User Ids
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        run_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Run Ids
+        queue_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Queue Ids
       type: object
+      title: SimpleQueueQuery
+    EvaluationQueueFlags:
+      properties:
+        is_sequential:
+          type: boolean
+          title: Is Sequential
+          default: false
+        is_default:
+          type: boolean
+          title: Is Default
+          default: false
+      type: object
+      title: EvaluationQueueFlags
+    EvaluationRunDataConcurrency:
+      properties:
+        batch_size:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Batch Size
+        max_retries:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Retries
+        retry_delay:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Retry Delay
+      type: object
+      title: EvaluationRunDataConcurrency
+    EvaluationScenarioResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        scenario:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationScenario'
+          - type: 'null'
+      type: object
+      title: EvaluationScenarioResponse
+    SimpleEvaluationCreate:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluationData'
+          - type: 'null'
+      type: object
+      title: SimpleEvaluationCreate
+    AddScenariosRequest:
+      properties:
+        count:
+          type: integer
+          title: Count
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+      type: object
+      required:
+      - count
+      title: AddScenariosRequest
+    EvaluationQueueEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueData'
+          - type: 'null'
+      type: object
+      title: EvaluationQueueEdit
+    EvaluationScenariosEditRequest:
+      properties:
+        scenarios:
+          items:
+            $ref: '#/components/schemas/EvaluationScenarioEdit'
+          type: array
+          title: Scenarios
+      type: object
+      required:
+      - scenarios
+      title: EvaluationScenariosEditRequest
+    SimpleEvaluationEditRequest:
+      properties:
+        evaluation:
+          $ref: '#/components/schemas/SimpleEvaluationEdit'
+      type: object
+      required:
+      - evaluation
+      title: SimpleEvaluationEditRequest
+    EvaluationScenarioIdsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        scenario_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Scenario Ids
+          default: []
+      type: object
+      title: EvaluationScenarioIdsResponse
+    EvaluationScenarioIdsRequest:
+      properties:
+        scenario_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Scenario Ids
+      type: object
+      required:
+      - scenario_ids
+      title: EvaluationScenarioIdsRequest
+    SimpleQueueScenariosQueryRequest:
+      properties:
+        queue:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleQueueScenariosQuery'
+          - type: 'null'
+        scenario:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationScenarioQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SimpleQueueScenariosQueryRequest
+    EvaluationQueueQueryRequest:
+      properties:
+        queue:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: EvaluationQueueQueryRequest
+    EvaluationResultResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        result:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationResult'
+          - type: 'null'
+      type: object
+      title: EvaluationResultResponse
+    SimpleEvaluationQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Ids
+      type: object
+      title: SimpleEvaluationQuery
+    EvaluationRunsEditRequest:
+      properties:
+        runs:
+          items:
+            $ref: '#/components/schemas/EvaluationRunEdit'
+          type: array
+          title: Runs
+      type: object
+      required:
+      - runs
+      title: EvaluationRunsEditRequest
+    EvaluationQueueData:
+      properties:
+        user_ids:
+          anyOf:
+          - items:
+              items:
+                type: string
+                format: uuid
+              type: array
+            type: array
+          - type: 'null'
+          title: User Ids
+        scenario_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Scenario Ids
+        step_keys:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Step Keys
+        batch_size:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Batch Size
+        batch_offset:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Batch Offset
+      type: object
+      title: EvaluationQueueData
+    RefreshSliceRequest:
+      properties:
+        scenario_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Scenario Ids
+        step_keys:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Step Keys
+        repeat_idxs:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Repeat Idxs
+      type: object
+      title: RefreshSliceRequest
+    EvaluationRun:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+          default: pending
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunData-Output'
+          - type: 'null'
+      type: object
+      title: EvaluationRun
+    EvaluationRunEditRequest:
       properties:
         run:
-          type: object
-          properties:
-            application_id:
-              type: string
-              format: uuid
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
-    EvaluationMetricsQueryRequest:
-      type: object
-      properties:
-        metrics:
-          type: object
-          properties:
-            run_id:
-              type: string
-              format: uuid
-    Windowing:
-      type: object
-      description: Cursor / time-window pagination controls.
-      properties:
-        next:
-          type: string
-        limit:
-          type: integer
-          default: 100
-        oldest:
-          type: string
-          format: date-time
-        newest:
-          type: string
-          format: date-time
-        order:
-          type: string
-          enum:
-          - ascending
-          - descending
-    EvaluationRunCreateRequest:
+          $ref: '#/components/schemas/EvaluationRunEdit'
       type: object
       required:
       - run
+      title: EvaluationRunEditRequest
+    JsonSchemas-Input:
       properties:
-        run:
-          type: object
-          properties:
-            name:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: JsonSchemas
+    EvaluationMetricsQuery:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        statuses:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationStatus'
+            type: array
+          - type: 'null'
+          title: Statuses
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        intervals:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Intervals
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        timestamps:
+          anyOf:
+          - items:
               type: string
-            testset_id:
+              format: date-time
+            type: array
+          - type: boolean
+          - type: 'null'
+          title: Timestamps
+        scenario_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Scenario Id
+        scenario_ids:
+          anyOf:
+          - items:
               type: string
               format: uuid
-            variant_ids:
-              type: array
-              items:
-                type: string
-                format: uuid
-            evaluator_ids:
-              type: array
-              items:
-                type: string
-                format: uuid
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
-    EvaluationResultQueryRequest:
-      type: object
-      properties:
-        result:
-          type: object
-          properties:
-            run_id:
+            type: array
+          - type: boolean
+          - type: 'null'
+          title: Scenario Ids
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        run_ids:
+          anyOf:
+          - items:
               type: string
               format: uuid
+            type: array
+          - type: 'null'
+          title: Run Ids
+        ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Ids
+      type: object
+      title: EvaluationMetricsQuery
+    EvaluationQueuesEditRequest:
+      properties:
+        queues:
+          items:
+            $ref: '#/components/schemas/EvaluationQueueEdit'
+          type: array
+          title: Queues
+      type: object
+      required:
+      - queues
+      title: EvaluationQueuesEditRequest
+    EvaluationQueueQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+        user_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: User Id
+        user_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: User Ids
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        run_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Run Ids
+        ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Ids
+      type: object
+      title: EvaluationQueueQuery
+    EvaluationResultsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        results:
+          items:
+            $ref: '#/components/schemas/EvaluationResult'
+          type: array
+          title: Results
+          default: []
+      type: object
+      title: EvaluationResultsResponse
+    EvaluationRunDataStep-Output:
+      properties:
+        key:
+          type: string
+          title: Key
+        type:
+          type: string
+          enum:
+          - input
+          - invocation
+          - annotation
+          title: Type
+        origin:
+          type: string
+          enum:
+          - custom
+          - human
+          - auto
+          title: Origin
+        references:
+          additionalProperties:
+            $ref: '#/components/schemas/Reference'
+          type: object
+          title: References
+        inputs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationRunDataStepInputKey'
+            type: array
+          - type: 'null'
+          title: Inputs
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+      type: object
+      required:
+      - key
+      - type
+      - origin
+      - references
+      title: EvaluationRunDataStep
+    SimpleQueueIdsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        queue_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Queue Ids
+          default: []
+      type: object
+      title: SimpleQueueIdsResponse
+    EvaluationScenariosResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        scenarios:
+          items:
+            $ref: '#/components/schemas/EvaluationScenario'
+          type: array
+          title: Scenarios
+          default: []
         windowing:
-          $ref: '#/components/schemas/Windowing'
-    EvaluationMetrics:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
       type: object
+      title: EvaluationScenariosResponse
+    EvaluationScenarioQuery:
       properties:
-        id:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        statuses:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationStatus'
+            type: array
+          - type: 'null'
+          title: Statuses
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        intervals:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Intervals
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        timestamps:
+          anyOf:
+          - items:
+              type: string
+              format: date-time
+            type: array
+          - type: 'null'
+          title: Timestamps
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        run_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Run Ids
+        ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Ids
+      type: object
+      title: EvaluationScenarioQuery
+    EvaluationRunIdsRequest:
+      properties:
+        run_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Run Ids
+      type: object
+      required:
+      - run_ids
+      title: EvaluationRunIdsRequest
+    EvaluationScenarioCreate:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        version:
           type: string
-          format: uuid
+          title: Version
+          default: '2025-07-14'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
         run_id:
           type: string
           format: uuid
-        evaluator_slug:
-          type: string
-        value:
-          type: number
-        data:
-          type: object
-          additionalProperties: true
+          title: Run Id
+      type: object
+      required:
+      - run_id
+      title: EvaluationScenarioCreate
+    EvaluationScenariosCreateRequest:
+      properties:
+        scenarios:
+          items:
+            $ref: '#/components/schemas/EvaluationScenarioCreate'
+          type: array
+          title: Scenarios
+      type: object
+      required:
+      - scenarios
+      title: EvaluationScenariosCreateRequest
+    EvaluationRunsCreateRequest:
+      properties:
+        runs:
+          items:
+            $ref: '#/components/schemas/EvaluationRunCreate'
+          type: array
+          title: Runs
+      type: object
+      required:
+      - runs
+      title: EvaluationRunsCreateRequest
+    ProcessSliceRequest:
+      properties:
+        scenario_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Scenario Ids
+        step_keys:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Step Keys
+        repeat_idxs:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Repeat Idxs
+        overwrite:
+          type: boolean
+          title: Overwrite
+          default: false
+      type: object
+      title: ProcessSliceRequest
     EvaluationResult:
-      type: object
       properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
         id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        hash_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Hash Id
+        trace_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Trace Id
+        testcase_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Testcase Id
+        error:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Error
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+          default: pending
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        repeat_idx:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Repeat Idx
+          default: 0
+        step_key:
           type: string
-          format: uuid
-        run_id:
-          type: string
-          format: uuid
+          title: Step Key
         scenario_id:
           type: string
           format: uuid
-        status:
+          title: Scenario Id
+        run_id:
           type: string
-        outputs:
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - step_key
+      - scenario_id
+      - run_id
+      title: EvaluationResult
+    EvaluationQueueResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        queue:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueue'
+          - type: 'null'
+      type: object
+      title: EvaluationQueueResponse
+    EvaluationMetricsRefreshRequest:
+      properties:
+        metrics:
+          $ref: '#/components/schemas/EvaluationMetricsRefresh'
+      type: object
+      required:
+      - metrics
+      title: EvaluationMetricsRefreshRequest
+    EvaluationResultIdsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        result_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Result Ids
+          default: []
+      type: object
+      title: EvaluationResultIdsResponse
+    EvaluationRunData-Input:
+      properties:
+        steps:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationRunDataStep-Input'
+            type: array
+          - type: 'null'
+          title: Steps
+        repeats:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Repeats
+          default: 1
+        concurrency:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunDataConcurrency'
+          - type: 'null'
+        mappings:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationRunDataMapping'
+            type: array
+          - type: 'null'
+          title: Mappings
+      type: object
+      title: EvaluationRunData
+    EvaluationRunsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        runs:
+          items:
+            $ref: '#/components/schemas/EvaluationRun'
+          type: array
+          title: Runs
+          default: []
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: EvaluationRunsResponse
+    EvaluationMetricsIdsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        metrics_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Metrics Ids
+          default: []
+      type: object
+      title: EvaluationMetricsIdsResponse
+    EvaluationResultsSetRequest:
+      properties:
+        results:
+          items:
+            $ref: '#/components/schemas/EvaluationResultCreate'
+          type: array
+          title: Results
+      type: object
+      required:
+      - results
+      title: EvaluationResultsSetRequest
+    SimpleQueueResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        queue:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleQueue'
+          - type: 'null'
+      type: object
+      title: SimpleQueueResponse
+    SimpleQueueCreateRequest:
+      properties:
+        queue:
+          $ref: '#/components/schemas/SimpleQueueCreate'
+      type: object
+      required:
+      - queue
+      title: SimpleQueueCreateRequest
+    EvaluationResultCreate:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        hash_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Hash Id
+        trace_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Trace Id
+        testcase_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Testcase Id
+        error:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Error
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        repeat_idx:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Repeat Idx
+          default: 0
+        step_key:
+          type: string
+          title: Step Key
+        scenario_id:
+          type: string
+          format: uuid
+          title: Scenario Id
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - step_key
+      - scenario_id
+      - run_id
+      title: EvaluationResultCreate
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    SimpleQueueCreate:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleQueueData'
+          - type: 'null'
+      type: object
+      title: SimpleQueueCreate
+    EvaluationQueueCreate:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+          default: pending
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueData'
+          - type: 'null'
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - run_id
+      title: EvaluationQueueCreate
+    EvaluationMetrics:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+          default: pending
+        data:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Data
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        scenario_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Scenario Id
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - run_id
+      title: EvaluationMetrics
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    EvaluationScenarioEditRequest:
+      properties:
+        scenario:
+          $ref: '#/components/schemas/EvaluationScenarioEdit'
+      type: object
+      required:
+      - scenario
+      title: EvaluationScenarioEditRequest
+    EvaluationMetricsIdsRequest:
+      properties:
+        metrics_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Metrics Ids
+      type: object
+      required:
+      - metrics_ids
+      title: EvaluationMetricsIdsRequest
+    EvaluationMetricsCreate:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        data:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Data
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        scenario_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Scenario Id
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - run_id
+      title: EvaluationMetricsCreate
+    EvaluationMetricsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        metrics:
+          items:
+            $ref: '#/components/schemas/EvaluationMetrics'
+          type: array
+          title: Metrics
+          default: []
+      type: object
+      title: EvaluationMetricsResponse
+    EvaluationQueueEditRequest:
+      properties:
+        queue:
+          $ref: '#/components/schemas/EvaluationQueueEdit'
+      type: object
+      required:
+      - queue
+      title: EvaluationQueueEditRequest
+    SimpleQueueSettings:
+      properties:
+        batch_size:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Batch Size
+        batch_offset:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Batch Offset
+      type: object
+      title: SimpleQueueSettings
+    EvaluationRunQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        statuses:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationStatus'
+            type: array
+          - type: 'null'
+          title: Statuses
+        references:
+          anyOf:
+          - items:
+              additionalProperties:
+                $ref: '#/components/schemas/Reference'
+              type: object
+            type: array
+          - type: 'null'
+          title: References
+        ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Ids
+      type: object
+      title: EvaluationRunQuery
+    EvaluationStatus:
+      type: string
+      enum:
+      - pending
+      - queued
+      - running
+      - success
+      - failure
+      - errors
+      - cancelled
+      title: EvaluationStatus
+    EvaluationQueuesCreateRequest:
+      properties:
+        queues:
+          items:
+            $ref: '#/components/schemas/EvaluationQueueCreate'
+          type: array
+          title: Queues
+      type: object
+      required:
+      - queues
+      title: EvaluationQueuesCreateRequest
+    EvaluationRunResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        run:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRun'
+          - type: 'null'
+      type: object
+      title: EvaluationRunResponse
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    SimpleQueueData:
+      properties:
+        kind:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleQueueKind'
+          - type: 'null'
+        queries:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Queries
+        testsets:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Testsets
+        evaluators:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - additionalProperties:
+              type: string
+              enum:
+              - custom
+              - human
+              - auto
+            propertyNames:
+              format: uuid
+            type: object
+          - type: 'null'
+          title: Evaluators
+        repeats:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Repeats
+        assignments:
+          anyOf:
+          - items:
+              items:
+                type: string
+                format: uuid
+              type: array
+            type: array
+          - type: 'null'
+          title: Assignments
+        step_keys:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Step Keys
+        settings:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleQueueSettings'
+          - type: 'null'
+      type: object
+      title: SimpleQueueData
+    EvaluationScenarioEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+      type: object
+      title: EvaluationScenarioEdit
+    PopulateSliceRequest:
+      properties:
+        results:
+          items:
+            $ref: '#/components/schemas/EvaluationResultCreate'
+          type: array
+          title: Results
+      type: object
+      required:
+      - results
+      title: PopulateSliceRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
           type: object
-          additionalProperties: true
-  responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    SimpleQueue:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+          default: pending
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleQueueData'
+          - type: 'null'
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - run_id
+      title: SimpleQueue
+    EvaluationResultQuery:
+      properties:
+        flags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Flags
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        statuses:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationStatus'
+            type: array
+          - type: 'null'
+          title: Statuses
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        intervals:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Intervals
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        timestamps:
+          anyOf:
+          - items:
+              type: string
+              format: date-time
+            type: array
+          - type: 'null'
+          title: Timestamps
+        repeat_idx:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Repeat Idx
+        repeat_idxs:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Repeat Idxs
+        step_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Step Key
+        step_keys:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Step Keys
+        scenario_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Scenario Id
+        scenario_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Scenario Ids
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        run_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Run Ids
+        ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Ids
+      type: object
+      title: EvaluationResultQuery
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    SimpleQueueQueryRequest:
+      properties:
+        queue:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleQueueQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SimpleQueueQueryRequest
+    AddStepsRequest:
+      properties:
+        steps:
+          items:
+            $ref: '#/components/schemas/EvaluationRunDataStep-Input'
+          type: array
+          title: Steps
+      type: object
+      required:
+      - steps
+      title: AddStepsRequest
+    EvaluationRunDataMapping:
+      properties:
+        column:
+          $ref: '#/components/schemas/EvaluationRunDataMappingColumn'
+        step:
+          $ref: '#/components/schemas/EvaluationRunDataMappingStep'
+      type: object
+      required:
+      - column
+      - step
+      title: EvaluationRunDataMapping
+    EvaluationResultIdResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        result_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Result Id
+      type: object
+      title: EvaluationResultIdResponse
+    EvaluationRunCreate:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunData-Input'
+          - type: 'null'
+      type: object
+      title: EvaluationRunCreate
+    SimpleQueueKind:
+      type: string
+      enum:
+      - queries
+      - testsets
+      - traces
+      - testcases
+      title: SimpleQueueKind
+    SetRepeatsRequest:
+      properties:
+        repeats:
+          type: integer
+          title: Repeats
+      type: object
+      required:
+      - repeats
+      title: SetRepeatsRequest
+    RemoveStepsRequest:
+      properties:
+        step_keys:
+          items:
+            type: string
+          type: array
+          title: Step Keys
+      type: object
+      required:
+      - step_keys
+      title: RemoveStepsRequest
+    SimpleEvaluation:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluationData'
+          - type: 'null'
+      type: object
+      title: SimpleEvaluation
+    Reference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Reference
+    SimpleEvaluationEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluationData'
+          - type: 'null'
+      type: object
+      title: SimpleEvaluationEdit
+    PruneSliceRequest:
+      properties:
+        scenario_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Scenario Ids
+        step_keys:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Step Keys
+        repeat_idxs:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Repeat Idxs
+      type: object
+      title: PruneSliceRequest
+    EvaluationQueueIdsRequest:
+      properties:
+        queue_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Queue Ids
+      type: object
+      required:
+      - queue_ids
+      title: EvaluationQueueIdsRequest
+    SimpleQueueScenariosResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        scenarios:
+          items:
+            $ref: '#/components/schemas/EvaluationScenario'
+          type: array
+          title: Scenarios
+          default: []
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SimpleQueueScenariosResponse
+    RemoveScenariosRequest:
+      properties:
+        scenario_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Scenario Ids
+      type: object
+      required:
+      - scenario_ids
+      title: RemoveScenariosRequest
+    EvaluationQueueQueryFlags:
+      properties:
+        is_sequential:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Sequential
+        is_default:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Default
+      type: object
+      title: EvaluationQueueQueryFlags
+    EvaluationQueuesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        queues:
+          items:
+            $ref: '#/components/schemas/EvaluationQueue'
+          type: array
+          title: Queues
+          default: []
+      type: object
+      title: EvaluationQueuesResponse
+    ProbeSliceRequest:
+      properties:
+        scenario_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Scenario Ids
+        step_keys:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Step Keys
+        repeat_idxs:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Repeat Idxs
+      type: object
+      title: ProbeSliceRequest
+    EvaluationRunDataStepInputKey:
+      properties:
+        key:
+          type: string
+          title: Key
+      type: object
+      required:
+      - key
+      title: EvaluationRunDataStepInputKey
+    SimpleEvaluationIdResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        evaluation_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluation Id
+      type: object
+      title: SimpleEvaluationIdResponse
+    SimpleEvaluationData:
+      properties:
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        query_steps:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - additionalProperties:
+              type: string
+              enum:
+              - custom
+              - human
+              - auto
+            propertyNames:
+              format: uuid
+            type: object
+          - type: 'null'
+          title: Query Steps
+        testset_steps:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - additionalProperties:
+              type: string
+              enum:
+              - custom
+              - human
+              - auto
+            propertyNames:
+              format: uuid
+            type: object
+          - type: 'null'
+          title: Testset Steps
+        application_steps:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - additionalProperties:
+              type: string
+              enum:
+              - custom
+              - human
+              - auto
+            propertyNames:
+              format: uuid
+            type: object
+          - type: 'null'
+          title: Application Steps
+        evaluator_steps:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - additionalProperties:
+              type: string
+              enum:
+              - custom
+              - human
+              - auto
+            propertyNames:
+              format: uuid
+            type: object
+          - type: 'null'
+          title: Evaluator Steps
+        repeats:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Repeats
+        concurrency:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunDataConcurrency'
+          - type: 'null'
+      type: object
+      title: SimpleEvaluationData
+    SimpleQueueTestcasesCreateRequest:
+      properties:
+        testcase_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Testcase Ids
+      type: object
+      required:
+      - testcase_ids
+      title: SimpleQueueTestcasesCreateRequest
+    EvaluationScenarioQueryRequest:
+      properties:
+        scenario:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationScenarioQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: EvaluationScenarioQueryRequest
+    EvaluationRunDataMappingStep:
+      properties:
+        key:
+          type: string
+          title: Key
+        path:
+          type: string
+          title: Path
+      type: object
+      required:
+      - key
+      - path
+      title: EvaluationRunDataMappingStep
+    EvaluationQueueScenariosQueryRequest:
+      properties:
+        queue:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueScenariosQuery'
+          - type: 'null'
+        scenario:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationScenarioQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: EvaluationQueueScenariosQueryRequest
+    EvaluationQueueIdsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        queue_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Queue Ids
+          default: []
+      type: object
+      title: EvaluationQueueIdsResponse
+    EvaluationScenario:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+          default: pending
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - run_id
+      title: EvaluationScenario
+    SimpleQueueIdsRequest:
+      properties:
+        queue_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Queue Ids
+      type: object
+      required:
+      - queue_ids
+      title: SimpleQueueIdsRequest
+    SimpleEvaluationCreateRequest:
+      properties:
+        evaluation:
+          $ref: '#/components/schemas/SimpleEvaluationCreate'
+      type: object
+      required:
+      - evaluation
+      title: SimpleEvaluationCreateRequest
+    EvaluationMetricsSetRequest:
+      properties:
+        metrics:
+          items:
+            $ref: '#/components/schemas/EvaluationMetricsCreate'
+          type: array
+          title: Metrics
+      type: object
+      required:
+      - metrics
+      title: EvaluationMetricsSetRequest
+    EvaluationRunIdsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        run_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Run Ids
+          default: []
+      type: object
+      title: EvaluationRunIdsResponse
+    EvaluationRunFlags:
+      properties:
+        is_live:
+          type: boolean
+          title: Is Live
+          default: false
+        is_active:
+          type: boolean
+          title: Is Active
+          default: false
+        is_closed:
+          type: boolean
+          title: Is Closed
+          default: false
+        is_queue:
+          type: boolean
+          title: Is Queue
+          default: false
+        is_cached:
+          type: boolean
+          title: Is Cached
+          default: false
+        is_split:
+          type: boolean
+          title: Is Split
+          default: false
+        has_queries:
+          type: boolean
+          title: Has Queries
+          default: false
+        has_testsets:
+          type: boolean
+          title: Has Testsets
+          default: false
+        has_traces:
+          type: boolean
+          title: Has Traces
+          default: false
+        has_testcases:
+          type: boolean
+          title: Has Testcases
+          default: false
+        has_evaluators:
+          type: boolean
+          title: Has Evaluators
+          default: false
+        has_custom:
+          type: boolean
+          title: Has Custom
+          default: false
+        has_human:
+          type: boolean
+          title: Has Human
+          default: false
+        has_auto:
+          type: boolean
+          title: Has Auto
+          default: false
+      type: object
+      title: EvaluationRunFlags
+    EvaluationResultIdsRequest:
+      properties:
+        result_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Result Ids
+      type: object
+      required:
+      - result_ids
+      title: EvaluationResultIdsRequest
+    EvaluationRunDataStep-Input:
+      properties:
+        key:
+          type: string
+          title: Key
+        type:
+          type: string
+          enum:
+          - input
+          - invocation
+          - annotation
+          title: Type
+        origin:
+          type: string
+          enum:
+          - custom
+          - human
+          - auto
+          title: Origin
+        references:
+          additionalProperties:
+            $ref: '#/components/schemas/Reference'
+          type: object
+          title: References
+        inputs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationRunDataStepInputKey'
+            type: array
+          - type: 'null'
+          title: Inputs
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Input'
+          - type: 'null'
+      type: object
+      required:
+      - key
+      - type
+      - origin
+      - references
+      title: EvaluationRunDataStep
+    SimpleQueuesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        queues:
+          items:
+            $ref: '#/components/schemas/SimpleQueue'
+          type: array
+          title: Queues
+          default: []
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SimpleQueuesResponse
+    SimpleEvaluationQueryRequest:
+      properties:
+        evaluation:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluationQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: SimpleEvaluationQueryRequest
+    EvaluationRunData-Output:
+      properties:
+        steps:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationRunDataStep-Output'
+            type: array
+          - type: 'null'
+          title: Steps
+        repeats:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Repeats
+          default: 1
+        concurrency:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunDataConcurrency'
+          - type: 'null'
+        mappings:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/EvaluationRunDataMapping'
+            type: array
+          - type: 'null'
+          title: Mappings
+      type: object
+      title: EvaluationRunData
+    SimpleQueueIdResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        queue_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Queue Id
+      type: object
+      title: SimpleQueueIdResponse
+    JsonSchemas-Output:
+      properties:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: JsonSchemas
+    EvaluationRunIdResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+      type: object
+      title: EvaluationRunIdResponse
+    SimpleEvaluationsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        evaluations:
+          items:
+            $ref: '#/components/schemas/SimpleEvaluation'
+          type: array
+          title: Evaluations
+          default: []
+      type: object
+      title: SimpleEvaluationsResponse
+    EvaluationRunDataMappingColumn:
+      properties:
+        kind:
+          type: string
+          title: Kind
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - kind
+      - name
+      title: EvaluationRunDataMappingColumn
+    EvaluationMetricsRefresh:
+      properties:
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        timestamp:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Timestamp
+        timestamps:
+          anyOf:
+          - items:
+              type: string
+              format: date-time
+            type: array
+          - type: 'null'
+          title: Timestamps
+        scenario_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Scenario Id
+        scenario_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Scenario Ids
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        run_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Run Ids
+      type: object
+      title: EvaluationMetricsRefresh
+    EvaluationMetricsQueryRequest:
+      properties:
+        metrics:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationMetricsQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: EvaluationMetricsQueryRequest
+    EvaluationRunQueryRequest:
+      properties:
+        run:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: EvaluationRunQueryRequest
+    SimpleEvaluationResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        evaluation:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluation'
+          - type: 'null'
+      type: object
+      title: SimpleEvaluationResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    EvaluationQueueIdResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        queue_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Queue Id
+      type: object
+      title: EvaluationQueueIdResponse
+    EvaluationQueueScenariosQuery:
+      properties:
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        user_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: User Id
+        user_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: User Ids
+      type: object
+      title: EvaluationQueueScenariosQuery
+    SimpleQueueScenariosQuery:
+      properties:
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        user_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: User Id
+        user_ids:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: User Ids
+      type: object
+      title: SimpleQueueScenariosQuery
+    EvaluationRunEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          type: string
+          title: Version
+          default: '2025-07-14'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationRunData-Input'
+          - type: 'null'
+      type: object
+      title: EvaluationRunEdit
+    SimpleQueueTracesCreateRequest:
+      properties:
+        trace_ids:
+          items:
+            type: string
+          type: array
+          title: Trace Ids
+      type: object
+      required:
+      - trace_ids
+      title: SimpleQueueTracesCreateRequest
+    EvaluationQueue:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationStatus'
+          - type: 'null'
+          default: pending
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationQueueData'
+          - type: 'null'
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - run_id
+      title: EvaluationQueue
+    EvaluationRunQueryFlags:
+      properties:
+        is_live:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Live
+        is_active:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Active
+        is_closed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Closed
+        is_queue:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Queue
+        is_cached:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Cached
+        is_split:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Split
+        has_queries:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Queries
+        has_testsets:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Testsets
+        has_traces:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Traces
+        has_testcases:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Testcases
+        has_evaluators:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Evaluators
+        has_custom:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Custom
+        has_human:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Human
+        has_auto:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Auto
+      type: object
+      title: EvaluationRunQueryFlags
+    EvaluationResultQueryRequest:
+      properties:
+        result:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluationResultQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: EvaluationResultQueryRequest
+    EvaluationScenarioIdResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        scenario_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Scenario Id
+      type: object
+      title: EvaluationScenarioIdResponse
   securitySchemes:
-    ApiKeyAuth:
-      type: http
-      scheme: bearer
-      description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>` (Bearer-style header credential).'
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

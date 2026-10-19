@@ -1,0 +1,4355 @@
+openapi: 3.2.0
+info:
+  title: Agenta Channels API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Channels
+  description: Chat platform channels — connections, agents, spaces, grants, and the inbound event log.
+paths:
+  /channels/slack/events/:
+    post:
+      tags:
+      - Channels
+      summary: Ingest Slack Event
+      operationId: ingest_slack_event
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelEventAck'
+  /channels/telegram/events/{routing_token}/:
+    post:
+      tags:
+      - Channels
+      summary: Ingest Telegram Event
+      operationId: ingest_telegram_event
+      parameters:
+      - name: routing_token
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Routing Token
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelEventAck'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/whatsapp/events/:
+    get:
+      tags:
+      - Channels
+      summary: Verify Whatsapp Webhook
+      description: 'Meta''s subscription check: echo `hub.challenge` as plain text when
+
+        `hub.verify_token` is the token a WhatsApp connection handed its
+
+        operator. The token starts with the phone number ID, which picks the
+
+        one connection to compare against. Echoing grants nothing, but an
+
+        unknown token is refused so the URL answers only for its own numbers.'
+      operationId: verify_whatsapp_webhook
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+    post:
+      tags:
+      - Channels
+      summary: Ingest Whatsapp Event
+      operationId: ingest_whatsapp_event
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelEventAck'
+  /channels/bridge/events/:
+    post:
+      tags:
+      - Channels
+      summary: Ingest Bridge Event
+      operationId: ingest_bridge_event
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelEventAck'
+  /channels/agenta/events/:
+    post:
+      tags:
+      - Channels
+      summary: Ingest Agenta Event
+      operationId: ingest_agenta_event
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelEventAck'
+  /channels/catalog/channels/:
+    get:
+      tags:
+      - Channels
+      summary: List Channels
+      operationId: list_channels
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelsCatalogResponse'
+  /channels/catalog/channels/{channel}/capabilities/:
+    get:
+      tags:
+      - Channels
+      summary: Fetch Channel Capabilities
+      operationId: fetch_channel_capabilities
+      parameters:
+      - name: channel
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Channel
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelCapabilitiesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/catalog/channels/{channel}/setup/:
+    get:
+      tags:
+      - Channels
+      summary: Fetch Channel Setup
+      description: 'Reachable before any connection exists -- the manifest an
+
+        operator needs to go build the platform app in the first place.
+
+        `fetch_channel_connection_setup` stays the route for a connection
+
+        that already exists; this is the one that precedes it.
+
+
+        `name`, `description` and `handle` are how the app the operator
+
+        builds presents itself; the adapter defaults and fits each one.'
+      operationId: fetch_channel_setup
+      parameters:
+      - name: channel
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Channel
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - name: description
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - name: handle
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Handle
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSetupResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/catalog/channels/slack/install/:
+    get:
+      tags:
+      - Channels
+      summary: Install Slack Connection
+      description: 'One click, from Settings -> Channels: mint the install state and
+
+        send the browser straight to Slack''s authorize URL. A deployment
+
+        with no hosted-app credentials refuses here, not with a 500 -- that
+
+        is the normal shape of a self-hosted deployment, not an error.'
+      operationId: install_slack_connection
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /channels/catalog/channels/slack/callback/:
+    get:
+      tags:
+      - Channels
+      summary: Slack Install Callback
+      description: 'Slack redirects the browser here, in or out of the session that
+
+        started the install -- the signed state is the whole of the
+
+        authorisation on this route, so this is public (see
+
+        `_PUBLIC_ENDPOINTS`), never `self._check`. State decodes first:
+
+        unknown, expired or tampered refuses before any exchange is
+
+        attempted.'
+      operationId: slack_install_callback
+      parameters:
+      - name: code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+      - name: state
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: State
+      - name: error
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/catalog/channels/telegram_hosted/bind-link/:
+    post:
+      tags:
+      - Channels
+      summary: Create Telegram Hosted Bind Link
+      description: 'Prepare the hosted Telegram connection and its agent, then mint the
+
+        one-time deep link the connect UI shows. 404 when the deployment has no
+
+        hosted bot configured.'
+      operationId: create_telegram_hosted_bind_link
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramHostedBindLinkRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramHostedBindLinkResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/catalog/channels/telegram_hosted/bindings/:
+    get:
+      tags:
+      - Channels
+      summary: List Telegram Hosted Bindings
+      description: 'The chats bound to a hosted Telegram connection in this project.
+
+        Empty until a /start consumed a bind token. 404 when the deployment has
+
+        no hosted bot configured.'
+      operationId: list_telegram_hosted_bindings
+      parameters:
+      - name: connection_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramHostedBindingsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/connections/:
+    post:
+      tags:
+      - Channels
+      summary: Create Channel Connection
+      operationId: create_channel_connection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelConnectionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/connections/query:
+    post:
+      tags:
+      - Channels
+      summary: Query Channel Connections
+      operationId: query_channel_connections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelConnectionQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelConnectionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/connections/{connection_id}/edit:
+    post:
+      tags:
+      - Channels
+      summary: Edit Channel Connection
+      operationId: edit_channel_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelConnectionEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelConnectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/connections/{connection_id}/archive:
+    post:
+      tags:
+      - Channels
+      summary: Archive Channel Connection
+      operationId: archive_channel_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelConnectionTeardownResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/connections/{connection_id}/unarchive:
+    post:
+      tags:
+      - Channels
+      summary: Unarchive Channel Connection
+      operationId: unarchive_channel_connection
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelConnectionTeardownResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/connections/{connection_id}/setup:
+    get:
+      tags:
+      - Channels
+      summary: Fetch Channel Connection Setup
+      operationId: fetch_channel_connection_setup
+      parameters:
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Connection Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelConnectionSetupResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/agents/:
+    get:
+      tags:
+      - Channels
+      summary: List Channel Agents
+      operationId: list_channel_agents
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelAgentsResponse'
+    post:
+      tags:
+      - Channels
+      summary: Create Channel Agent
+      operationId: create_channel_agent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelAgentRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelAgentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/agents/query:
+    post:
+      tags:
+      - Channels
+      summary: Query Channel Agents
+      operationId: query_channel_agents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelAgentQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelAgentsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/agents/{agent_id}:
+    get:
+      tags:
+      - Channels
+      summary: Fetch Channel Agent
+      operationId: fetch_channel_agent
+      parameters:
+      - name: agent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Agent Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelAgentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Channels
+      summary: Edit Channel Agent
+      operationId: edit_channel_agent
+      parameters:
+      - name: agent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Agent Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelAgentEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelAgentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Channels
+      summary: Delete Channel Agent
+      operationId: delete_channel_agent
+      parameters:
+      - name: agent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Agent Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/agents/{agent_id}/default:
+    post:
+      tags:
+      - Channels
+      summary: Set Channel Agent Default
+      operationId: set_channel_agent_default
+      parameters:
+      - name: agent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Agent Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelAgentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/spaces/:
+    get:
+      tags:
+      - Channels
+      summary: List Channel Spaces
+      operationId: list_channel_spaces
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSpacesResponse'
+    post:
+      tags:
+      - Channels
+      summary: Create Channel Space
+      operationId: create_channel_space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelSpaceRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSpaceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/spaces/query:
+    post:
+      tags:
+      - Channels
+      summary: Query Channel Spaces
+      operationId: query_channel_spaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelSpaceQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSpacesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/spaces/discover:
+    post:
+      tags:
+      - Channels
+      summary: Discover Channel Spaces
+      operationId: discover_channel_spaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelSpaceDiscoverRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSpaceCandidatesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/spaces/{space_id}:
+    get:
+      tags:
+      - Channels
+      summary: Fetch Channel Space
+      operationId: fetch_channel_space
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Space Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSpaceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Channels
+      summary: Edit Channel Space
+      operationId: edit_channel_space
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Space Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelSpaceEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSpaceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Channels
+      summary: Delete Channel Space
+      operationId: delete_channel_space
+      parameters:
+      - name: space_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Space Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/grants/:
+    get:
+      tags:
+      - Channels
+      summary: List Channel Grants
+      operationId: list_channel_grants
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelGrantsResponse'
+    post:
+      tags:
+      - Channels
+      summary: Create Channel Grant
+      operationId: create_channel_grant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelGrantRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelGrantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/grants/query:
+    post:
+      tags:
+      - Channels
+      summary: Query Channel Grants
+      operationId: query_channel_grants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelGrantQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelGrantsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/grants/{grant_id}:
+    put:
+      tags:
+      - Channels
+      summary: Edit Channel Grant
+      operationId: edit_channel_grant
+      parameters:
+      - name: grant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Grant Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelGrantEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelGrantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Channels
+      summary: Delete Channel Grant
+      operationId: delete_channel_grant
+      parameters:
+      - name: grant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Grant Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/grants/{grant_id}/default:
+    post:
+      tags:
+      - Channels
+      summary: Set Channel Grant Default
+      operationId: set_channel_grant_default
+      parameters:
+      - name: grant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Grant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelGrantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/policy/resolve:
+    post:
+      tags:
+      - Channels
+      summary: Resolve Channel Policy
+      operationId: resolve_channel_policy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelPolicyResolveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelPolicyResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/threads/query:
+    post:
+      tags:
+      - Channels
+      summary: Query Channel Threads
+      operationId: query_channel_threads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelThreadQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelThreadsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/threads/{thread_id}/close:
+    post:
+      tags:
+      - Channels
+      summary: Close Channel Thread
+      operationId: close_channel_thread
+      parameters:
+      - name: thread_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Thread Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelThreadResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/inbox/events/query:
+    post:
+      tags:
+      - Channels
+      summary: Query Channel Inbox Events
+      operationId: query_channel_inbox_events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelInboxEventQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelInboxEventsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/outbox/events/query:
+    post:
+      tags:
+      - Channels
+      summary: Query Channel Outbox Events
+      operationId: query_channel_outbox_events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelOutboxEventQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelOutboxEventsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/agenta/conversations/{id}:
+    get:
+      tags:
+      - Channels
+      summary: Read Agenta Conversation
+      description: 'The space''s inbox log plus what the outbox posted back, merged and
+
+        ordered by when each was written.'
+      operationId: read_agenta_conversation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentaConversationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/tools/availability:
+    post:
+      tags:
+      - Channels
+      summary: Fetch Channel Tools Availability
+      description: 'Whether this agent is connected to an active, verified bot, and
+
+        which channel tools its runs get under the bots'' settings. The agent
+
+        runtime reads it to add the tools to every run.'
+      operationId: fetch_channel_tools_availability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelToolsAvailabilityRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelToolsAvailabilityResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/tools/destinations/query:
+    post:
+      tags:
+      - Channels
+      summary: Query Channel Destinations
+      operationId: query_channel_destinations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelDestinationsQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelDestinationsPage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/tools/messages/send:
+    post:
+      tags:
+      - Channels
+      summary: Send Channel Message
+      operationId: send_channel_message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelMessageSendRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSendResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/tools/messages/read:
+    post:
+      tags:
+      - Channels
+      summary: Read Channel Messages
+      operationId: read_channel_messages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelMessagesReadRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelMessagesPage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /channels/tools/messages/search:
+    post:
+      tags:
+      - Channels
+      summary: Search Channel Messages
+      operationId: search_channel_messages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelMessagesSearchRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSearchResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    TelegramHostedBindLinkRequest:
+      properties:
+        references:
+          additionalProperties: true
+          type: object
+          title: References
+      type: object
+      required:
+      - references
+      title: TelegramHostedBindLinkRequest
+    ChannelSpaceQueryRequest:
+      properties:
+        space:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSpaceQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: ChannelSpaceQueryRequest
+    ChannelsCatalogResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        channels:
+          items:
+            type: string
+          type: array
+          title: Channels
+      type: object
+      title: ChannelsCatalogResponse
+    ChannelInboxEventQuery:
+      properties:
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        connection_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Connection Id
+        space_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Space Id
+        kind:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelEventKind'
+          - type: 'null'
+        origin:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelEventOrigin'
+          - type: 'null'
+        external_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: External Id
+      type: object
+      title: ChannelInboxEventQuery
+    ChannelOutboxEventFlags:
+      properties: {}
+      type: object
+      title: ChannelOutboxEventFlags
+      description: Empty today, same reason as the inbox event flags.
+    ChannelGrantEditRequest:
+      properties:
+        grant:
+          $ref: '#/components/schemas/ChannelGrantEdit'
+      type: object
+      required:
+      - grant
+      title: ChannelGrantEditRequest
+    ChannelFill:
+      properties:
+        backfill:
+          $ref: '#/components/schemas/ChannelFillMode'
+        forwardfill:
+          $ref: '#/components/schemas/ChannelFillMode'
+      type: object
+      title: ChannelFill
+    ChannelSetup:
+      properties:
+        instructions:
+          items:
+            type: string
+          type: array
+          title: Instructions
+        document:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSetupDoc'
+          - type: 'null'
+        fields:
+          items:
+            $ref: '#/components/schemas/ChannelSetupField'
+          type: array
+          title: Fields
+        hosted_available:
+          type: boolean
+          title: Hosted Available
+          default: false
+      type: object
+      title: ChannelSetup
+    ChannelFillMode:
+      properties:
+        supported:
+          type: boolean
+          title: Supported
+          default: false
+        requires_permission:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requires Permission
+      type: object
+      title: ChannelFillMode
+    ChannelInboxEventsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        events:
+          items:
+            $ref: '#/components/schemas/ChannelInboxEvent'
+          type: array
+          title: Events
+      type: object
+      title: ChannelInboxEventsResponse
+    ChannelTriggerKind:
+      type: string
+      enum:
+      - mention
+      - command
+      - action
+      title: ChannelTriggerKind
+    ChannelGrantQueryRequest:
+      properties:
+        grant:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelGrantQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: ChannelGrantQueryRequest
+    ChannelSearchResultItem:
+      properties:
+        message_id:
+          type: string
+          title: Message Id
+        destination_id:
+          type: string
+          title: Destination Id
+        channel_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Channel Name
+        thread_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Thread Id
+        sender_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sender Name
+        excerpt:
+          type: string
+          title: Excerpt
+          default: ''
+        sent_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Sent At
+      type: object
+      required:
+      - message_id
+      - destination_id
+      title: ChannelSearchResultItem
+    ChannelInboxEventFlags:
+      properties:
+        is_consumed:
+          type: boolean
+          title: Is Consumed
+          default: false
+      type: object
+      title: ChannelInboxEventFlags
+    ChannelSpaceMembership:
+      type: string
+      enum:
+      - member
+      - joinable
+      - invite_required
+      title: ChannelSpaceMembership
+      description: 'Whether the bot is in a discovered space, and if not, who can put it
+
+        there. Unset where the platform reports no membership.'
+    ChannelSpaceDiscoverRequest:
+      properties:
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+      type: object
+      required:
+      - connection_id
+      title: ChannelSpaceDiscoverRequest
+      description: 'No core DTO either: `discover_spaces` persists nothing, so its only
+
+        input is the connection to ask.'
+    ChannelControls:
+      properties:
+        update:
+          type: boolean
+          title: Update
+          default: false
+        ephemeral:
+          type: boolean
+          title: Ephemeral
+          default: false
+        indicator:
+          type: string
+          enum:
+          - message
+          - native
+          title: Indicator
+          default: message
+      type: object
+      title: ChannelControls
+    ChannelGrantEdit:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelGrantFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          $ref: '#/components/schemas/ChannelGrantData'
+      type: object
+      required:
+      - data
+      title: ChannelGrantEdit
+    ChannelMessagesSearchRequest:
+      properties:
+        artifact_id:
+          type: string
+          format: uuid
+          title: Artifact Id
+        query:
+          type: string
+          maxLength: 500
+          minLength: 1
+          title: Query
+        destination_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+            maxItems: 100
+          - type: 'null'
+          title: Destination Ids
+        after:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: After
+        before:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Before
+        limit:
+          anyOf:
+          - type: integer
+            maximum: 50.0
+            minimum: 1.0
+          - type: 'null'
+          title: Limit
+        cursor:
+          anyOf:
+          - type: string
+            maxLength: 64
+          - type: 'null'
+          title: Cursor
+      additionalProperties: false
+      type: object
+      required:
+      - artifact_id
+      - query
+      title: ChannelMessagesSearchRequest
+    AgentaConversationItem:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        direction:
+          type: string
+          enum:
+          - inbound
+          - outbound
+          title: Direction
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        content:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Content
+      type: object
+      required:
+      - id
+      - direction
+      title: AgentaConversationItem
+      description: 'One row of the merged read: the inbox log and what the outbox posted
+
+        back, collapsed to the one shape a poller needs.'
+    TelegramHostedBinding:
+      properties:
+        chat_id:
+          type: string
+          title: Chat Id
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+      type: object
+      required:
+      - chat_id
+      - connection_id
+      title: TelegramHostedBinding
+    ChannelGrantResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        grant:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelGrant'
+          - type: 'null'
+      type: object
+      title: ChannelGrantResponse
+    ChannelAgentsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        agents:
+          items:
+            $ref: '#/components/schemas/ChannelAgent'
+          type: array
+          title: Agents
+      type: object
+      title: ChannelAgentsResponse
+    ChannelButtons:
+      properties:
+        supported:
+          type: boolean
+          title: Supported
+          default: false
+        max:
+          type: integer
+          title: Max
+          default: 0
+      type: object
+      title: ChannelButtons
+    ChannelSigils:
+      properties:
+        agent:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent
+        command:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Command
+      type: object
+      title: ChannelSigils
+    ChannelSpaceCandidatesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        candidates:
+          items:
+            $ref: '#/components/schemas/ChannelSpaceCandidate'
+          type: array
+          title: Candidates
+      type: object
+      title: ChannelSpaceCandidatesResponse
+    ChannelGrantCreate:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelGrantFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        agent_id:
+          type: string
+          format: uuid
+          title: Agent Id
+        effect:
+          $ref: '#/components/schemas/ChannelGrantEffect'
+        kind:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSpaceKind'
+          - type: 'null'
+        space_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Space Id
+        data:
+          $ref: '#/components/schemas/ChannelGrantData'
+      type: object
+      required:
+      - agent_id
+      - effect
+      - data
+      title: ChannelGrantCreate
+    ChannelAgent:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelAgentFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        data:
+          $ref: '#/components/schemas/ChannelAgentData'
+      type: object
+      required:
+      - connection_id
+      - data
+      title: ChannelAgent
+    ChannelToolsAvailabilityRequest:
+      properties:
+        artifact_id:
+          type: string
+          format: uuid
+          title: Artifact Id
+      additionalProperties: false
+      type: object
+      required:
+      - artifact_id
+      title: ChannelToolsAvailabilityRequest
+    ChannelGrant:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelGrantFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        agent_id:
+          type: string
+          format: uuid
+          title: Agent Id
+        effect:
+          $ref: '#/components/schemas/ChannelGrantEffect'
+        kind:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSpaceKind'
+          - type: 'null'
+        space_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Space Id
+        data:
+          $ref: '#/components/schemas/ChannelGrantData'
+      type: object
+      required:
+      - agent_id
+      - effect
+      - data
+      title: ChannelGrant
+    ChannelOutboxEventQuery:
+      properties:
+        thread_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Thread Id
+        turn_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Turn Id
+        key:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Key
+        state:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelDeliveryState'
+          - type: 'null'
+      type: object
+      title: ChannelOutboxEventQuery
+    ChannelConversation:
+      properties:
+        units:
+          items:
+            $ref: '#/components/schemas/ChannelKeyGrain'
+          type: array
+          title: Units
+        default:
+          $ref: '#/components/schemas/ChannelKeyGrain'
+          default: space
+        reply_window_seconds:
+          type: integer
+          title: Reply Window Seconds
+          default: 0
+        opt_out:
+          type: boolean
+          title: Opt Out
+          default: false
+      type: object
+      title: ChannelConversation
+    ChannelDestination:
+      properties:
+        destination_id:
+          type: string
+          title: Destination Id
+        type:
+          type: string
+          const: channel
+          title: Type
+          default: channel
+        platform:
+          type: string
+          title: Platform
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        can_post:
+          type: boolean
+          title: Can Post
+        can_read:
+          type: boolean
+          title: Can Read
+        can_search:
+          type: boolean
+          title: Can Search
+        supports_threads:
+          type: boolean
+          title: Supports Threads
+      type: object
+      required:
+      - destination_id
+      - platform
+      - can_post
+      - can_read
+      - can_search
+      - supports_threads
+      title: ChannelDestination
+    ChannelSpaceCandidate:
+      properties:
+        kind:
+          $ref: '#/components/schemas/ChannelSpaceKind'
+        external_locator:
+          additionalProperties: true
+          type: object
+          title: External Locator
+        display_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Display Name
+        is_configured:
+          type: boolean
+          title: Is Configured
+          default: false
+        external_key:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: External Key
+        membership:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSpaceMembership'
+          - type: 'null'
+      type: object
+      required:
+      - kind
+      - external_locator
+      title: ChannelSpaceCandidate
+      description: 'One row in the configuration pick-list. Not an entity: no id, no
+
+        lifecycle, nothing persisted until the operator chooses.'
+    ChannelThreadQuery:
+      properties:
+        space_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Space Id
+        agent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+        external_key:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: External Key
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+      type: object
+      title: ChannelThreadQuery
+    ChannelSendResult:
+      properties:
+        delivery_id:
+          type: string
+          title: Delivery Id
+        state:
+          type: string
+          enum:
+          - sent
+          - failed
+          - unknown
+          title: State
+        message_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message Id
+        thread_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Thread Id
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - delivery_id
+      - state
+      title: ChannelSendResult
+      description: '`sent` only with the provider''s acknowledgement; `unknown` when the post
+
+        may have reached the chat without a receipt, which is never retried.'
+    ChannelMessage:
+      properties:
+        message_id:
+          type: string
+          title: Message Id
+        thread_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Thread Id
+        sender_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sender Name
+        from_bot:
+          type: boolean
+          title: From Bot
+          default: false
+        text:
+          type: string
+          title: Text
+          default: ''
+        sent_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Sent At
+      type: object
+      required:
+      - message_id
+      title: ChannelMessage
+    ChannelGrantQuery:
+      properties:
+        agent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+        kind:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSpaceKind'
+          - type: 'null'
+        space_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Space Id
+      type: object
+      title: ChannelGrantQuery
+    ChannelGrantData:
+      properties:
+        policy:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelPolicy'
+          - type: 'null'
+      type: object
+      title: ChannelGrantData
+    ChannelInboxEventProcessed:
+      properties:
+        content:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Content
+        sender:
+          additionalProperties: true
+          type: object
+          title: Sender
+        sent_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Sent At
+        message_ref:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message Ref
+      type: object
+      required:
+      - content
+      - sender
+      title: ChannelInboxEventProcessed
+      description: What core reads. The adapter's normalisation of the platform's payload.
+    ChannelCapabilities:
+      properties:
+        channel:
+          type: string
+          title: Channel
+        protocol:
+          $ref: '#/components/schemas/ChannelProtocol'
+        addressing:
+          $ref: '#/components/schemas/ChannelAddressing'
+        spaces:
+          $ref: '#/components/schemas/ChannelSpacesSupport'
+        conversation:
+          $ref: '#/components/schemas/ChannelConversation'
+        fill:
+          $ref: '#/components/schemas/ChannelFill'
+        rendering:
+          $ref: '#/components/schemas/ChannelRendering'
+        identity:
+          $ref: '#/components/schemas/ChannelIdentity'
+        setup:
+          $ref: '#/components/schemas/ChannelSetup'
+        commands:
+          items:
+            type: string
+          type: array
+          title: Commands
+      type: object
+      required:
+      - channel
+      title: ChannelCapabilities
+    ChannelSpaceEditRequest:
+      properties:
+        space:
+          $ref: '#/components/schemas/ChannelSpaceEdit'
+      type: object
+      required:
+      - space
+      title: ChannelSpaceEditRequest
+    ChannelAgentCreate:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelAgentFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        data:
+          $ref: '#/components/schemas/ChannelAgentData'
+      type: object
+      required:
+      - connection_id
+      - data
+      title: ChannelAgentCreate
+    TelegramHostedBindingsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+        bindings:
+          items:
+            $ref: '#/components/schemas/TelegramHostedBinding'
+          type: array
+          title: Bindings
+      type: object
+      required:
+      - count
+      - bindings
+      title: TelegramHostedBindingsResponse
+    ChannelSpaceCreate:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelSpaceFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        kind:
+          $ref: '#/components/schemas/ChannelSpaceKind'
+        external_key:
+          type: string
+          format: uuid
+          title: External Key
+        data:
+          $ref: '#/components/schemas/ChannelSpaceData'
+      type: object
+      required:
+      - connection_id
+      - kind
+      - external_key
+      - data
+      title: ChannelSpaceCreate
+    ChannelThreadsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        threads:
+          items:
+            $ref: '#/components/schemas/ChannelThread'
+          type: array
+          title: Threads
+      type: object
+      title: ChannelThreadsResponse
+    ChannelInboxEventData:
+      properties:
+        external_locator:
+          additionalProperties: true
+          type: object
+          title: External Locator
+        processed:
+          $ref: '#/components/schemas/ChannelInboxEventProcessed'
+        space_kind:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSpaceKind'
+          - type: 'null'
+        addressed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Addressed
+      type: object
+      required:
+      - external_locator
+      - processed
+      title: ChannelInboxEventData
+    ChannelSearchResult:
+      properties:
+        results:
+          items:
+            $ref: '#/components/schemas/ChannelSearchResultItem'
+          type: array
+          title: Results
+        cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+        searched:
+          items:
+            $ref: '#/components/schemas/ChannelSearchedChannel'
+          type: array
+          title: Searched
+      type: object
+      title: ChannelSearchResult
+    ChannelEventOrigin:
+      type: string
+      enum:
+      - pulled
+      - pushed
+      title: ChannelEventOrigin
+      description: 'Who initiated the transfer — and therefore where the row sorts.
+
+
+        Declared oldest-first: PULLED rows predate every PUSHED row, so
+
+        `ORDER BY origin, id` is the log''s true sequence.'
+    ChannelGrantsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        grants:
+          items:
+            $ref: '#/components/schemas/ChannelGrant'
+          type: array
+          title: Grants
+      type: object
+      title: ChannelGrantsResponse
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    ChannelSpaceRequest:
+      properties:
+        space:
+          $ref: '#/components/schemas/ChannelSpaceCreate'
+      type: object
+      required:
+      - space
+      title: ChannelSpaceRequest
+    ChannelAgentResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        agent:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelAgent'
+          - type: 'null'
+      type: object
+      title: ChannelAgentResponse
+    ChannelCapabilitiesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        capabilities:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelCapabilities'
+          - type: 'null'
+      type: object
+      title: ChannelCapabilitiesResponse
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    ChannelAgentFlags:
+      properties:
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+        is_default:
+          type: boolean
+          title: Is Default
+          default: false
+      type: object
+      title: ChannelAgentFlags
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    ChannelThreadResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        thread:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelThread'
+          - type: 'null'
+      type: object
+      title: ChannelThreadResponse
+    ChannelConnectionEditRequest:
+      properties:
+        connection:
+          $ref: '#/components/schemas/ChannelConnectionEdit'
+      type: object
+      required:
+      - connection
+      title: ChannelConnectionEditRequest
+    ChannelSpaceKind:
+      type: string
+      enum:
+      - private
+      - group
+      - topic
+      title: ChannelSpaceKind
+    ChannelDestinationsPage:
+      properties:
+        destinations:
+          items:
+            $ref: '#/components/schemas/ChannelDestination'
+          type: array
+          title: Destinations
+        cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+        notes:
+          items:
+            type: string
+          type: array
+          title: Notes
+      type: object
+      title: ChannelDestinationsPage
+    ChannelAgentQueryRequest:
+      properties:
+        agent:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelAgentQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: ChannelAgentQueryRequest
+    ChannelMessagesPage:
+      properties:
+        messages:
+          items:
+            $ref: '#/components/schemas/ChannelMessage'
+          type: array
+          title: Messages
+        cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+        notes:
+          items:
+            type: string
+          type: array
+          title: Notes
+      type: object
+      title: ChannelMessagesPage
+    ChannelRendering:
+      properties:
+        controls:
+          $ref: '#/components/schemas/ChannelControls'
+        buttons:
+          $ref: '#/components/schemas/ChannelButtons'
+        text:
+          $ref: '#/components/schemas/ChannelText'
+        files:
+          $ref: '#/components/schemas/ChannelFiles'
+      type: object
+      title: ChannelRendering
+    ChannelSpacesSupport:
+      properties:
+        private:
+          type: boolean
+          title: Private
+          default: false
+        group:
+          type: boolean
+          title: Group
+          default: false
+        topic:
+          type: boolean
+          title: Topic
+          default: false
+      type: object
+      title: ChannelSpacesSupport
+    ChannelThread:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        space_id:
+          type: string
+          format: uuid
+          title: Space Id
+        agent_id:
+          type: string
+          format: uuid
+          title: Agent Id
+        external_key:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: External Key
+        session_id:
+          type: string
+          title: Session Id
+        data:
+          $ref: '#/components/schemas/ChannelThreadData'
+        flags:
+          $ref: '#/components/schemas/ChannelThreadFlags'
+      type: object
+      required:
+      - space_id
+      - agent_id
+      - session_id
+      - data
+      title: ChannelThread
+    ChannelConnectionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        connections:
+          items:
+            $ref: '#/components/schemas/ChannelConnection'
+          type: array
+          title: Connections
+      type: object
+      title: ChannelConnectionsResponse
+    ChannelSpaceResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        space:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSpace'
+          - type: 'null'
+      type: object
+      title: ChannelSpaceResponse
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    ChannelOutboxEventQueryRequest:
+      properties:
+        event:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelOutboxEventQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: ChannelOutboxEventQueryRequest
+    ChannelSessionScope:
+      type: string
+      enum:
+      - thread
+      - message
+      title: ChannelSessionScope
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ChannelAgentQuery:
+      properties:
+        connection_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Connection Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When `true`, include archived bindings and bindings of archived connections. Defaults to `false`.
+      type: object
+      title: ChannelAgentQuery
+    ChannelProtocol:
+      properties:
+        versions:
+          items:
+            type: string
+          type: array
+          title: Versions
+      type: object
+      title: ChannelProtocol
+    ChannelConnectionSetupResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        setup:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSetup'
+          - type: 'null'
+      type: object
+      title: ChannelConnectionSetupResponse
+      description: 'The declaration, plus the generated document: `setup.fields` and
+
+        `setup.instructions` come straight from the capability declaration,
+
+        `setup.document` is rebuilt per request from `build_setup_document`.'
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    ChannelPendingChoiceItem:
+      properties:
+        label:
+          type: string
+          title: Label
+        token:
+          type: string
+          title: Token
+      type: object
+      required:
+      - label
+      - token
+      title: ChannelPendingChoiceItem
+      description: 'One rendered option. `label` is the agent''s own words; `token` is
+
+        ours and never shown -- it is what a click''s `value` and a numbered
+
+        reply''s resolved position both collapse to.'
+    ChannelSpaceFlags:
+      properties:
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+        is_backfilled:
+          type: boolean
+          title: Is Backfilled
+          default: false
+        is_opted_out:
+          type: boolean
+          title: Is Opted Out
+          default: false
+      type: object
+      title: ChannelSpaceFlags
+    ChannelEffectivePolicy:
+      properties:
+        triggers:
+          items:
+            $ref: '#/components/schemas/ChannelTriggerKind'
+          type: array
+          uniqueItems: true
+          title: Triggers
+        session_scope:
+          $ref: '#/components/schemas/ChannelSessionScope'
+        backfill:
+          type: boolean
+          title: Backfill
+        forwardfill:
+          type: boolean
+          title: Forwardfill
+        decided_by:
+          additionalProperties:
+            $ref: '#/components/schemas/ChannelPolicyLevel'
+          type: object
+          title: Decided By
+      type: object
+      required:
+      - triggers
+      - session_scope
+      - backfill
+      - forwardfill
+      - decided_by
+      title: ChannelEffectivePolicy
+      description: What the intersection DECIDED. Every field present, none optional.
+    ChannelOutboxEventsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        events:
+          items:
+            $ref: '#/components/schemas/ChannelOutboxEvent'
+          type: array
+          title: Events
+      type: object
+      title: ChannelOutboxEventsResponse
+    ChannelFiles:
+      properties:
+        send:
+          $ref: '#/components/schemas/ChannelFileDirection'
+        receive:
+          $ref: '#/components/schemas/ChannelFileDirection'
+      type: object
+      title: ChannelFiles
+    ChannelMessagesReadRequest:
+      properties:
+        artifact_id:
+          type: string
+          format: uuid
+          title: Artifact Id
+        destination_id:
+          type: string
+          maxLength: 256
+          title: Destination Id
+        thread_id:
+          anyOf:
+          - type: string
+            maxLength: 256
+          - type: 'null'
+          title: Thread Id
+        limit:
+          anyOf:
+          - type: integer
+            maximum: 200.0
+            minimum: 1.0
+          - type: 'null'
+          title: Limit
+        cursor:
+          anyOf:
+          - type: string
+            maxLength: 256
+          - type: 'null'
+          title: Cursor
+      additionalProperties: false
+      type: object
+      required:
+      - artifact_id
+      - destination_id
+      title: ChannelMessagesReadRequest
+    ChannelEventAck:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: accepted
+        detail:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Detail
+      type: object
+      title: ChannelEventAck
+      description: The 202 body. Mirrors TriggerEventAck exactly.
+    ChannelConnectionTeardownResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        connection:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelConnection'
+          - type: 'null'
+        platform_notice:
+          type: string
+          title: Platform Notice
+      type: object
+      required:
+      - platform_notice
+      title: ChannelConnectionTeardownResponse
+      description: 'Archive/unarchive: say what changed, and what did not — we never own
+
+        the customer''s app, so nothing here uninstalls anything on their side.'
+    ChannelNativeCommands:
+      properties:
+        native:
+          type: boolean
+          title: Native
+          default: false
+        in_conversation:
+          type: boolean
+          title: In Conversation
+          default: false
+      type: object
+      title: ChannelNativeCommands
+    ChannelIdentity:
+      properties:
+        scope:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Scope
+        stable:
+          type: boolean
+          title: Stable
+          default: false
+        keys:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          propertyNames:
+            $ref: '#/components/schemas/ChannelKeyGrain'
+          type: object
+          title: Keys
+      type: object
+      title: ChannelIdentity
+    ChannelAgentEditRequest:
+      properties:
+        agent:
+          $ref: '#/components/schemas/ChannelAgentEdit'
+      type: object
+      required:
+      - agent
+      title: ChannelAgentEditRequest
+    ChannelPendingChoice:
+      properties:
+        choices:
+          items:
+            $ref: '#/components/schemas/ChannelPendingChoiceItem'
+          type: array
+          title: Choices
+        posted_at:
+          type: string
+          format: date-time
+          title: Posted At
+        interaction_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Interaction Id
+        outbox_event_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Outbox Event Id
+      type: object
+      required:
+      - choices
+      - posted_at
+      title: ChannelPendingChoice
+      description: 'The thread''s single open question. Written wholesale by the outbox
+
+        each time a choice renders -- a newer one replaces this field entirely,
+
+        which is what makes an older token stop resolving without any separate
+
+        expiry bookkeeping.'
+    ChannelAddressing:
+      properties:
+        sigils:
+          $ref: '#/components/schemas/ChannelSigils'
+        mention:
+          type: boolean
+          title: Mention
+          default: false
+        commands:
+          $ref: '#/components/schemas/ChannelNativeCommands'
+      type: object
+      title: ChannelAddressing
+    TelegramHostedBindLinkResponse:
+      properties:
+        url:
+          type: string
+          title: Url
+        expires_in_seconds:
+          type: integer
+          title: Expires In Seconds
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+      type: object
+      required:
+      - url
+      - expires_in_seconds
+      - connection_id
+      title: TelegramHostedBindLinkResponse
+    Reference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Reference
+    ChannelSpaceEdit:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelSpaceFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          $ref: '#/components/schemas/ChannelSpaceData'
+      type: object
+      required:
+      - data
+      title: ChannelSpaceEdit
+    ChannelMessageSendRequest:
+      properties:
+        artifact_id:
+          type: string
+          format: uuid
+          title: Artifact Id
+        session_id:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Session Id
+        tool_call_id:
+          type: string
+          minLength: 1
+          title: Tool Call Id
+        destination_id:
+          type: string
+          maxLength: 256
+          title: Destination Id
+        text:
+          type: string
+          maxLength: 40000
+          minLength: 1
+          title: Text
+        thread_id:
+          anyOf:
+          - type: string
+            maxLength: 256
+          - type: 'null'
+          title: Thread Id
+      additionalProperties: false
+      type: object
+      required:
+      - artifact_id
+      - session_id
+      - tool_call_id
+      - destination_id
+      - text
+      title: ChannelMessageSendRequest
+    ChannelConnectionQueryRequest:
+      properties:
+        connection:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelConnectionQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: ChannelConnectionQueryRequest
+    ChannelSetupResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        setup:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSetup'
+          - type: 'null'
+      type: object
+      title: ChannelSetupResponse
+      description: 'The channel-level twin of `ChannelConnectionSetupResponse`: reachable
+
+        with a channel name alone, before any connection row exists.'
+    ChannelSetupField:
+      properties:
+        name:
+          type: string
+          title: Name
+        label:
+          type: string
+          title: Label
+        secret:
+          type: boolean
+          title: Secret
+          default: false
+        required:
+          type: boolean
+          title: Required
+          default: true
+        help:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Help
+        pattern:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pattern
+        pattern_error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pattern Error
+      type: object
+      required:
+      - name
+      - label
+      title: ChannelSetupField
+    ChannelGrantEffect:
+      type: string
+      enum:
+      - allow
+      - deny
+      title: ChannelGrantEffect
+    ChannelPolicy:
+      properties:
+        triggers:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ChannelTriggerKind'
+            type: array
+            uniqueItems: true
+          - type: 'null'
+          title: Triggers
+        session_scope:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSessionScope'
+          - type: 'null'
+        backfill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Backfill
+        forwardfill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Forwardfill
+      type: object
+      title: ChannelPolicy
+      description: What one level STATED. Every field optional; None means no opinion.
+    ChannelConnectionRequest:
+      properties:
+        connection:
+          $ref: '#/components/schemas/ChannelConnectionCreate'
+      type: object
+      required:
+      - connection
+      title: ChannelConnectionRequest
+    ChannelOutboxEvent:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        thread_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Thread Id
+        space_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Space Id
+        turn_id:
+          type: string
+          title: Turn Id
+        key:
+          type: string
+          format: uuid
+          title: Key
+        state:
+          $ref: '#/components/schemas/ChannelDeliveryState'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/Status'
+          - type: 'null'
+        data:
+          $ref: '#/components/schemas/ChannelOutboxEventData'
+        flags:
+          $ref: '#/components/schemas/ChannelOutboxEventFlags'
+      type: object
+      required:
+      - connection_id
+      - turn_id
+      - key
+      - state
+      - data
+      title: ChannelOutboxEvent
+    ChannelText:
+      properties:
+        format:
+          type: string
+          enum:
+          - markdown
+          - plain
+          - html
+          title: Format
+          default: plain
+        max_chars:
+          type: integer
+          title: Max Chars
+          default: 0
+      type: object
+      title: ChannelText
+    ChannelAgentRequest:
+      properties:
+        agent:
+          $ref: '#/components/schemas/ChannelAgentCreate'
+      type: object
+      required:
+      - agent
+      title: ChannelAgentRequest
+    ChannelPolicyResolveRequest:
+      properties:
+        agent_id:
+          type: string
+          format: uuid
+          title: Agent Id
+        space_id:
+          type: string
+          format: uuid
+          title: Space Id
+      type: object
+      required:
+      - agent_id
+      - space_id
+      title: ChannelPolicyResolveRequest
+    ChannelConnectionCreate:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelConnectionFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        channel:
+          type: string
+          title: Channel
+        external_key:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: External Key
+        data:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Data
+        credentials:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Credentials
+      type: object
+      required:
+      - channel
+      title: ChannelConnectionCreate
+    ChannelToolsAvailabilityResponse:
+      properties:
+        available:
+          type: boolean
+          title: Available
+        tools:
+          items:
+            type: string
+          type: array
+          title: Tools
+      type: object
+      required:
+      - available
+      title: ChannelToolsAvailabilityResponse
+    ChannelConnectionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        connection:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelConnection'
+          - type: 'null'
+        setup:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSetup'
+          - type: 'null'
+      type: object
+      title: ChannelConnectionResponse
+    ChannelPolicyResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        policy:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelEffectivePolicy'
+          - type: 'null'
+      type: object
+      title: ChannelPolicyResponse
+    ChannelConnectionEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelConnectionFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        data:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Data
+        credentials:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Credentials
+      type: object
+      title: ChannelConnectionEdit
+      description: 'An edit names what changes. Every field is optional, and an omitted
+
+        field keeps its stored value: the service layers the fields the caller
+
+        sent over the existing row (`data` merges key by key) before the write.
+
+        A plain rename once nulled the whole data blob and bricked the connection
+
+        (F98).'
+    ChannelThreadData:
+      properties:
+        external_locator:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: External Locator
+        pending_choice:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelPendingChoice'
+          - type: 'null'
+      type: object
+      title: ChannelThreadData
+    ChannelDeliveryState:
+      type: string
+      enum:
+      - created
+      - sent
+      - failed
+      - abandoned
+      - held
+      title: ChannelDeliveryState
+      description: 'Where one outbound message is in its life. CREATED, not PENDING: the row
+
+        is inserted before the post is attempted.'
+    ChannelKeyGrain:
+      type: string
+      enum:
+      - connection
+      - space
+      - thread
+      title: ChannelKeyGrain
+    ChannelSearchedChannel:
+      properties:
+        destination_id:
+          type: string
+          title: Destination Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        coverage:
+          type: string
+          title: Coverage
+      type: object
+      required:
+      - destination_id
+      - coverage
+      title: ChannelSearchedChannel
+    ChannelSpace:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelSpaceFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        kind:
+          $ref: '#/components/schemas/ChannelSpaceKind'
+        external_key:
+          type: string
+          format: uuid
+          title: External Key
+        data:
+          $ref: '#/components/schemas/ChannelSpaceData'
+      type: object
+      required:
+      - connection_id
+      - kind
+      - external_key
+      - data
+      title: ChannelSpace
+    ChannelFileDirection:
+      properties:
+        supported:
+          type: boolean
+          title: Supported
+          default: false
+        max_bytes:
+          type: integer
+          title: Max Bytes
+          default: 0
+      type: object
+      title: ChannelFileDirection
+    ChannelSpacesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        spaces:
+          items:
+            $ref: '#/components/schemas/ChannelSpace'
+          type: array
+          title: Spaces
+      type: object
+      title: ChannelSpacesResponse
+    ChannelPolicyLevel:
+      type: string
+      enum:
+      - capability
+      - channel
+      - agent
+      - space
+      - grant
+      title: ChannelPolicyLevel
+    ChannelOutboxEventData:
+      properties:
+        external_locator:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: External Locator
+        processed:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Processed
+      type: object
+      title: ChannelOutboxEventData
+    ChannelAgentToolSettings:
+      properties:
+        can_post_outside_conversation:
+          type: boolean
+          title: Can Post Outside Conversation
+          default: true
+        readable_space_keys:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Readable Space Keys
+      type: object
+      title: ChannelAgentToolSettings
+      description: 'What the channel agent tools may do through this bot. Permissive by
+
+        default: a bot saved before this block existed reads as these values.'
+    ChannelAgentEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelAgentFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelAgentDataEdit'
+          - type: 'null'
+      type: object
+      title: ChannelAgentEdit
+      description: 'Same contract as the connection edit: an omitted field keeps its stored
+
+        value. A policy-only agent edit once reset `is_default` and muted the whole
+
+        connection (F91).'
+    ChannelSpaceQuery:
+      properties:
+        connection_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Connection Id
+        kind:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelSpaceKind'
+          - type: 'null'
+        external_key:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: External Key
+      type: object
+      title: ChannelSpaceQuery
+    ChannelAgentDataEdit:
+      properties:
+        references:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: References
+        policy:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelPolicy'
+          - type: 'null'
+        tools:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelAgentToolSettings'
+          - type: 'null'
+      type: object
+      title: ChannelAgentDataEdit
+      description: '`ChannelAgentData` for an edit: both fields optional, and an omitted one
+
+        keeps its stored value. `policy: null` clears the policy on purpose.'
+    ChannelAgentData:
+      properties:
+        references:
+          additionalProperties:
+            $ref: '#/components/schemas/Reference'
+          type: object
+          title: References
+        policy:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelPolicy'
+          - type: 'null'
+        tools:
+          $ref: '#/components/schemas/ChannelAgentToolSettings'
+      type: object
+      required:
+      - references
+      title: ChannelAgentData
+    ChannelDestinationsQueryRequest:
+      properties:
+        artifact_id:
+          type: string
+          format: uuid
+          title: Artifact Id
+        type:
+          anyOf:
+          - type: string
+            const: channel
+          - type: 'null'
+          title: Type
+        query:
+          anyOf:
+          - type: string
+            maxLength: 200
+          - type: 'null'
+          title: Query
+        limit:
+          anyOf:
+          - type: integer
+            maximum: 100.0
+            minimum: 1.0
+          - type: 'null'
+          title: Limit
+        cursor:
+          anyOf:
+          - type: string
+            maxLength: 64
+          - type: 'null'
+          title: Cursor
+      additionalProperties: false
+      type: object
+      required:
+      - artifact_id
+      title: ChannelDestinationsQueryRequest
+    ChannelInboxEvent:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        connection_id:
+          type: string
+          format: uuid
+          title: Connection Id
+        external_id:
+          type: string
+          title: External Id
+        kind:
+          $ref: '#/components/schemas/ChannelEventKind'
+        origin:
+          $ref: '#/components/schemas/ChannelEventOrigin'
+        space_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Space Id
+        sent_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Sent At
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/Status'
+          - type: 'null'
+        data:
+          $ref: '#/components/schemas/ChannelInboxEventData'
+        flags:
+          $ref: '#/components/schemas/ChannelInboxEventFlags'
+      type: object
+      required:
+      - connection_id
+      - external_id
+      - kind
+      - origin
+      - data
+      title: ChannelInboxEvent
+    ChannelConnection:
+      properties:
+        flags:
+          $ref: '#/components/schemas/ChannelConnectionFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        channel:
+          type: string
+          title: Channel
+        external_key:
+          type: string
+          format: uuid
+          title: External Key
+        data:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Data
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/Status'
+          - type: 'null'
+      type: object
+      required:
+      - channel
+      - external_key
+      title: ChannelConnection
+    ChannelThreadQueryRequest:
+      properties:
+        thread:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelThreadQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: ChannelThreadQueryRequest
+    ChannelEventKind:
+      type: string
+      enum:
+      - message
+      - action
+      title: ChannelEventKind
+      description: The two kinds of thing an agent can be addressed by.
+    ChannelConnectionFlags:
+      properties:
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+        is_verified:
+          type: boolean
+          title: Is Verified
+          default: false
+        is_hosted:
+          type: boolean
+          title: Is Hosted
+          default: false
+      type: object
+      title: ChannelConnectionFlags
+    ChannelGrantFlags:
+      properties:
+        is_default:
+          type: boolean
+          title: Is Default
+          default: false
+      type: object
+      title: ChannelGrantFlags
+    ChannelSpaceData:
+      properties:
+        external_locator:
+          additionalProperties: true
+          type: object
+          title: External Locator
+        policy:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelPolicy'
+          - type: 'null'
+      type: object
+      required:
+      - external_locator
+      title: ChannelSpaceData
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ChannelInboxEventQueryRequest:
+      properties:
+        event:
+          anyOf:
+          - $ref: '#/components/schemas/ChannelInboxEventQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: ChannelInboxEventQueryRequest
+    ChannelSetupDoc:
+      properties:
+        format:
+          type: string
+          title: Format
+        content:
+          type: string
+          title: Content
+        filename:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filename
+        link:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Link
+      type: object
+      required:
+      - format
+      - content
+      title: ChannelSetupDoc
+      description: 'What `build_setup_document` generates, request-url-dependent and so
+
+        never baked into the static capability declaration.'
+    ChannelGrantRequest:
+      properties:
+        grant:
+          $ref: '#/components/schemas/ChannelGrantCreate'
+      type: object
+      required:
+      - grant
+      title: ChannelGrantRequest
+    ChannelThreadFlags:
+      properties:
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+      type: object
+      title: ChannelThreadFlags
+    AgentaConversationResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        items:
+          items:
+            $ref: '#/components/schemas/AgentaConversationItem'
+          type: array
+          title: Items
+      type: object
+      title: AgentaConversationResponse
+    Status:
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        stacktrace:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stacktrace
+      type: object
+      title: Status
+    ChannelConnectionQuery:
+      properties:
+        channel:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Channel
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: ChannelConnectionQuery
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

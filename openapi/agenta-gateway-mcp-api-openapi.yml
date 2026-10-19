@@ -1,0 +1,1475 @@
+openapi: 3.2.0
+info:
+  title: 'Agenta Gateway: MCP API'
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: 'Gateway: MCP'
+paths:
+  /gateways/mcps/credentials/agenta:
+    post:
+      tags:
+      - 'Gateway: MCP'
+      summary: Issue Agenta Credential
+      description: 'Narrow an invocation credential to its resolved callback tools.
+
+
+        Three guards, because the value this hands back travels into a sandbox:
+
+
+        - Only the API-created service token contains ``gateway_run_id``. Browser
+
+        and API-key callers therefore cannot mint a credential for Agenta tools
+
+        at all.
+
+        - The caller must hold the permission that governs SPENDING the MCP
+
+        gateway, which is where the issued credential is spent
+
+        (`MCPGatewayService.relay` authorizes the same one on every call). A
+
+        credential can then never reach a plane its buyer could not reach.
+
+        - The tool list is bounded rather than signed as given
+
+        (:func:`entitled_agenta_tools`): a credential already carrying a tool set
+
+        may only narrow it, and one carrying none may still only name call_refs
+
+        `POST /tools/call` would dispatch.
+
+
+        The issued value is confined to the gateway audience, like the one
+
+        `POST /gateways/credentials` hands the sandbox for every other MCP server.
+
+        That is what makes the bound hold: an audience-bound credential cannot reach
+
+        this route (it is not a data-plane path), so the narrowed credential can
+
+        never buy a wider one.'
+      operationId: issue_agenta_mcp_credential
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPAgentaCredentialRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPAgentaCredentialResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gateways/mcps/endpoints/:
+    get:
+      tags:
+      - 'Gateway: MCP'
+      summary: List Endpoints
+      operationId: list_mcp_endpoints
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPEndpointsResponse'
+    post:
+      tags:
+      - 'Gateway: MCP'
+      summary: Create Endpoint
+      operationId: create_mcp_endpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPEndpointCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPEndpointResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gateways/mcps/endpoints/query:
+    post:
+      tags:
+      - 'Gateway: MCP'
+      summary: Query Endpoints
+      operationId: query_mcp_endpoints
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPEndpointQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPEndpointsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gateways/mcps/endpoints/probe:
+    post:
+      tags:
+      - 'Gateway: MCP'
+      summary: Probe Endpoint
+      description: 'Report what a URL is, so the connect journey can ask for a URL first.
+
+
+        Gated on EDIT_MCP_ENDPOINTS rather than VIEW: this makes the deployment fetch an
+
+        address of the caller''s choosing, so it is the permission to add a server, not the
+
+        permission to look at one.'
+      operationId: probe_mcp_endpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPEndpointProbeRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPEndpointProbeResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gateways/mcps/endpoints/{endpoint_id}:
+    get:
+      tags:
+      - 'Gateway: MCP'
+      summary: Fetch Endpoint
+      operationId: fetch_mcp_endpoint
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Endpoint Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPEndpointResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - 'Gateway: MCP'
+      summary: Edit Endpoint
+      operationId: edit_mcp_endpoint
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Endpoint Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPEndpointEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPEndpointResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - 'Gateway: MCP'
+      summary: Delete Endpoint
+      description: 'Delete a connection.
+
+
+        A connect sheet abandoning the row it made sends `pending_auth_mode`, the mode it
+
+        made the row in, after it cancelled its own sign-in. The row is then deleted only
+
+        while it is still in that mode with no credential bound and no sign-in in flight,
+
+        decided under the connection''s lock. A row that another tab took over since, or is
+
+        signing in on, is kept, and the answer is 409.'
+      operationId: delete_mcp_endpoint
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Endpoint Id
+      - name: pending_auth_mode
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/GatewayAuthScheme'
+          - type: 'null'
+          title: Pending Auth Mode
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gateways/mcps/endpoints/{endpoint_id}/check:
+    post:
+      tags:
+      - 'Gateway: MCP'
+      summary: Record Endpoint Check
+      description: 'Record the result of a check the connect sheet ran, so the connection''s row can
+
+        say when it was last checked and how that went. The check itself is the sheet''s
+
+        handshake through the relay; agent calls never write this.'
+      operationId: record_mcp_endpoint_check
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Endpoint Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPEndpointCheckRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPEndpointResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gateways/mcps/endpoints/{endpoint_id}/connect:
+    post:
+      tags:
+      - 'Gateway: MCP'
+      summary: Connect Endpoint
+      description: 'One route, two steps. `body.scopes is None` -> discover and cache the
+
+        checklist onto the row; a list (possibly empty) -> begin and return the
+
+        authorization redirect.'
+      operationId: connect_mcp_endpoint
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Endpoint Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MCPConnectRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPConnectResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - 'Gateway: MCP'
+      summary: Disconnect Endpoint
+      description: 'Drop one connection''s authorization and keep the connection itself.
+
+
+        The connection survives with its id, slug, name, URL and tool policy intact, so
+
+        every agent configured against it stays configured and one Connect reconnects
+
+        it. Deleting the endpoint is the other operation, and it is not this one.
+
+
+        Only this connection''s grant goes. Another account at the same server keeps its
+
+        own, which is what the connection-keyed grant is for.
+
+
+        Idempotent: disconnecting something already disconnected returns the endpoint
+
+        and changes nothing, so a repeated click or a retried request is not an error.'
+      operationId: disconnect_mcp_endpoint
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Endpoint Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPEndpointResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gateways/mcps/endpoints/{endpoint_id}/connect/attempts/{attempt_id}:
+    get:
+      tags:
+      - 'Gateway: MCP'
+      summary: Fetch Connect Attempt
+      description: 'How one consent attempt stands.
+
+
+        The sheet asks when the popup closes or the wait runs out without a message from
+
+        the callback page, which is how a result posted to an opener that is gone, or to
+
+        an origin the app is not on, still reaches the person.'
+      operationId: fetch_mcp_connect_attempt
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Endpoint Id
+      - name: attempt_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Attempt Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MCPConnectAttemptResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - 'Gateway: MCP'
+      summary: Cancel Connect Attempt
+      description: 'Cancel one pending consent attempt. Its callback then writes nothing.
+
+
+        Idempotent: an attempt already settled, cancelled or swept is left as it is.'
+      operationId: cancel_mcp_connect_attempt
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Endpoint Id
+      - name: attempt_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Attempt Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    MCPEndpointSettings:
+      properties:
+        timeout_seconds:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Timeout Seconds
+      type: object
+      title: MCPEndpointSettings
+      description: MCP endpoint settings.
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    MCPEndpointsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        endpoints:
+          items:
+            $ref: '#/components/schemas/MCPEndpoint'
+          type: array
+          title: Endpoints
+      type: object
+      title: MCPEndpointsResponse
+    MCPConnectRequest:
+      properties:
+        scopes:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Scopes
+      type: object
+      title: MCPConnectRequest
+      description: 'Request MCP OAuth scope discovery or authorization.
+
+        `scopes` present (an empty list is a legal "no scopes") is the begin step.'
+    MCPAgentaCredentialRequest:
+      properties:
+        tools:
+          items:
+            $ref: '#/components/schemas/MCPAgentaToolDescriptor'
+          type: array
+          maxItems: 128
+          title: Tools
+      type: object
+      title: MCPAgentaCredentialRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    MCPOAuthAttemptStatus:
+      type: string
+      enum:
+      - pending
+      - claimed
+      - connected
+      - failed
+      - cancelled
+      title: MCPOAuthAttemptStatus
+      description: 'Where one attempt stands.
+
+
+        `claimed` is the moment between the callback taking the attempt and it writing an
+
+        outcome, while the code is exchanged. The browser reads it as still pending.'
+    MCPEndpointQueryRequest:
+      properties:
+        endpoint:
+          anyOf:
+          - $ref: '#/components/schemas/MCPEndpointQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: MCPEndpointQueryRequest
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    MCPEndpointCheckRequest:
+      properties:
+        ok:
+          type: boolean
+          title: Ok
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - ok
+      title: MCPEndpointCheckRequest
+      description: The result of a check the connect sheet just ran against the connection.
+    MCPProbeProblem:
+      properties:
+        cause:
+          type: string
+          title: Cause
+        message:
+          type: string
+          title: Message
+        transport:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Transport
+        response:
+          anyOf:
+          - $ref: '#/components/schemas/MCPProbeResponse'
+          - type: 'null'
+      type: object
+      required:
+      - cause
+      - message
+      title: MCPProbeProblem
+      description: Why the probe could not answer. `cause` is for branching, `message` for a person.
+    MCPOAuthAttemptOutcome:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        status:
+          $ref: '#/components/schemas/MCPOAuthAttemptStatus'
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - id
+      - status
+      title: MCPOAuthAttemptOutcome
+      description: 'What the browser is told about one attempt it started.
+
+
+        `claimed` reads as `pending`, and a pending attempt past its expiry as `cancelled`:
+
+        the browser only needs to know whether to keep waiting, and how it ended.'
+    MCPEndpointResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        endpoint:
+          anyOf:
+          - $ref: '#/components/schemas/MCPEndpoint'
+          - type: 'null'
+      type: object
+      title: MCPEndpointResponse
+    MCPServerProbeResult:
+      properties:
+        reachable:
+          type: boolean
+          title: Reachable
+          default: false
+        server_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Server Name
+        protocol_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Protocol Version
+        auth:
+          $ref: '#/components/schemas/MCPProbeAuth'
+          default:
+            mode: unknown
+            scopes_offered: []
+            challenge_schemes: []
+        problem:
+          anyOf:
+          - $ref: '#/components/schemas/MCPProbeProblem'
+          - type: 'null'
+        legacy_transport_suspected:
+          type: boolean
+          title: Legacy Transport Suspected
+          default: false
+      type: object
+      title: MCPServerProbeResult
+      description: Everything the probe learned. No identity, because it created nothing.
+    MCPEndpointEdit:
+      properties:
+        flags:
+          $ref: '#/components/schemas/MCPEndpointFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        auth_mode:
+          $ref: '#/components/schemas/GatewayAuthScheme'
+        secret_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Secret Id
+        data:
+          $ref: '#/components/schemas/MCPEndpointData'
+      type: object
+      required:
+      - auth_mode
+      - data
+      title: MCPEndpointEdit
+    MCPOAuthConfig:
+      properties:
+        client_id:
+          anyOf:
+          - type: string
+            minLength: 1
+          - type: 'null'
+          title: Client Id
+        client_secret_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Client Secret Id
+        token_endpoint_auth_method:
+          anyOf:
+          - type: string
+            enum:
+            - client_secret_basic
+            - client_secret_post
+            - none
+          - type: 'null'
+          title: Token Endpoint Auth Method
+        scopes:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Scopes
+      type: object
+      title: MCPOAuthConfig
+      description: 'What the person chose for an OAuth connection, apart from what discovery found.
+
+
+        `client_id` is an OAuth app the person registered with the provider in advance, for a
+
+        server that registers no clients on its own (GitHub, HubSpot, Asana). It is used before
+
+        any registration Agenta would make. `client_secret_id` names the project secret that
+
+        holds the app''s secret; the value stays in the vault. `token_endpoint_auth_method` is
+
+        how the app authenticates at the token endpoint; unset takes RFC 7591''s default.
+
+
+        `scopes` is the selection the person last asked for, so a reconnect starts from it.
+
+        What the server offers lives in the discovery cache beside this.'
+    MCPConnectAttemptResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        attempt:
+          anyOf:
+          - $ref: '#/components/schemas/MCPOAuthAttemptOutcome'
+          - type: 'null'
+      type: object
+      title: MCPConnectAttemptResponse
+    MCPAgentaToolDescriptor:
+      properties:
+        name:
+          type: string
+          maxLength: 128
+          minLength: 1
+          title: Name
+        call_ref:
+          type: string
+          maxLength: 512
+          minLength: 1
+          title: Call Ref
+        description:
+          anyOf:
+          - type: string
+            maxLength: 4096
+          - type: 'null'
+          title: Description
+        input_schema:
+          additionalProperties: true
+          type: object
+          title: Input Schema
+      type: object
+      required:
+      - name
+      - call_ref
+      title: MCPAgentaToolDescriptor
+      description: One callback tool selected by the agent service for a single run.
+    MCPEndpointProbeResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        probe:
+          anyOf:
+          - $ref: '#/components/schemas/MCPServerProbeResult'
+          - type: 'null'
+      type: object
+      title: MCPEndpointProbeResponse
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    MCPEndpointEditRequest:
+      properties:
+        endpoint:
+          $ref: '#/components/schemas/MCPEndpointEdit'
+      type: object
+      required:
+      - endpoint
+      title: MCPEndpointEditRequest
+    GatewayAuthScheme:
+      type: string
+      enum:
+      - oauth
+      - api_key
+      - none
+      title: GatewayAuthScheme
+      description: How the gateway authenticates to an upstream.
+    MCPCredentialBinding:
+      properties:
+        kind:
+          type: string
+          enum:
+          - header
+          - query
+          - url
+          title: Kind
+          default: header
+        name:
+          anyOf:
+          - type: string
+            minLength: 1
+          - type: 'null'
+          title: Name
+        prefix:
+          anyOf:
+          - type: string
+            minLength: 1
+          - type: 'null'
+          title: Prefix
+      type: object
+      title: MCPCredentialBinding
+      description: 'Where an API-key endpoint''s credential goes when the relay sends it.
+
+
+        Configuration only: the value stays in the vault behind the endpoint''s `secret_id`, so
+
+        this is as readable as `base_url` is. `kind` and `name` match the SDK''s
+
+        `HeaderCredentialBinding`. A `header` binding sends `<name>: <prefix> <value>`, or
+
+        `<name>: <value>` with no prefix; a `query` binding adds `<name>=<value>` to the
+
+        upstream URL at request time; a `url` binding puts the value where `base_url` holds
+
+        `{secret}`. The stored URL never holds the value. The prefix is the scheme word
+
+        (`Bearer`, `Basic`) a server expects in front of the value, because a raw key under
+
+        `Authorization` is refused by every server that names a scheme.'
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    MCPEndpointRoute:
+      properties:
+        base_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Base Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Headers
+        credential_binding:
+          anyOf:
+          - $ref: '#/components/schemas/MCPCredentialBinding'
+          - type: 'null'
+      type: object
+      title: MCPEndpointRoute
+      description: 'Route for one MCP server.
+
+
+        `credential_binding` says how an API-key endpoint''s credential travels. None sends
+
+        `Authorization: Bearer <key>`, and an OAuth endpoint ignores it because a grant
+
+        travels under the scheme its authorization server issued it with.'
+    MCPConnectResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        redirect_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Redirect Url
+        scopes_offered:
+          items:
+            type: string
+          type: array
+          title: Scopes Offered
+        attempt_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Attempt Id
+        expires_in:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expires In
+      type: object
+      title: MCPConnectResponse
+    MCPProbeRegistration:
+      type: string
+      enum:
+      - dynamic
+      - metadata
+      - unavailable
+      title: MCPProbeRegistration
+      description: How this deployment would register itself with the discovered issuer.
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    MCPOAuthData:
+      properties:
+        resource:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resource
+        authorization_server:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization Server
+        scopes_offered:
+          items:
+            type: string
+          type: array
+          title: Scopes Offered
+      type: object
+      title: MCPOAuthData
+      description: Non-secret OAuth discovery metadata.
+    MCPEndpointData:
+      properties:
+        route:
+          $ref: '#/components/schemas/MCPEndpointRoute'
+        tools:
+          $ref: '#/components/schemas/GatewayEndpointFilter'
+        settings:
+          $ref: '#/components/schemas/MCPEndpointSettings'
+        oauth:
+          anyOf:
+          - $ref: '#/components/schemas/MCPOAuthData'
+          - type: 'null'
+        oauth_config:
+          anyOf:
+          - $ref: '#/components/schemas/MCPOAuthConfig'
+          - type: 'null'
+        check:
+          anyOf:
+          - $ref: '#/components/schemas/MCPEndpointCheck'
+          - type: 'null'
+      type: object
+      title: MCPEndpointData
+    GatewayEndpointNamespace:
+      type: string
+      enum:
+      - builtin
+      - standard
+      - custom
+      title: GatewayEndpointNamespace
+      description: Gateway route namespace.
+    MCPEndpointQuery:
+      properties:
+        auth_mode:
+          anyOf:
+          - $ref: '#/components/schemas/GatewayAuthScheme'
+          - type: 'null'
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: MCPEndpointQuery
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    MCPEndpointCheck:
+      properties:
+        ok:
+          type: boolean
+          title: Ok
+        reason:
+          anyOf:
+          - type: string
+            maxLength: 300
+          - type: 'null'
+          title: Reason
+        checked_at:
+          type: string
+          format: date-time
+          title: Checked At
+      type: object
+      required:
+      - ok
+      - checked_at
+      title: MCPEndpointCheck
+      description: 'The result of the last explicit check of a connection, from the connect sheet or a
+
+        reconnect. Agent calls never write it, so it says when someone last looked, not how
+
+        the connection is doing now.'
+    MCPEndpointProbeRequest:
+      properties:
+        url:
+          type: string
+          title: Url
+        secret_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Secret Id
+        credential_binding:
+          anyOf:
+          - $ref: '#/components/schemas/MCPCredentialBinding'
+          - type: 'null'
+      type: object
+      required:
+      - url
+      title: MCPEndpointProbeRequest
+      description: 'Inspect a server URL before an endpoint exists.
+
+
+        The probe routes a request and reports what came back. It takes no name (nothing is
+
+        being labelled), no slug or id (nothing is being identified), and no credential value.
+
+
+        `secret_id` names a project secret to send the way `credential_binding` says, which
+
+        is a `{secret}` in the URL''s path when it says nothing: that address does not exist
+
+        without its key. A key sent in a header or the query is how a changed key is checked
+
+        before a connection saves it. The API reads the value from the vault, so the browser
+
+        never sends it.'
+    MCPProbeAuthMode:
+      type: string
+      enum:
+      - none
+      - oauth
+      - unknown
+      title: MCPProbeAuthMode
+      description: What the server asked for, as far as the probe could establish.
+    MCPEndpointFlags:
+      properties:
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+        is_valid:
+          type: boolean
+          title: Is Valid
+          default: true
+      type: object
+      title: MCPEndpointFlags
+    MCPEndpointCreate:
+      properties:
+        flags:
+          $ref: '#/components/schemas/MCPEndpointFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        auth_mode:
+          $ref: '#/components/schemas/GatewayAuthScheme'
+        secret_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Secret Id
+        data:
+          $ref: '#/components/schemas/MCPEndpointData'
+      type: object
+      required:
+      - auth_mode
+      - data
+      title: MCPEndpointCreate
+    MCPEndpoint:
+      properties:
+        flags:
+          $ref: '#/components/schemas/MCPEndpointFlags'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        auth_mode:
+          $ref: '#/components/schemas/GatewayAuthScheme'
+        namespace:
+          $ref: '#/components/schemas/GatewayEndpointNamespace'
+          default: custom
+        secret_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Secret Id
+        connection_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Connection Id
+        provider_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider Key
+        integration_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration Key
+        data:
+          $ref: '#/components/schemas/MCPEndpointData'
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/Status'
+          - type: 'null'
+      type: object
+      required:
+      - auth_mode
+      - data
+      title: MCPEndpoint
+    MCPAgentaCredentialResponse:
+      properties:
+        credentials:
+          type: string
+          title: Credentials
+      type: object
+      required:
+      - credentials
+      title: MCPAgentaCredentialResponse
+    MCPEndpointCreateRequest:
+      properties:
+        endpoint:
+          $ref: '#/components/schemas/MCPEndpointCreate'
+      type: object
+      required:
+      - endpoint
+      title: MCPEndpointCreateRequest
+    MCPProbeResponse:
+      properties:
+        status:
+          type: integer
+          title: Status
+        body:
+          type: string
+          title: Body
+      type: object
+      required:
+      - status
+      - body
+      title: MCPProbeResponse
+      description: 'What the server answered, for a person to read: its status and the start of its body.
+
+
+        Credentials the URL carried are removed from the body before it is cut to length.'
+    Status:
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        stacktrace:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stacktrace
+      type: object
+      title: Status
+    MCPProbeAuth:
+      properties:
+        mode:
+          $ref: '#/components/schemas/MCPProbeAuthMode'
+          default: unknown
+        authorization_server:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization Server
+        scopes_offered:
+          items:
+            type: string
+          type: array
+          title: Scopes Offered
+          default: []
+        registration:
+          anyOf:
+          - $ref: '#/components/schemas/MCPProbeRegistration'
+          - type: 'null'
+        challenge_status:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Challenge Status
+        challenge_schemes:
+          items:
+            type: string
+          type: array
+          title: Challenge Schemes
+          default: []
+        redirect_uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Redirect Uri
+      type: object
+      title: MCPProbeAuth
+    GatewayEndpointFilter:
+      properties:
+        allowlist:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Allowlist
+        denylist:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Denylist
+      type: object
+      title: GatewayEndpointFilter
+      description: Allowlist and denylist filter for models or tools.
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

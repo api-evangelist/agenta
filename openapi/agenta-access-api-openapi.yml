@@ -1,0 +1,393 @@
+openapi: 3.2.0
+info:
+  title: Agenta Access API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Access
+  description: Authentication discovery, organization access checks, and SSO callback endpoints.
+paths:
+  /access/plans:
+    get:
+      tags:
+      - Access
+      summary: Fetch Plans
+      description: 'Return the effective plan catalog: slug -> entitlement controls.
+
+
+        The shape mirrors what `AGENTA_ACCESS_PLANS` accepts, but fully parsed
+
+        and validated. The frontend reads `flags`, `counters`, `gauges`, and
+
+        `throttles` from here rather than slug-matching against constants.'
+      operationId: fetch_access_plans
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  additionalProperties: true
+                  type: object
+                type: object
+                title: Response Fetch Access Plans
+  /auth/discover:
+    post:
+      tags:
+      - Access
+      summary: Discover
+      description: 'Discover authentication methods available for a given email.
+
+
+        This endpoint does NOT reveal:
+
+        - Organization names
+
+        - User existence (optionally - currently does for UX)
+
+        - Detailed policy information
+
+
+        Returns minimal information needed for authentication flow.'
+      operationId: discover_access
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscoverRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoverResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/access:
+    get:
+      tags:
+      - Access
+      summary: Check Organization Access
+      description: 'Check if the current session satisfies the organization''s auth policy.
+
+
+        Returns 200 when access is allowed, 403 with AUTH_UPGRADE_REQUIRED when not.'
+      operationId: check_organization_access
+      parameters:
+      - name: organization_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/session/identities:
+    patch:
+      tags:
+      - Access
+      summary: Update Session Identities
+      operationId: update_session_identities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionIdentitiesUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/sso/callback/{organization_slug}/{provider_slug}:
+    get:
+      tags:
+      - Access
+      summary: Sso Callback Redirect
+      description: 'Custom SSO callback endpoint that redirects to SuperTokens.
+
+
+        This endpoint:
+
+        1. Accepts clean URL path: /auth/sso/callback/{organization_slug}/{provider_slug}
+
+        2. Validates the organization and provider exist
+
+        3. Builds SuperTokens thirdPartyId: sso:{organization_slug}:{provider_slug}
+
+        4. Redirects to SuperTokens callback: /auth/callback/{thirdPartyId}
+
+
+        SuperTokens then handles:
+
+        1. Exchange code for tokens (using our dynamic provider config)
+
+        2. Get user info
+
+        3. Call our sign_in_up override (creates user_identity, adds user_identities to session)
+
+        4. Redirect to frontend with session cookie'
+      operationId: sso_callback_redirect
+      parameters:
+      - name: organization_slug
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Slug
+      - name: provider_slug
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Provider Slug
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /access/permissions/check:
+    get:
+      tags:
+      - Access
+      summary: Check Permissions
+      description: 'Evaluate a permission against the AUTHENTICATED scope.
+
+
+        `scope_id` asserts that the request was authenticated for that scope; it never
+
+        selects it. A caller asking about a specific project must also send the
+
+        `project_id` query param the auth middleware reads — a session with no explicit
+
+        `project_id` is scoped to the default project, and any other `scope_id` is denied
+
+        regardless of the caller''s role there.'
+      operationId: check_permissions
+      parameters:
+      - name: action
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Action
+      - name: scope_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Scope Type
+      - name: scope_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Scope Id
+      - name: resource_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resource Type
+      - name: resource_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Resource Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /access/roles:
+    get:
+      tags:
+      - Access
+      summary: Fetch Roles
+      description: 'Return the effective role catalog per scope (organization,
+
+        workspace, project). RBAC is an OSS feature, so this is served in both
+
+        editions; the frontend reads the `workspace` scope for the members UI.'
+      operationId: fetch_access_roles
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+                type: object
+                title: Response Fetch Access Roles
+components:
+  schemas:
+    DiscoverRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+      type: object
+      required:
+      - email
+      title: DiscoverRequest
+    SSOProviders:
+      properties:
+        providers:
+          items:
+            $ref: '#/components/schemas/SSOProviderInfo'
+          type: array
+          title: Providers
+      type: object
+      required:
+      - providers
+      title: SSOProviders
+    SSOProviderInfo:
+      properties:
+        id:
+          type: string
+          title: Id
+        slug:
+          type: string
+          title: Slug
+        third_party_id:
+          type: string
+          title: Third Party Id
+      type: object
+      required:
+      - id
+      - slug
+      - third_party_id
+      title: SSOProviderInfo
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    SessionIdentitiesUpdate:
+      properties:
+        session_identities:
+          items:
+            type: string
+          type: array
+          title: Session Identities
+      type: object
+      required:
+      - session_identities
+      title: SessionIdentitiesUpdate
+    DiscoverResponse:
+      properties:
+        exists:
+          type: boolean
+          title: Exists
+        methods:
+          additionalProperties:
+            anyOf:
+            - type: boolean
+            - $ref: '#/components/schemas/SSOProviders'
+          type: object
+          title: Methods
+      type: object
+      required:
+      - exists
+      - methods
+      title: DiscoverResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

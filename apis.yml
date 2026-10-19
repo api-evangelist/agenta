@@ -91,41 +91,6 @@ apis:
     url: https://docs.agenta.ai/observability/overview
   - type: APIReference
     url: https://docs.agenta.ai/reference/api/traces
-- aid: agenta:agenta-configs-api
-  name: Agenta Configs API
-  description: Fetch and deploy versioned prompt configurations.
-  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
-  baseURL: https://cloud.agenta.ai/api
-  tags:
-  - Configs
-  properties:
-  - type: OpenAPI
-    url: openapi/agenta-configs-api-openapi.yml
-  - type: Documentation
-    url: https://docs.agenta.ai/prompt-engineering/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/list-api-endpoints
-  - type: PostmanCollection
-    url: collections/agenta.postman_collection.json
-  - type: OpenCollection
-    url: collections/agenta.opencollection.json
-  - type: Documentation
-    url: >-
-      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/sdk/configuration-management
-  - type: Documentation
-    url: https://docs.agenta.ai/evaluation/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/evaluations
-  - type: Documentation
-    url: https://docs.agenta.ai/evaluation/create-test-sets
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/testsets
-  - type: Documentation
-    url: https://docs.agenta.ai/observability/overview
-  - type: APIReference
-    url: https://docs.agenta.ai/reference/api/traces
 - aid: agenta:agenta-evaluations-api
   name: Agenta Evaluations API
   description: Run evaluations of variants against testsets.
@@ -233,14 +198,1067 @@ apis:
     url: https://docs.agenta.ai/observability/overview
   - type: APIReference
     url: https://docs.agenta.ai/reference/api/traces
-- aid: agenta:agenta-open-telemetry-api
-  name: Agenta Open Telemetry API
-  description: Ingest LLM telemetry over OTLP/HTTP.
+- aid: agenta:agenta-access-api
+  name: Agenta Access API
+  description: Authentication discovery, organization access checks, and SSO callback endpoints.
   humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
   baseURL: https://cloud.agenta.ai/api
   tags:
-  - OpenTelemetry
-  tags_raw:
+  - Access
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-access-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-admin-api
+  name: Agenta Admin API
+  description: Internal administration endpoints — restricted to platform operators.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Admin
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-admin-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-annotations-api
+  name: Agenta Annotations API
+  description: Attach evaluator-style feedback to existing traces and spans.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Annotations
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-annotations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-billing-api
+  name: Agenta Billing API
+  description: Subscription, plan, and usage endpoints for workspace billing.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Billing
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-billing-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-channels-api
+  name: Agenta Channels API
+  description: Chat platform channels — connections, agents, spaces, grants, and the inbound event log.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Channels
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-channels-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-deprecated-api
+  name: Agenta Deprecated API
+  description: Deprecated endpoints kept for backwards compatibility — avoid in new integrations.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Deprecated
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-deprecated-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-environments-api
+  name: Agenta Environments API
+  description: Deployment environments (e.g. production, staging) and their active variants.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Environments
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-environments-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-events-api
+  name: Agenta Events API
+  description: The Events API from Agenta — 1 operation(s) for events.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-events-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-folders-api
+  name: Agenta Folders API
+  description: Organize applications and other resources into folder hierarchies.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Folders
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-folders-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-gateway-api
+  name: Agenta Gateway API
+  description: The Gateway API from Agenta — 1 operation(s) for gateway.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Gateway
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-gateway-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-gateway-llm-api
+  name: 'Agenta Gateway: LLM API'
+  description: 'The Gateway: LLM API from Agenta — 4 operation(s) for gateway: llm.'
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - 'Gateway: LLM'
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-gateway-llm-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-gateway-mcp-api
+  name: 'Agenta Gateway: MCP API'
+  description: 'The Gateway: MCP API from Agenta — 8 operation(s) for gateway: mcp.'
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - 'Gateway: MCP'
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-gateway-mcp-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-invocations-api
+  name: Agenta Invocations API
+  description: Run an application against a payload and capture the resulting trace.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Invocations
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-invocations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-keys-api
+  name: Agenta Keys API
+  description: Create and revoke API keys used to authenticate programmatic requests.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Keys
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-keys-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-legacy-api
+  name: Agenta Legacy API
+  description: >-
+    Stable legacy endpoints retained for existing integrations — not deprecated, but new integrations
+    should prefer the canonical surface.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Legacy
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-legacy-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-mounts-api
+  name: Agenta Mounts API
+  description: Durable object-store mounts for agent working directories.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Mounts
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-mounts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-organizations-api
+  name: Agenta Organizations API
+  description: Manage organizations, workspaces, SSO domains, and identity providers.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Organizations
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-organizations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-projects-api
+  name: Agenta Projects API
+  description: Manage projects within a workspace.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Projects
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-projects-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-queries-api
+  name: Agenta Queries API
+  description: Saved query definitions used to filter and retrieve trace data.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Queries
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-queries-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-secrets-api
+  name: Agenta Secrets API
+  description: Manage provider credentials and secret values stored in the vault.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Secrets
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-secrets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-sessions-api
+  name: Agenta Sessions API
+  description: >-
+    Agent sessions — runner coordination (invoke/cancel/steer/attach/detach/heartbeat/liveness), state
+    persistence (durable SDK state and sandbox resume pointer), records, and streams.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Sessions
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-sessions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-skills-api
+  name: Agenta Skills API
+  description: The Skills API from Agenta — 11 operation(s) for skills.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Skills
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-skills-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-status-api
+  name: Agenta Status API
+  description: API server liveness and readiness status.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Status
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-status-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-tools-api
+  name: Agenta Tools API
+  description: External tool connections and OAuth integrations available to applications.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Tools
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-tools-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-triggers-api
+  name: Agenta Triggers API
+  description: Inbound provider event triggers and their watchable event catalog.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Triggers
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-triggers-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-users-api
+  name: Agenta Users API
+  description: User profile and account management — view profile, update username, reset password.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-users-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-wallets-api
+  name: Agenta Wallets API
+  description: The Wallets API from Agenta — 2 operation(s) for wallets.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Wallets
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-wallets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-webhooks-api
+  name: Agenta Webhooks API
+  description: Register and manage webhooks that fire on platform events.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-webhooks-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-workflows-api
+  name: Agenta Workflows API
+  description: Workflow definitions — the runnable pipelines that back an application.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Workflows
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-workflows-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-workspaces-api
+  name: Agenta Workspaces API
+  description: Manage workspaces within an organization and their members.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
+  - Workspaces
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-workspaces-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-open-telemetry-api
+  name: Agenta Open Telemetry API
+  description: >-
+    OTLP-compatible endpoints for ingesting traces directly from OpenTelemetry-instrumented services.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
   - Open Telemetry
   properties:
   - type: OpenAPI
@@ -270,14 +1288,47 @@ apis:
     url: https://docs.agenta.ai/observability/overview
   - type: APIReference
     url: https://docs.agenta.ai/reference/api/traces
-- aid: agenta:agenta-test-sets-api
-  name: Agenta Test Sets API
-  description: Manage evaluation datasets (testsets).
+- aid: agenta:agenta-test-cases-api
+  name: Agenta Test Cases API
+  description: Individual test cases within a testset.
   humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
   baseURL: https://cloud.agenta.ai/api
   tags:
-  - Testsets
-  tags_raw:
+  - Test Cases
+  properties:
+  - type: OpenAPI
+    url: openapi/agenta-test-cases-api-openapi.yml
+  - type: Documentation
+    url: https://docs.agenta.ai/prompt-engineering/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/list-api-endpoints
+  - type: PostmanCollection
+    url: collections/agenta.postman_collection.json
+  - type: OpenCollection
+    url: collections/agenta.opencollection.json
+  - type: Documentation
+    url: >-
+      https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/sdk/configuration-management
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/evaluations
+  - type: Documentation
+    url: https://docs.agenta.ai/evaluation/create-test-sets
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/testsets
+  - type: Documentation
+    url: https://docs.agenta.ai/observability/overview
+  - type: APIReference
+    url: https://docs.agenta.ai/reference/api/traces
+- aid: agenta:agenta-test-sets-api
+  name: Agenta Test Sets API
+  description: Test datasets — collections of input/output pairs used in evaluations.
+  humanURL: https://docs.agenta.ai/reference/api/list-api-endpoints
+  baseURL: https://cloud.agenta.ai/api
+  tags:
   - Test Sets
   properties:
   - type: OpenAPI

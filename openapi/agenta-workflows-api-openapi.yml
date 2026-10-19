@@ -1,0 +1,5765 @@
+openapi: 3.2.0
+info:
+  title: Agenta Workflows API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Workflows
+  description: Workflow definitions — the runnable pipelines that back an application.
+paths:
+  /workflows/catalog/types/:
+    get:
+      tags:
+      - Workflows
+      summary: List Workflow Catalog Types
+      description: 'List the shared JSON Schema fragments available to workflow schemas.
+
+
+        Workflow input/output schemas reference these via `x-ag-type-ref` (for
+
+        example, `message` or `prompt`). Use this endpoint to discover what
+
+        type keys exist before building a schema.
+
+
+        See: Workflows.'
+      operationId: list_workflow_catalog_types
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCatalogTypesResponse'
+  /workflows/catalog/types/{ag_type}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Workflow Catalog Type
+      description: 'Return the JSON Schema for a single shared type key.
+
+
+        Returns 404 when the `ag_type` is not part of the shipped catalog.
+
+
+        See: Workflows.'
+      operationId: fetch_workflow_catalog_type
+      parameters:
+      - name: ag_type
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Ag Type
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCatalogTypeResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/catalog/harnesses/:
+    get:
+      tags:
+      - Workflows
+      summary: List Workflow Catalog Harnesses
+      description: 'List the agent harness records shipped with the product.
+
+
+        Each record carries the harness `capabilities` (providers, deployments, connection
+
+        modes, model selection, models). A workflow''s harness field references one via
+
+        `x-ag-harness-ref`, resolved against `/catalog/harnesses/{ag_harness}`.
+
+
+        See: Workflows.'
+      operationId: list_workflow_catalog_harnesses
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCatalogHarnessesResponse'
+  /workflows/catalog/harnesses/{ag_harness}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Workflow Catalog Harness
+      description: 'Return a single harness record (with its `capabilities`).
+
+
+        Returns 404 when the `ag_harness` is not part of the shipped catalog.
+
+
+        See: Workflows.'
+      operationId: fetch_workflow_catalog_harness
+      parameters:
+      - name: ag_harness
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Ag Harness
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCatalogHarnessResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/catalog/templates/:
+    get:
+      tags:
+      - Workflows
+      summary: List Workflow Catalog Templates
+      description: 'List workflow blueprints shipped with the product.
+
+
+        Filter by domain with `is_application`, `is_evaluator`, or
+
+        `is_snippet`. Archived templates are hidden unless `include_archived`
+
+        is true. Templates are global and read-only.
+
+
+        See: Workflows.'
+      operationId: list_workflow_catalog_templates
+      parameters:
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      - name: is_application
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+      - name: is_evaluator
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+      - name: is_snippet
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCatalogTemplatesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/catalog/templates/{template_key}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Workflow Catalog Template
+      description: 'Return a single workflow template by its key.
+
+
+        Returns `count=0` when the template is not found. Templates are global
+
+        metadata and are not scoped to a project.
+
+
+        See: Workflows.'
+      operationId: fetch_workflow_catalog_template
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCatalogTemplateResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/catalog/templates/{template_key}/presets/:
+    get:
+      tags:
+      - Workflows
+      summary: List Workflow Catalog Presets
+      description: 'List presets defined against a template.
+
+
+        Presets are named parameter sets that can be committed as the first
+
+        revision of a new variant. Returns an empty list when a template has
+
+        no canned presets.
+
+
+        See: Workflows.'
+      operationId: list_workflow_catalog_presets
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCatalogPresetsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/catalog/templates/{template_key}/presets/{preset_key}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Workflow Catalog Preset
+      description: 'Return a single preset for a template by key.
+
+
+        Returns `count=0` when the preset is not defined.
+
+
+        See: Workflows.'
+      operationId: fetch_workflow_catalog_preset
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      - name: preset_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Preset Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCatalogPresetResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/:
+    post:
+      tags:
+      - Workflows
+      summary: Create Workflow
+      description: 'Create a workflow artifact.
+
+
+        Creates the top-level container only; commit a revision on a variant
+
+        before the workflow can be retrieved or invoked. Use when you need the
+
+        lower-level primitive — pick `/applications/` for serving logic or
+
+        `/evaluators/` for scoring logic.
+
+
+        See: Workflows,
+
+        Versioning.'
+      operationId: create_workflow
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/{workflow_id}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Workflow
+      description: 'Fetch a workflow artifact by ID.
+
+
+        Returns the artifact only — variants and revisions are not included.
+
+        Use `/workflows/variants/query` and `/workflows/revisions/query` for
+
+        the child entities.
+
+
+        See: Workflows.'
+      operationId: fetch_workflow
+      parameters:
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Workflows
+      summary: Edit Workflow
+      description: 'Update artifact-level fields on a workflow.
+
+
+        The `id` in the body must match the path parameter. Only supplied
+
+        fields are modified. Configuration (parameters, URL, schemas) lives on
+
+        revisions — commit a new revision to change those.
+
+
+        See: Workflows,
+
+        Versioning.'
+      operationId: edit_workflow
+      parameters:
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/{workflow_id}/archive:
+    post:
+      tags:
+      - Workflows
+      summary: Archive Workflow
+      description: 'Archive a workflow artifact (soft delete).
+
+
+        Sets `deleted_at` on the workflow and its variants. Archived
+
+        workflows are hidden from queries unless `include_archived=true`.
+
+        Revision IDs remain resolvable so historical traces stay intact.
+
+
+        See: Versioning.'
+      operationId: archive_workflow
+      parameters:
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/{workflow_id}/unarchive:
+    post:
+      tags:
+      - Workflows
+      summary: Unarchive Workflow
+      description: 'Restore a previously archived workflow.
+
+
+        Clears `deleted_at` on the workflow. Archived variants and revisions
+
+        are restored with the workflow.
+
+
+        See: Versioning.'
+      operationId: unarchive_workflow
+      parameters:
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/query:
+    post:
+      tags:
+      - Workflows
+      summary: Query Workflows
+      description: 'Query workflow artifacts with filters and pagination.
+
+
+        Accepts the same filters as query parameters or in the request body;
+
+        body fields win when both are supplied. Results are ordered by
+
+        creation time; pass `windowing.next` back for the following page.
+
+
+        See: Query Pattern.'
+      operationId: query_workflows
+      parameters:
+      - name: workflow_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+      - name: workflow_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Workflow Ids
+      - name: workflow_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+      - name: workflow_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Workflow Slugs
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - name: description
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - name: flags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Flags
+      - name: tags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tags
+      - name: meta
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Meta
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      - name: next
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+      - name: newest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+      - name: oldest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: order
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - ascending
+            - descending
+            type: string
+          - type: 'null'
+          title: Order
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/variants/:
+    post:
+      tags:
+      - Workflows
+      summary: Create Workflow Variant
+      description: 'Create a new variant under an existing workflow.
+
+
+        Variants are branches of an artifact''s history; each maintains its own
+
+        revision log. Variant slugs are unique within the project — reuse of a
+
+        slug already in use returns a 409 conflict.
+
+
+        See: Versioning.'
+      operationId: create_workflow_variant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowVariantCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/variants/{workflow_variant_id}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Workflow Variant
+      description: 'Fetch a workflow variant by ID.
+
+
+        Returns the variant metadata only — use
+
+        `/workflows/revisions/retrieve` or `/workflows/revisions/log` for the
+
+        variant''s revisions.
+
+
+        See: Workflows.'
+      operationId: fetch_workflow_variant
+      parameters:
+      - name: workflow_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Workflows
+      summary: Edit Workflow Variant
+      description: 'Update metadata on a workflow variant.
+
+
+        The `id` in the body must match the path parameter. Revisions on the
+
+        variant are not affected — commit a new revision to change data.
+
+
+        See: Versioning.'
+      operationId: edit_workflow_variant
+      parameters:
+      - name: workflow_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Variant Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowVariantEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/variants/{workflow_variant_id}/archive:
+    post:
+      tags:
+      - Workflows
+      summary: Archive Workflow Variant
+      description: 'Archive a workflow variant.
+
+
+        Soft-deletes the variant and its revisions. Archived variants are
+
+        hidden from queries unless `include_archived=true`. See
+
+        Versioning.'
+      operationId: archive_workflow_variant
+      parameters:
+      - name: workflow_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/variants/{workflow_variant_id}/unarchive:
+    post:
+      tags:
+      - Workflows
+      summary: Unarchive Workflow Variant
+      description: 'Restore a previously archived workflow variant.
+
+
+        Clears `deleted_at` on the variant and its revisions. See
+
+        Versioning.'
+      operationId: unarchive_workflow_variant
+      parameters:
+      - name: workflow_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/variants/query:
+    post:
+      tags:
+      - Workflows
+      summary: Query Workflow Variants
+      description: 'Query workflow variants with filters and pagination.
+
+
+        Scope the query by `workflow_refs` (parent artifact) or
+
+        `workflow_variant_refs` (specific variants). Accepts the same fields
+
+        as query parameters or in the request body.
+
+
+        See: Query Pattern.'
+      operationId: query_workflow_variants
+      parameters:
+      - name: workflow_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+      - name: workflow_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Workflow Ids
+      - name: workflow_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+      - name: workflow_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Workflow Slugs
+      - name: workflow_variant_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+      - name: workflow_variant_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Workflow Variant Ids
+      - name: workflow_variant_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Slug
+      - name: workflow_variant_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Workflow Variant Slugs
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - name: description
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - name: flags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Flags
+      - name: tags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tags
+      - name: meta
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Meta
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      - name: next
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+      - name: newest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+      - name: oldest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: order
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - ascending
+            - descending
+            type: string
+          - type: 'null'
+          title: Order
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowVariantsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/variants/fork:
+    post:
+      tags:
+      - Workflows
+      summary: Fork Workflow Variant
+      operationId: fork_workflow_variant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowVariantForkRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/retrieve:
+    post:
+      tags:
+      - Workflows
+      summary: Retrieve Workflow Revision
+      operationId: retrieve_workflow_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRevisionRetrieveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/deploy:
+    post:
+      tags:
+      - Workflows
+      summary: Deploy Workflow Revision
+      operationId: deploy_workflow_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRevisionDeployRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/:
+    post:
+      tags:
+      - Workflows
+      summary: Create Workflow Revision
+      operationId: create_workflow_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRevisionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/{workflow_revision_id}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Workflow Revision
+      operationId: fetch_workflow_revision
+      parameters:
+      - name: workflow_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Workflows
+      summary: Edit Workflow Revision
+      operationId: edit_workflow_revision
+      parameters:
+      - name: workflow_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Revision Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRevisionEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/{workflow_revision_id}/archive:
+    post:
+      tags:
+      - Workflows
+      summary: Archive Workflow Revision
+      operationId: archive_workflow_revision
+      parameters:
+      - name: workflow_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/{workflow_revision_id}/unarchive:
+    post:
+      tags:
+      - Workflows
+      summary: Unarchive Workflow Revision
+      operationId: unarchive_workflow_revision
+      parameters:
+      - name: workflow_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/query:
+    post:
+      tags:
+      - Workflows
+      summary: Query Workflow Revisions
+      operationId: query_workflow_revisions
+      parameters:
+      - name: workflow_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+      - name: workflow_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Workflow Ids
+      - name: workflow_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+      - name: workflow_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Workflow Slugs
+      - name: workflow_variant_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+      - name: workflow_variant_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Workflow Variant Ids
+      - name: workflow_variant_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Slug
+      - name: workflow_variant_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Workflow Variant Slugs
+      - name: workflow_revision_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Revision Id
+      - name: workflow_revision_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Workflow Revision Ids
+      - name: workflow_revision_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Revision Slug
+      - name: workflow_revision_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Workflow Revision Slugs
+      - name: workflow_revision_version
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Revision Version
+      - name: workflow_revision_versions
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Workflow Revision Versions
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - name: description
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - name: flags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Flags
+      - name: tags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tags
+      - name: meta
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Meta
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      - name: next
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+      - name: newest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+      - name: oldest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: order
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - ascending
+            - descending
+            type: string
+          - type: 'null'
+          title: Order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/WorkflowRevisionQueryRequest'
+              - type: 'null'
+              title: Query Request Body
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/commit:
+    post:
+      tags:
+      - Workflows
+      summary: Commit Workflow Revision
+      description: 'The human and SDK route: no write scope, the caller owns the whole revision.'
+      operationId: commit_workflow_revision
+      parameters:
+      - name: workflow_variant_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRevisionCommitRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/log:
+    post:
+      tags:
+      - Workflows
+      summary: Log Workflow Revisions
+      operationId: log_workflow_revisions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRevisionsLogRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /workflows/revisions/resolve:
+    post:
+      tags:
+      - Workflows
+      summary: Resolve Workflow Revision Endpoint
+      description: 'Resolve embedded references in a workflow revision configuration.
+
+
+        This endpoint:
+
+        1. Fetches the workflow revision
+
+        2. Resolves all @ag.references tokens in the configuration
+
+        3. Returns the revision with resolved configuration + metadata'
+      operationId: resolve_workflow_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRevisionResolveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRevisionResolveResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /agent-templates/validate:
+    post:
+      tags:
+      - Workflows
+      summary: Validate Template
+      operationId: validate_agent_template
+      parameters:
+      - name: project_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateValidateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateValidationResult'
+        '403':
+          description: Forbidden
+        '404':
+          description: Template source not found
+        '422':
+          description: Invalid request
+  /agent-templates/query:
+    post:
+      tags:
+      - Workflows
+      summary: Query Templates
+      operationId: query_agent_templates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/TemplatesQueryRequest'
+              - type: 'null'
+              title: Query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /agent-templates/sources/scan:
+    post:
+      tags:
+      - Workflows
+      summary: Scan Template Source
+      operationId: scan_agent_template_source
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateSourceScanRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateRepositoryScan'
+        '403':
+          description: Forbidden
+        '404':
+          description: Repository or ref not found
+        '422':
+          description: Invalid request
+        '503':
+          description: GitHub unavailable
+  /agent-templates/load:
+    post:
+      tags:
+      - Workflows
+      summary: Load Template
+      operationId: load_agent_template
+      parameters:
+      - name: project_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateLoadRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateLoadResult'
+        '200':
+          description: Idempotent replay
+        '400':
+          description: Idempotency key required
+        '403':
+          description: Forbidden
+        '404':
+          description: Template source not found
+        '409':
+          description: Idempotency conflict
+        '422':
+          description: Invalid package or request
+        '503':
+          description: Load handoff not durable
+  /agent-templates/{key}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Template
+      operationId: fetch_agent_template
+      parameters:
+      - name: key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Key
+      - name: version
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 128
+          - type: 'null'
+          title: Version
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '404':
+          description: Template not found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/workflows/:
+    post:
+      tags:
+      - Workflows
+      summary: Create Simple Workflow
+      operationId: create_simple_workflow
+      parameters:
+      - name: workflow_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleWorkflowCreateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleWorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/workflows/{workflow_id}:
+    get:
+      tags:
+      - Workflows
+      summary: Fetch Simple Workflow
+      operationId: fetch_simple_workflow
+      parameters:
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleWorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Workflows
+      summary: Edit Simple Workflow
+      operationId: edit_simple_workflow
+      parameters:
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleWorkflowEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleWorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/workflows/{workflow_id}/archive:
+    post:
+      tags:
+      - Workflows
+      summary: Archive Simple Workflow
+      operationId: archive_simple_workflow
+      parameters:
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleWorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/workflows/{workflow_id}/unarchive:
+    post:
+      tags:
+      - Workflows
+      summary: Unarchive Simple Workflow
+      operationId: unarchive_simple_workflow
+      parameters:
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Workflow Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleWorkflowResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/workflows/query:
+    post:
+      tags:
+      - Workflows
+      summary: Query Simple Workflows
+      operationId: query_simple_workflows
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleWorkflowQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleWorkflowsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    WorkflowVariantForkRequest:
+      properties:
+        workflow_variant:
+          $ref: '#/components/schemas/WorkflowVariantFork'
+          description: Config for the new variant (slug, name, description, flags).
+        workflow_variant_ref:
+          $ref: '#/components/schemas/Reference'
+          description: Source variant to fork from.
+        workflow_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Pin the fork to this revision; defaults to the source variant's head.
+      type: object
+      required:
+      - workflow_variant
+      - workflow_variant_ref
+      title: WorkflowVariantForkRequest
+    WorkflowRevisionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of revisions in this page.
+          default: 0
+        workflow_revisions:
+          items:
+            $ref: '#/components/schemas/WorkflowRevision-Output'
+          type: array
+          title: Workflow Revisions
+          description: Workflow revisions matching the query, ordered by commit time.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Pagination cursor.
+      type: object
+      title: WorkflowRevisionsResponse
+    WorkflowRevisionsLogRequest:
+      properties:
+        workflow_revisions:
+          $ref: '#/components/schemas/WorkflowRevisionsLog'
+          description: Log query. Supply `workflow_id`, `workflow_variant_id`, or `workflow_revision_id` to scope the log, and an optional `depth`.
+      type: object
+      required:
+      - workflow_revisions
+      title: WorkflowRevisionsLogRequest
+    WorkflowCatalogPresetResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when the preset is returned, `0` when not found.'
+          default: 0
+        preset:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogPreset'
+          - type: 'null'
+          description: Named parameter set defined against a template.
+      type: object
+      title: WorkflowCatalogPresetResponse
+    CatalogAuthor:
+      properties:
+        schema_version:
+          type: integer
+          const: 1
+          title: Schema Version
+        id:
+          type: string
+          pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+          title: Id
+        name:
+          type: string
+          maxLength: 128
+          minLength: 1
+          title: Name
+        bio:
+          type: string
+          maxLength: 2000
+          minLength: 1
+          title: Bio
+        avatar_url:
+          anyOf:
+          - type: string
+            maxLength: 2048
+            pattern: ^(https://\S+|media(/[A-Za-z0-9_-][A-Za-z0-9._-]*)+)$
+          - type: 'null'
+          title: Avatar Url
+        links:
+          items:
+            $ref: '#/components/schemas/CatalogAuthorLink'
+          type: array
+          title: Links
+      additionalProperties: false
+      type: object
+      required:
+      - schema_version
+      - id
+      - name
+      - bio
+      title: CatalogAuthor
+    SessionFileTemplateSource:
+      properties:
+        kind:
+          type: string
+          const: session_file
+          title: Kind
+          default: session_file
+        session_id:
+          type: string
+          maxLength: 256
+          minLength: 1
+          title: Session Id
+        path:
+          type: string
+          maxLength: 1024
+          minLength: 1
+          title: Path
+        pin:
+          anyOf:
+          - $ref: '#/components/schemas/TemplateSourcePin'
+          - type: 'null'
+      additionalProperties: false
+      type: object
+      required:
+      - session_id
+      - path
+      title: SessionFileTemplateSource
+      description: 'A zip in a session''s working directory, such as one an agent wrote in chat.
+
+
+        The file is mutable, so load requires the pin that validation returned and
+
+        rejects bytes that no longer match it.'
+    WorkflowCatalogTypesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of type definitions available.
+          default: 0
+        types:
+          items:
+            $ref: '#/components/schemas/WorkflowCatalogType'
+          type: array
+          title: Types
+          description: Shared JSON Schema fragments shipped with the product.
+      type: object
+      title: WorkflowCatalogTypesResponse
+    WorkflowVariantFork:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowVariantFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: WorkflowVariantFork
+    WorkflowVariantResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a variant is returned, `0` when none matched.'
+          default: 0
+        workflow_variant:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowVariant'
+          - type: 'null'
+          description: The workflow variant.
+      type: object
+      title: WorkflowVariantResponse
+    TemplatesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+        templates:
+          items:
+            $ref: '#/components/schemas/AgentTemplateEntry'
+          type: array
+          title: Templates
+      type: object
+      required:
+      - count
+      - templates
+      title: TemplatesResponse
+    SimpleWorkflow:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflowData-Output'
+          - type: 'null'
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+      type: object
+      title: SimpleWorkflow
+    GitHubTemplateSource:
+      properties:
+        kind:
+          type: string
+          const: github
+          title: Kind
+          default: github
+        repo_url:
+          type: string
+          maxLength: 256
+          title: Repo Url
+        commit:
+          type: string
+          title: Commit
+        path:
+          type: string
+          maxLength: 1024
+          title: Path
+      additionalProperties: false
+      type: object
+      required:
+      - repo_url
+      - commit
+      - path
+      title: GitHubTemplateSource
+      description: 'A package directory in a public GitHub repository at one exact commit.
+
+
+        Branches, tags and abbreviated SHAs are rejected, never resolved: the caller
+
+        resolves a mutable revision before loading, so the backend fetches only
+
+        immutable content.'
+    TemplateResponse:
+      properties:
+        template:
+          $ref: '#/components/schemas/AgentTemplateEntry'
+      type: object
+      required:
+      - template
+      title: TemplateResponse
+    WorkflowRevisionOperation:
+      properties:
+        operation:
+          type: string
+          enum:
+          - set
+          - merge
+          - remove
+          - edit_text
+          - add_item
+          - replace_item
+          - remove_item
+          title: Operation
+        target:
+          items: {}
+          type: array
+          title: Target
+        value:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Value
+        edits:
+          anyOf:
+          - items:
+              additionalProperties:
+                type: string
+              type: object
+            type: array
+          - type: 'null'
+          title: Edits
+        match_mode:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - exact
+          - type: 'null'
+          title: Match Mode
+      additionalProperties: false
+      type: object
+      required:
+      - operation
+      - target
+      title: WorkflowRevisionOperation
+      description: 'One ordered operation. The new delta arm (agent-config-editing, contract 3.2).
+
+
+        ``extra="forbid"`` applies to this NEW model only. The legacy ``set``/``remove`` arm
+
+        stays permissive on purpose: tightening it would reject payloads that shipped
+
+        playbooks send today and that the server has always ignored.'
+    Workflow:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowArtifactFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Workflow
+    SimpleWorkflowQueryRequest:
+      properties:
+        workflow:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflowQuery'
+          - type: 'null'
+          description: Attribute filter on simple workflows (slug, slugs, flags, tags, meta).
+        workflow_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Workflow Refs
+          description: Restrict results to workflows matching these references.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When true, include archived workflows.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor-based pagination controls.
+      type: object
+      title: SimpleWorkflowQueryRequest
+    WorkflowCatalogTemplateResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when the template is returned, `0` when not found.'
+          default: 0
+        template:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogTemplate'
+          - type: 'null'
+          description: Workflow blueprint (key, name, description, flags, default data).
+      type: object
+      title: WorkflowCatalogTemplateResponse
+    ErrorPolicy:
+      type: string
+      enum:
+      - exception
+      - placeholder
+      - keep
+      title: ErrorPolicy
+    WorkflowRevisionResolveRequest:
+      properties:
+        workflow_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Workflow artifact; resolves against its latest revision.
+        workflow_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Workflow variant; resolves against its latest revision.
+        workflow_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Specific workflow revision to resolve.
+        workflow_revision:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevision-Input'
+          - type: 'null'
+          description: Resolve the references embedded in this revision payload directly, without fetching it first.
+        max_depth:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Depth
+          description: Maximum recursive depth for nested `@ag.references`.
+          default: 10
+        max_embeds:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Embeds
+          description: Maximum number of embeds to resolve in one call.
+          default: 100
+        error_policy:
+          anyOf:
+          - $ref: '#/components/schemas/ErrorPolicy'
+          - type: 'null'
+          description: 'How to handle unresolved references: `EXCEPTION` or `IGNORE`.'
+          default: exception
+      type: object
+      title: WorkflowRevisionResolveRequest
+    WorkflowRevisionCommitRequest:
+      properties:
+        workflow_revision:
+          $ref: '#/components/schemas/WorkflowRevisionCommit'
+          description: Revision to append to a variant's history. Requires `workflow_variant_id` and optional `message`; `data` carries the new configuration.
+      type: object
+      required:
+      - workflow_revision
+      title: WorkflowRevisionCommitRequest
+    SkipConnectionChoiceRequest:
+      properties:
+        connection_key:
+          type: string
+          maxLength: 128
+          minLength: 1
+          title: Connection Key
+        kind:
+          type: string
+          const: skip
+          title: Kind
+      additionalProperties: false
+      type: object
+      required:
+      - connection_key
+      - kind
+      title: SkipConnectionChoiceRequest
+    SimpleWorkflowCreate:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflowData-Input'
+          - type: 'null'
+      type: object
+      title: SimpleWorkflowCreate
+    AgentTemplateEntry:
+      properties:
+        key:
+          type: string
+          title: Key
+        source:
+          $ref: '#/components/schemas/InternalTemplateSource'
+        version:
+          type: string
+          title: Version
+        latest:
+          type: string
+          title: Latest
+        versions:
+          items:
+            type: string
+          type: array
+          title: Versions
+        digest:
+          type: string
+          title: Digest
+        name:
+          type: string
+          title: Name
+        summary:
+          type: string
+          title: Summary
+        description:
+          type: string
+          title: Description
+        category:
+          type: string
+          title: Category
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+        author:
+          $ref: '#/components/schemas/CatalogAuthor'
+        initials:
+          type: string
+          title: Initials
+        color:
+          type: string
+          title: Color
+        instructions_summary:
+          type: string
+          title: Instructions Summary
+        trigger:
+          type: string
+          title: Trigger
+        trigger_description:
+          type: string
+          title: Trigger Description
+        seed_message:
+          type: string
+          title: Seed Message
+        builder_message:
+          type: string
+          title: Builder Message
+        model:
+          type: string
+          title: Model
+        tools_summary:
+          type: string
+          title: Tools Summary
+        connections:
+          items:
+            $ref: '#/components/schemas/AgentTemplateConnection'
+          type: array
+          title: Connections
+        example:
+          anyOf:
+          - $ref: '#/components/schemas/CatalogTemplateExample'
+          - type: 'null'
+        media:
+          items:
+            $ref: '#/components/schemas/CatalogMedia'
+          type: array
+          title: Media
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - source
+      - version
+      - latest
+      - versions
+      - digest
+      - name
+      - summary
+      - description
+      - category
+      - tags
+      - author
+      - initials
+      - color
+      - instructions_summary
+      - trigger
+      - trigger_description
+      - seed_message
+      - builder_message
+      - model
+      - tools_summary
+      - connections
+      title: AgentTemplateEntry
+    JsonSchemas-Input:
+      properties:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: JsonSchemas
+    WorkflowCreateRequest:
+      properties:
+        workflow:
+          $ref: '#/components/schemas/WorkflowCreate'
+          description: Workflow artifact to create. Must include a project-unique `slug`; `name`, `description`, `flags`, `tags`, and `meta` are optional.
+      type: object
+      required:
+      - workflow
+      title: WorkflowCreateRequest
+    WorkflowRevisionDelta:
+      properties:
+        set:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Set
+        remove:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Remove
+        operations:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/WorkflowRevisionOperation'
+            type: array
+          - type: 'null'
+          title: Operations
+      type: object
+      title: WorkflowRevisionDelta
+      description: "Delta operations on a workflow revision's data tree.\n\nTwo forms, never mixed (contract 3):\n\n- **legacy** — ``set``: a partial data tree deep-merged onto the base revision's data\n  (nested dicts merge; scalars and lists replace); ``remove``: dotted key paths to\n  delete (e.g. ``parameters.agent.tools``).\n- **ordered** — ``operations``: the seven verbs, applied in array order, all or\n  nothing.\n\nThe engine enforces the exclusivity and every operation rule; this model only carries\nthe shapes.\n\nUnknown keys beside ``set``/``remove``/``operations`` are refused on the ORDERED arm\nonly, so a caller cannot believe it sent an operation modifier the server never saw.\nA pure-legacy envelope keeps its shipped tolerance: the server has always ignored\nstray keys there, and playbooks in the field send them. Neither rule reaches the tree\ninside ``set``, which stays free-form."
+    ResolutionInfo:
+      properties:
+        references_used:
+          items:
+            additionalProperties:
+              $ref: '#/components/schemas/Reference'
+            type: object
+          type: array
+          title: References Used
+        depth_reached:
+          type: integer
+          title: Depth Reached
+        embeds_resolved:
+          type: integer
+          title: Embeds Resolved
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+      type: object
+      required:
+      - references_used
+      - depth_reached
+      - embeds_resolved
+      title: ResolutionInfo
+    TemplateRepositoryScan:
+      properties:
+        repo_url:
+          type: string
+          title: Repo Url
+        commit:
+          type: string
+          title: Commit
+        templates:
+          items:
+            $ref: '#/components/schemas/TemplateRepositoryEntry'
+          type: array
+          title: Templates
+      type: object
+      required:
+      - repo_url
+      - commit
+      - templates
+      title: TemplateRepositoryScan
+    WorkflowEditRequest:
+      properties:
+        workflow:
+          $ref: '#/components/schemas/WorkflowEdit'
+          description: Workflow fields to update. `id` is required and must match the path parameter; only supplied fields are modified.
+      type: object
+      required:
+      - workflow
+      title: WorkflowEditRequest
+    WorkflowRevisionCommit:
+      properties:
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Input'
+          - type: 'null'
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+        delta:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionDelta'
+          - type: 'null'
+        base_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Base Revision Id
+          description: 'The revision this change was built on. Omit it to keep today''s last-write-wins behavior. Send it on a legacy delta and the commit is refused with `409` when the variant''s head has moved since: sending the field is how a caller asks for that check. An ordered delta requires it.'
+      type: object
+      title: WorkflowRevisionCommit
+    WorkflowArtifactFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+      type: object
+      title: WorkflowArtifactFlags
+    TemplateLoadResult:
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+          title: Workflow Id
+        workflow_slug:
+          type: string
+          title: Workflow Slug
+        variant_id:
+          type: string
+          format: uuid
+          title: Variant Id
+        revision_id:
+          type: string
+          format: uuid
+          title: Revision Id
+        session_id:
+          type: string
+          title: Session Id
+        execution_id:
+          type: string
+          title: Execution Id
+        input_id:
+          type: string
+          format: uuid
+          title: Input Id
+        replayed:
+          type: boolean
+          title: Replayed
+      additionalProperties: false
+      type: object
+      required:
+      - workflow_id
+      - workflow_slug
+      - variant_id
+      - revision_id
+      - session_id
+      - execution_id
+      - input_id
+      - replayed
+      title: TemplateLoadResult
+    WorkflowRevisionDeployRequest:
+      properties:
+        workflow_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Workflow artifact to deploy. One of the workflow refs is required.
+        workflow_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Workflow variant to deploy. Resolves to the latest revision of this variant.
+        workflow_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Specific workflow revision to deploy.
+        environment_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Target environment artifact. One of the environment refs is required.
+        environment_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Target environment variant.
+        environment_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Target environment revision.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Reference key to set on the environment revision. Defaults to `<workflow_slug>.revision` when omitted.
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+          description: Commit message recorded on the resulting environment revision.
+      type: object
+      title: WorkflowRevisionDeployRequest
+    UploadTemplateSource:
+      properties:
+        kind:
+          type: string
+          const: upload
+          title: Kind
+          default: upload
+        staging_session_id:
+          type: string
+          maxLength: 256
+          minLength: 1
+          title: Staging Session Id
+        attachment_id:
+          type: string
+          format: uuid
+          title: Attachment Id
+      additionalProperties: false
+      type: object
+      required:
+      - staging_session_id
+      - attachment_id
+      title: UploadTemplateSource
+      description: 'A zip the user uploaded as a staged session attachment.
+
+
+        Attachments are immutable once ready (the row keeps a content digest), so the
+
+        reference itself pins the bytes.'
+    SimpleWorkflowEditRequest:
+      properties:
+        workflow:
+          $ref: '#/components/schemas/SimpleWorkflowEdit'
+          description: Simple-workflow edit payload. Updates artifact-level fields and commits a new revision when `data` changes.
+      type: object
+      required:
+      - workflow
+      title: SimpleWorkflowEditRequest
+    RevisionGrouping:
+      properties:
+        by:
+          type: string
+          enum:
+          - artifact
+          - variant
+          title: By
+        get:
+          type: string
+          const: latest
+          title: Get
+      type: object
+      required:
+      - by
+      - get
+      title: RevisionGrouping
+    WorkflowRevision-Output:
+      properties:
+        workflow_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Slug
+        variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Variant Slug
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Output'
+          - type: 'null'
+      type: object
+      title: WorkflowRevision
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    WorkflowRevisionFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+      type: object
+      title: WorkflowRevisionFlags
+    WorkflowVariantsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of variants in this page.
+          default: 0
+        workflow_variants:
+          items:
+            $ref: '#/components/schemas/WorkflowVariant'
+          type: array
+          title: Workflow Variants
+          description: Workflow variants matching the query.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Pagination cursor.
+      type: object
+      title: WorkflowVariantsResponse
+    CommitWarning:
+      properties:
+        code:
+          type: string
+          title: Code
+        message:
+          type: string
+          title: Message
+        target:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Target
+        operation_index:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Operation Index
+      type: object
+      required:
+      - code
+      - message
+      title: CommitWarning
+      description: 'One thing the caller should know about a commit that still succeeded.
+
+
+        The codes are the engine''s (change-set.md 7.1) plus `no_change`, which the commit
+
+        wrapper owns. `target` carries contract-shaped segments, so a caller can act on the
+
+        warning without parsing its prose.'
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    WorkflowsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of workflows in this page.
+          default: 0
+        workflows:
+          items:
+            $ref: '#/components/schemas/Workflow'
+          type: array
+          title: Workflows
+          description: Workflow artifacts matching the query.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Pagination cursor; pass `windowing.next` back to fetch the following page.
+      type: object
+      title: WorkflowsResponse
+    TemplateRepositoryEntry:
+      properties:
+        path:
+          type: string
+          title: Path
+        name:
+          type: string
+          title: Name
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - path
+      - name
+      title: TemplateRepositoryEntry
+      description: One template package directory found in a repository scan.
+    WorkflowCatalogPreset:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
+          type: string
+          title: Key
+        categories:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Categories
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogFlags'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Output'
+          - type: 'null'
+      type: object
+      required:
+      - key
+      title: WorkflowCatalogPreset
+    WorkflowRevisionRetrieveRequest:
+      properties:
+        workflow_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Workflow artifact to look up. Identifies the artifact by `id` or `slug` (both project-unique). When no variant_ref or revision_ref is provided, returns the latest revision of the workflow's default variant.
+        workflow_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Workflow variant to look up. Identifies the variant by `id` or `slug` (both project-unique). When no revision_ref is provided, returns the latest revision of this variant.
+        workflow_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Workflow revision to look up. `id` alone identifies a revision (project-unique). `slug` alone identifies a revision (project-unique). `version` alone is a per-variant sequence number and is **not** sufficient on its own; it must be combined with a `workflow_variant_ref`. Sending only `version` without a variant ref returns HTTP 400.
+        environment_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Environment artifact backing the deployment to resolve from.
+        environment_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Environment variant backing the deployment to resolve from.
+        environment_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Specific environment revision to resolve from.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Key into the environment revision's reference map. Required when retrieving via environment refs.
+        resolve:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Resolve
+          description: When true, resolve `@ag.references` tokens embedded in the revision configuration before returning it.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When false, an archived workflow, variant, or revision resolves to nothing.
+      type: object
+      title: WorkflowRevisionRetrieveRequest
+      description: 'Request body for `POST /workflows/revisions/retrieve`.
+
+
+        Resolves to a single revision by one or more reference types. Every
+
+        reference supplied must agree with the resolved revision; contradictions
+
+        return HTTP 400. For environment-backed lookup, `key` may be omitted when
+
+        `workflow_ref` is provided, in which case it defaults to
+
+        `<workflow_slug>.revision`.'
+    WorkflowCatalogFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_archived:
+          type: boolean
+          title: Is Archived
+          default: false
+        is_recommended:
+          type: boolean
+          title: Is Recommended
+          default: false
+      type: object
+      title: WorkflowCatalogFlags
+    AgentTemplateConnection:
+      properties:
+        key:
+          type: string
+          title: Key
+        role:
+          type: string
+          title: Role
+        required:
+          type: boolean
+          title: Required
+        primary:
+          $ref: '#/components/schemas/AgentTemplateConnectionOption'
+        alternatives:
+          items:
+            type: string
+          type: array
+          title: Alternatives
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - role
+      - required
+      - primary
+      title: AgentTemplateConnection
+    SimpleWorkflowCreateRequest:
+      properties:
+        workflow:
+          $ref: '#/components/schemas/SimpleWorkflowCreate'
+          description: Simple-workflow create payload. Creates the artifact, a default variant, and an initial revision in one call.
+      type: object
+      required:
+      - workflow
+      title: SimpleWorkflowCreateRequest
+    WorkflowVariantCreateRequest:
+      properties:
+        workflow_variant:
+          $ref: '#/components/schemas/WorkflowVariantCreate'
+          description: Variant to create under an existing workflow. Requires `workflow_id` (the artifact) and a project-unique `slug`.
+      type: object
+      required:
+      - workflow_variant
+      title: WorkflowVariantCreateRequest
+    CatalogAuthorLink:
+      properties:
+        kind:
+          type: string
+          maxLength: 64
+          minLength: 1
+          title: Kind
+        url:
+          type: string
+          maxLength: 2048
+          minLength: 1
+          pattern: ^https://\S+$
+          title: Url
+        label:
+          anyOf:
+          - type: string
+            maxLength: 128
+          - type: 'null'
+          title: Label
+      additionalProperties: false
+      type: object
+      required:
+      - kind
+      - url
+      title: CatalogAuthorLink
+    CatalogTemplateExample:
+      properties:
+        prompt:
+          type: string
+          minLength: 1
+          title: Prompt
+        steps:
+          items:
+            type: string
+          type: array
+          minItems: 1
+          title: Steps
+        reply:
+          type: string
+          minLength: 1
+          title: Reply
+        artifacts:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Artifacts
+        status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+      additionalProperties: false
+      type: object
+      required:
+      - prompt
+      - steps
+      - reply
+      title: CatalogTemplateExample
+    WorkflowRevisionCreate:
+      properties:
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: WorkflowRevisionCreate
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    MCPConnectionChoiceRequest:
+      properties:
+        connection_key:
+          type: string
+          maxLength: 128
+          minLength: 1
+          title: Connection Key
+        kind:
+          type: string
+          const: mcp
+          title: Kind
+        server:
+          type: string
+          maxLength: 128
+          minLength: 1
+          title: Server
+      additionalProperties: false
+      type: object
+      required:
+      - connection_key
+      - kind
+      - server
+      title: MCPConnectionChoiceRequest
+    WorkflowRevisionEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: WorkflowRevisionEdit
+    WorkflowCatalogTemplate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
+          type: string
+          title: Key
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        categories:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Categories
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogFlags'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Output'
+          - type: 'null'
+      type: object
+      required:
+      - key
+      title: WorkflowCatalogTemplate
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    SimpleWorkflowData-Input:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Input'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: SimpleWorkflowData
+    RetrievalInfo:
+      properties:
+        references:
+          additionalProperties:
+            $ref: '#/components/schemas/Reference'
+          type: object
+          title: References
+        selector:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Selector
+      type: object
+      title: RetrievalInfo
+      description: 'References actually used to retrieve a revision.
+
+
+        For direct retrievals, `references` carries the artifact / variant / revision
+
+        that was fetched. For environment-backed retrievals, it additionally carries
+
+        the environment + environment_variant + environment_revision used to look
+
+        the target up, and `selector` is {the key: path} map inside the environment''s
+
+        references map that selected the target.'
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    SimpleWorkflowsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of workflows in the response.
+          default: 0
+        workflows:
+          items:
+            $ref: '#/components/schemas/SimpleWorkflow'
+          type: array
+          title: Workflows
+          description: Workflow artifacts each merged with their resolved variant and revision.
+      type: object
+      title: SimpleWorkflowsResponse
+    WorkflowRevisionQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        slugs:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Slugs
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        authors:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Authors
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        dates:
+          anyOf:
+          - items:
+              type: string
+              format: date-time
+            type: array
+          - type: 'null'
+          title: Dates
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+      type: object
+      title: WorkflowRevisionQuery
+    WorkflowFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+      type: object
+      title: WorkflowFlags
+      description: Legacy full workflow flag set.
+    SimpleWorkflowEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflowData-Input'
+          - type: 'null'
+      type: object
+      title: SimpleWorkflowEdit
+    TemplateSourcePin:
+      properties:
+        version:
+          type: string
+          maxLength: 128
+          minLength: 1
+          title: Version
+        digest:
+          type: string
+          pattern: ^sha256:[0-9a-f]{64}$
+          title: Digest
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - digest
+      title: TemplateSourcePin
+    SimpleWorkflowQueryFlags:
+      properties:
+        is_application:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+        is_evaluator:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+        is_snippet:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
+        is_managed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Managed
+        is_custom:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Custom
+        is_llm:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Llm
+        is_hook:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Hook
+        is_code:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Code
+        is_match:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Match
+        is_feedback:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Feedback
+        is_agent:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Agent
+        is_skill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Skill
+        is_chat:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Chat
+        has_url:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Url
+        has_script:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Script
+        has_handler:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Handler
+        is_static:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Static
+      type: object
+      title: SimpleWorkflowQueryFlags
+    WorkflowRevisionResolveResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a revision is returned, `0` when none matched.'
+          default: 0
+        workflow_revision:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevision-Output'
+          - type: 'null'
+          description: The workflow revision with `@ag.references` replaced by their resolved payloads.
+        resolution_info:
+          anyOf:
+          - $ref: '#/components/schemas/ResolutionInfo'
+          - type: 'null'
+          description: Metadata describing which references were resolved, depth reached, and errors.
+        retrieval_info:
+          anyOf:
+          - $ref: '#/components/schemas/RetrievalInfo'
+          - type: 'null'
+          description: References (artifact / variant / revision) actually used to retrieve this revision.
+      type: object
+      title: WorkflowRevisionResolveResponse
+    CatalogTemplateTool:
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Name
+        description:
+          type: string
+          minLength: 1
+          title: Description
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - description
+      title: CatalogTemplateTool
+    GatewayConnectionChoiceRequest:
+      properties:
+        connection_key:
+          type: string
+          maxLength: 128
+          minLength: 1
+          title: Connection Key
+        kind:
+          type: string
+          const: gateway
+          title: Kind
+        provider:
+          type: string
+          const: composio
+          title: Provider
+        integration:
+          type: string
+          pattern: ^[a-z0-9]+(?:[_-][a-z0-9]+)*$
+          title: Integration
+      additionalProperties: false
+      type: object
+      required:
+      - connection_key
+      - kind
+      - provider
+      - integration
+      title: GatewayConnectionChoiceRequest
+    Reference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Reference
+    WorkflowEdit:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: WorkflowEdit
+    WorkflowCatalogTemplatesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of templates returned.
+          default: 0
+        templates:
+          items:
+            $ref: '#/components/schemas/WorkflowCatalogTemplate'
+          type: array
+          title: Templates
+          description: Workflow blueprints shipped with the product.
+      type: object
+      title: WorkflowCatalogTemplatesResponse
+    WorkflowRevisionEditRequest:
+      properties:
+        workflow_revision:
+          $ref: '#/components/schemas/WorkflowRevisionEdit'
+          description: Revision fields to update (lifecycle metadata only). Data and configuration are immutable — commit a new revision to change them.
+      type: object
+      required:
+      - workflow_revision
+      title: WorkflowRevisionEditRequest
+    TemplateValidationIssue:
+      properties:
+        code:
+          type: string
+          title: Code
+        path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+        field:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Field
+        message:
+          type: string
+          title: Message
+        next_step:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Step
+      additionalProperties: false
+      type: object
+      required:
+      - code
+      - message
+      title: TemplateValidationIssue
+    WorkflowRevisionData-Input:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Input'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: WorkflowRevisionData
+    WorkflowRevisionQueryFlags:
+      properties:
+        is_application:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+        is_evaluator:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+        is_snippet:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
+        is_managed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Managed
+        is_custom:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Custom
+        is_llm:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Llm
+        is_hook:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Hook
+        is_code:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Code
+        is_match:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Match
+        is_feedback:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Feedback
+        is_agent:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Agent
+        is_skill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Skill
+        is_chat:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Chat
+        has_url:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Url
+        has_script:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Script
+        has_handler:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Handler
+        is_static:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Static
+      type: object
+      title: WorkflowRevisionQueryFlags
+    WorkflowResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a workflow is returned, `0` when none matched.'
+          default: 0
+        workflow:
+          anyOf:
+          - $ref: '#/components/schemas/Workflow'
+          - type: 'null'
+          description: The workflow artifact.
+      type: object
+      title: WorkflowResponse
+    TemplatesQueryRequest:
+      properties:
+        search:
+          anyOf:
+          - type: string
+            maxLength: 200
+          - type: 'null'
+          title: Search
+        category:
+          anyOf:
+          - type: string
+            maxLength: 64
+          - type: 'null'
+          title: Category
+        author_id:
+          anyOf:
+          - type: string
+            maxLength: 64
+          - type: 'null'
+          title: Author Id
+      additionalProperties: false
+      type: object
+      title: TemplatesQueryRequest
+    WorkflowVariantCreate:
+      properties:
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: WorkflowVariantCreate
+    WorkflowCatalogHarnessResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a harness record is returned, `0` when not found.'
+          default: 0
+        harness:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogHarness'
+          - type: 'null'
+          description: A harness record referenced by a template's harness field via `x-ag-harness-ref`.
+      type: object
+      title: WorkflowCatalogHarnessResponse
+    SimpleWorkflowQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflowQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        slugs:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Slugs
+      type: object
+      title: SimpleWorkflowQuery
+    TemplateLoadRequest:
+      properties:
+        source:
+          oneOf:
+          - $ref: '#/components/schemas/InternalTemplateSource'
+          - $ref: '#/components/schemas/UploadTemplateSource'
+          - $ref: '#/components/schemas/SessionFileTemplateSource'
+          - $ref: '#/components/schemas/GitHubTemplateSource'
+          title: Source
+        base_revision:
+          $ref: '#/components/schemas/WorkflowRevisionData-Input'
+        ui_build_kit_enabled:
+          type: boolean
+          title: Ui Build Kit Enabled
+          default: false
+        ui_disabled_ops:
+          items:
+            type: string
+          type: array
+          maxItems: 128
+          title: Ui Disabled Ops
+        ui_op_permissions:
+          additionalProperties:
+            type: string
+            enum:
+            - allow
+            - ask
+          type: object
+          maxProperties: 128
+          title: Ui Op Permissions
+        staging_session_id:
+          anyOf:
+          - type: string
+            maxLength: 256
+            minLength: 1
+          - type: 'null'
+          title: Staging Session Id
+        attachment_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          maxItems: 10
+          title: Attachment Ids
+        initial_message:
+          type: string
+          maxLength: 20000
+          minLength: 1
+          title: Initial Message
+        connection_choices:
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/GatewayConnectionChoiceRequest'
+            - $ref: '#/components/schemas/MCPConnectionChoiceRequest'
+            - $ref: '#/components/schemas/SkipConnectionChoiceRequest'
+            discriminator:
+              propertyName: kind
+              mapping:
+                gateway: '#/components/schemas/GatewayConnectionChoiceRequest'
+                mcp: '#/components/schemas/MCPConnectionChoiceRequest'
+                skip: '#/components/schemas/SkipConnectionChoiceRequest'
+          type: array
+          maxItems: 64
+          title: Connection Choices
+      additionalProperties: false
+      type: object
+      required:
+      - source
+      - base_revision
+      - initial_message
+      title: TemplateLoadRequest
+    AgentTemplateConnectionOption:
+      properties:
+        slug:
+          type: string
+          title: Slug
+        scope:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Scope
+        tools:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/CatalogTemplateTool'
+            type: array
+          - type: 'null'
+          title: Tools
+      additionalProperties: false
+      type: object
+      required:
+      - slug
+      title: AgentTemplateConnectionOption
+    WorkflowRevisionCreateRequest:
+      properties:
+        workflow_revision:
+          $ref: '#/components/schemas/WorkflowRevisionCreate'
+          description: Revision to create on an existing variant. The revision is immutable once persisted; to change the payload, commit a new revision.
+      type: object
+      required:
+      - workflow_revision
+      title: WorkflowRevisionCreateRequest
+    WorkflowVariantEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: WorkflowVariantEdit
+    TemplateValidateRequest:
+      properties:
+        source:
+          oneOf:
+          - $ref: '#/components/schemas/InternalTemplateSource'
+          - $ref: '#/components/schemas/UploadTemplateSource'
+          - $ref: '#/components/schemas/SessionFileTemplateSource'
+          - $ref: '#/components/schemas/GitHubTemplateSource'
+          title: Source
+        pin:
+          anyOf:
+          - $ref: '#/components/schemas/TemplateSourcePin'
+          - type: 'null'
+      additionalProperties: false
+      type: object
+      required:
+      - source
+      title: TemplateValidateRequest
+    WorkflowCatalogType:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
+          type: string
+          title: Key
+        json_schema:
+          additionalProperties:
+            $ref: '#/components/schemas/FullJson-Output'
+          type: object
+          title: Json Schema
+      type: object
+      required:
+      - key
+      - json_schema
+      title: WorkflowCatalogType
+    WorkflowVariantEditRequest:
+      properties:
+        workflow_variant:
+          $ref: '#/components/schemas/WorkflowVariantEdit'
+          description: Variant fields to update. `id` is required and must match the path parameter.
+      type: object
+      required:
+      - workflow_variant
+      title: WorkflowVariantEditRequest
+    WorkflowRevisionsLog:
+      properties:
+        workflow_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Revision Id
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        depth:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Depth
+      type: object
+      title: WorkflowRevisionsLog
+    SimpleWorkflowFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+      type: object
+      title: SimpleWorkflowFlags
+    WorkflowCatalogHarness:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
+          type: string
+          title: Key
+        capabilities:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Capabilities
+      type: object
+      required:
+      - key
+      title: WorkflowCatalogHarness
+    JsonSchemas-Output:
+      properties:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: JsonSchemas
+    TemplateSourceScanRequest:
+      properties:
+        repo_url:
+          type: string
+          maxLength: 256
+          title: Repo Url
+      additionalProperties: false
+      type: object
+      required:
+      - repo_url
+      title: TemplateSourceScanRequest
+    WorkflowRevision-Input:
+      properties:
+        workflow_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Slug
+        variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Variant Slug
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Input'
+          - type: 'null'
+      type: object
+      title: WorkflowRevision
+    WorkflowRevisionQueryRequest:
+      properties:
+        workflow_revision:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionQuery'
+          - type: 'null'
+          description: Attribute filter on workflow revisions.
+        workflow_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Workflow Refs
+          description: Scope revisions to workflows matching these references.
+        workflow_variant_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Workflow Variant Refs
+          description: Scope revisions to variants matching these references.
+        workflow_revision_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Workflow Revision Refs
+          description: Restrict results to revisions matching these references (supports `version`).
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When true, include archived revisions.
+        grouping:
+          anyOf:
+          - $ref: '#/components/schemas/RevisionGrouping'
+          - type: 'null'
+          description: Divide matching revisions by artifact or variant and select one revision from each group.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor-based pagination controls.
+      type: object
+      title: WorkflowRevisionQueryRequest
+    WorkflowCatalogTypeResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a type definition is returned, `0` when not found.'
+          default: 0
+        type:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogType'
+          - type: 'null'
+          description: JSON Schema fragment referenced by workflow input/output schemas via `x-ag-type-ref`.
+      type: object
+      title: WorkflowCatalogTypeResponse
+    InternalTemplateSource:
+      properties:
+        kind:
+          type: string
+          const: internal
+          title: Kind
+          default: internal
+        key:
+          type: string
+          pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+          title: Key
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      title: InternalTemplateSource
+    WorkflowVariant:
+      properties:
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowVariantFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: WorkflowVariant
+    WorkflowCatalogHarnessesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of harness records available.
+          default: 0
+        harnesses:
+          items:
+            $ref: '#/components/schemas/WorkflowCatalogHarness'
+          type: array
+          title: Harnesses
+          description: Harness records shipped with the product (each carries its `capabilities`).
+      type: object
+      title: WorkflowCatalogHarnessesResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    WorkflowCreate:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: WorkflowCreate
+    CatalogMedia:
+      properties:
+        kind:
+          type: string
+          enum:
+          - image
+          - video
+          title: Kind
+        url:
+          type: string
+          maxLength: 2048
+          minLength: 1
+          pattern: ^(https://\S+|media(/[A-Za-z0-9_-][A-Za-z0-9._-]*)+)$
+          title: Url
+        alt:
+          type: string
+          maxLength: 500
+          minLength: 1
+          title: Alt
+        caption:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: Caption
+        poster_url:
+          anyOf:
+          - type: string
+            maxLength: 2048
+            pattern: ^(https://\S+|media(/[A-Za-z0-9_-][A-Za-z0-9._-]*)+)$
+          - type: 'null'
+          title: Poster Url
+      additionalProperties: false
+      type: object
+      required:
+      - kind
+      - url
+      - alt
+      title: CatalogMedia
+    TemplateValidationResult:
+      properties:
+        valid:
+          type: boolean
+          title: Valid
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        digest:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Digest
+        supported_schema_versions:
+          items:
+            type: string
+          type: array
+          title: Supported Schema Versions
+        issues:
+          items:
+            $ref: '#/components/schemas/TemplateValidationIssue'
+          type: array
+          title: Issues
+      additionalProperties: false
+      type: object
+      required:
+      - valid
+      - supported_schema_versions
+      title: TemplateValidationResult
+    WorkflowVariantFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+      type: object
+      title: WorkflowVariantFlags
+    SimpleWorkflowData-Output:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: SimpleWorkflowData
+    SimpleWorkflowResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a simple workflow is returned, `0` when none matched.'
+          default: 0
+        workflow:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleWorkflow'
+          - type: 'null'
+          description: Workflow artifact with its resolved variant and revision merged.
+      type: object
+      title: SimpleWorkflowResponse
+    WorkflowRevisionData-Output:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: WorkflowRevisionData
+    WorkflowRevisionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: '`1` when a revision is returned, `0` when none matched.'
+          default: 0
+        workflow_revision:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevision-Output'
+          - type: 'null'
+          description: The workflow revision.
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - committed
+            - no_change
+          - type: 'null'
+          title: Status
+          description: Commit outcome. `no_change` means the change produced the stored configuration, so no revision was created and `workflow_revision` is the current head. Absent on paths that do not run the checked commit; a reader must treat absent as `committed`.
+        warnings:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/CommitWarning'
+            type: array
+          - type: 'null'
+          title: Warnings
+          description: Structured advisories about the commit; never an error.
+        resolution_info:
+          anyOf:
+          - $ref: '#/components/schemas/ResolutionInfo'
+          - type: 'null'
+          description: Reference-resolution metadata; populated when `resolve=true` on retrieve.
+        retrieval_info:
+          anyOf:
+          - $ref: '#/components/schemas/RetrievalInfo'
+          - type: 'null'
+          description: References used to retrieve the top-level revision.
+      type: object
+      title: WorkflowRevisionResponse
+    WorkflowCatalogPresetsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of presets returned.
+          default: 0
+        presets:
+          items:
+            $ref: '#/components/schemas/WorkflowCatalogPreset'
+          type: array
+          title: Presets
+          description: Named parameter sets defined against a template.
+      type: object
+      title: WorkflowCatalogPresetsResponse
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

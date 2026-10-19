@@ -1,56 +1,228 @@
 openapi: 3.2.0
 info:
   title: Agenta Evaluators API
-  description: Agenta is an open-source LLMOps platform for prompt management, LLM evaluation, and LLM observability.
-  termsOfService: https://agenta.ai/terms
+  description: Agenta API
   contact:
-    name: Agenta Support
+    name: Agenta
     url: https://agenta.ai/
     email: team@agenta.ai
-  license:
-    name: MIT
-    url: https://github.com/Agenta-AI/agenta/blob/main/LICENSE
-  version: '1.0'
+  version: 0.1.0
 servers:
-- url: https://cloud.agenta.ai/api
-  description: Agenta Cloud (US)
+- url: /api
 - url: https://eu.cloud.agenta.ai/api
-  description: Agenta Cloud (EU)
 security:
-- ApiKeyAuth: []
+- APIKeyHeader: []
 tags:
 - name: Evaluators
-  description: Configure evaluators used to score variants.
+  description: Evaluator definitions — the metrics and judges used in evaluation runs.
 paths:
-  /evaluators/query:
-    post:
-      operationId: queryEvaluators
+  /evaluators/catalog/types/:
+    get:
       tags:
       - Evaluators
-      summary: List and filter evaluators
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EvaluatorQueryRequest'
+      summary: List Evaluator Catalog Types
+      description: 'List the JSON schema types the evaluator catalog understands.
+
+
+        Types are static metadata shipped with the product. Use this when
+
+        rendering a catalog UI or validating that a template''s schema is
+
+        supported. See the Evaluators guide for how the catalog relates
+
+        to user-owned evaluator artifacts.'
+      operationId: list_evaluator_catalog_types
       responses:
         '200':
-          description: A list of evaluators.
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Evaluator'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /evaluators/:
-    post:
-      operationId: createEvaluator
+                $ref: '#/components/schemas/EvaluatorCatalogTypesResponse'
+  /evaluators/catalog/templates/:
+    get:
       tags:
       - Evaluators
-      summary: Create an evaluator
+      summary: List Evaluator Catalog Templates
+      description: 'List evaluator templates from the catalog.
+
+
+        Templates are blueprints that describe an evaluator''s handler
+
+        URI, JSON schemas, and default configuration. Pass
+
+        `include_archived=true` to include deprecated templates. Use the
+
+        returned `key` with `/catalog/templates/{template_key}/presets/`
+
+        to list its presets.'
+      operationId: list_evaluator_catalog_templates
+      parameters:
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorCatalogTemplatesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/catalog/templates/{template_key}:
+    get:
+      tags:
+      - Evaluators
+      summary: Fetch Evaluator Catalog Template
+      description: 'Fetch one evaluator template by key.
+
+
+        Returns an empty envelope (`count: 0`) when no template matches
+
+        the key. Template keys come from
+
+        `GET /catalog/templates/`.'
+      operationId: fetch_evaluator_catalog_template
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorCatalogTemplateResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/catalog/templates/{template_key}/presets/:
+    get:
+      tags:
+      - Evaluators
+      summary: List Evaluator Catalog Presets
+      description: 'List presets defined against one evaluator template.
+
+
+        A preset is a named set of parameter values pre-filled against
+
+        the template. Use the returned `key` to fetch a specific preset
+
+        via `GET /catalog/templates/{template_key}/presets/{preset_key}`.'
+      operationId: list_evaluator_catalog_presets
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorCatalogPresetsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/catalog/templates/{template_key}/presets/{preset_key}:
+    get:
+      tags:
+      - Evaluators
+      summary: Fetch Evaluator Catalog Preset
+      description: 'Fetch one evaluator preset by template and preset key.
+
+
+        Presets are not separate entities; they are metadata. Use the
+
+        returned preset payload as the starting point when creating a
+
+        new evaluator from a template. See the Evaluators guide.'
+      operationId: fetch_evaluator_catalog_preset
+      parameters:
+      - name: template_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Template Key
+      - name: preset_key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Preset Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorCatalogPresetResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/:
+    post:
+      tags:
+      - Evaluators
+      summary: Create Evaluator
+      description: 'Create an evaluator artifact, its first variant, and its initial revision.
+
+
+        Use this endpoint when you already know you want to manage the
+
+        artifact / variant / revision layers independently. For a
+
+        one-shot "create and forget" call that returns a flat record,
+
+        see `POST /simple/evaluators/`. See the Versioning guide for
+
+        commit semantics.'
+      operationId: create_evaluator
+      parameters:
+      - name: evaluator_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
       requestBody:
         required: true
         content:
@@ -59,137 +231,4522 @@ paths:
               $ref: '#/components/schemas/EvaluatorCreateRequest'
       responses:
         '200':
-          description: The created evaluator.
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Evaluator'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /evaluators/catalog/templates/:
+                $ref: '#/components/schemas/EvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/{evaluator_id}:
     get:
-      operationId: listEvaluatorCatalogTemplates
       tags:
       - Evaluators
-      summary: List the built-in evaluator catalog templates
+      summary: Fetch Evaluator
+      description: 'Fetch an evaluator artifact by id.
+
+
+        Returns the artifact-level record (slug, name, flags, lifecycle)
+
+        without variant or revision data. Use the variant and revision
+
+        endpoints to retrieve those layers.'
+      operationId: fetch_evaluator
+      parameters:
+      - name: evaluator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Id
       responses:
         '200':
-          description: A list of evaluator templates.
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EvaluatorTemplate'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: '#/components/schemas/EvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Evaluators
+      summary: Edit Evaluator
+      description: 'Edit an evaluator artifact''s metadata.
+
+
+        Edits are limited to metadata fields (description, tags, meta).
+
+        Renaming is temporarily disabled and returns 400. To change
+
+        evaluator behavior, commit a new revision on the variant — see
+
+        `/evaluators/revisions/commit`.'
+      operationId: edit_evaluator
+      parameters:
+      - name: evaluator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/{evaluator_id}/archive:
+    post:
+      tags:
+      - Evaluators
+      summary: Archive Evaluator
+      description: 'Soft-delete an evaluator artifact.
+
+
+        Sets `deleted_at` on the evaluator and hides it from subsequent
+
+        `/query` responses unless `include_archived=true`. Revision IDs
+
+        remain resolvable so historical traces stay intact.'
+      operationId: archive_evaluator
+      parameters:
+      - name: evaluator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/{evaluator_id}/unarchive:
+    post:
+      tags:
+      - Evaluators
+      summary: Unarchive Evaluator
+      description: 'Restore a soft-deleted evaluator artifact.
+
+
+        Clears `deleted_at` on the evaluator so it re-appears in `/query`
+
+        responses.'
+      operationId: unarchive_evaluator
+      parameters:
+      - name: evaluator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/query:
+    post:
+      tags:
+      - Evaluators
+      summary: Query Evaluators
+      description: 'Query evaluator artifacts with filters and pagination.
+
+
+        Returns artifact-level records only. The request body follows
+
+        the shared query pattern (filter + refs + windowing). Send `{}`
+
+        to list all evaluators in the project. See the Query Pattern
+
+        guide.'
+      operationId: query_evaluators
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/variants/:
+    post:
+      tags:
+      - Evaluators
+      summary: Create Evaluator Variant
+      description: 'Create a new variant on an existing evaluator.
+
+
+        A variant is a named branch of the evaluator''s history. New
+
+        revisions committed to this variant do not touch other variants.
+
+        See the Versioning guide.'
+      operationId: create_evaluator_variant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorVariantCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/variants/{evaluator_variant_id}:
+    get:
+      tags:
+      - Evaluators
+      summary: Fetch Evaluator Variant
+      description: 'Fetch an evaluator variant by id.
+
+
+        Returns the variant record (slug, flags, lifecycle) without the
+
+        committed revisions. Use `/evaluators/revisions/retrieve` to
+
+        read the variant''s current revision payload.'
+      operationId: fetch_evaluator_variant
+      parameters:
+      - name: evaluator_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Evaluators
+      summary: Edit Evaluator Variant
+      description: 'Edit a variant''s metadata.
+
+
+        Edits only touch variant-level metadata. To change evaluator
+
+        behavior commit a new revision via
+
+        `/evaluators/revisions/commit`.'
+      operationId: edit_evaluator_variant
+      parameters:
+      - name: evaluator_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Variant Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorVariantEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/variants/{evaluator_variant_id}/archive:
+    post:
+      tags:
+      - Evaluators
+      summary: Archive Evaluator Variant
+      description: 'Soft-delete an evaluator variant.
+
+
+        Sets `deleted_at` on the variant. Its revisions stay resolvable
+
+        by id; they are hidden from `/query` unless the caller sets
+
+        `include_archived=true`.'
+      operationId: archive_evaluator_variant
+      parameters:
+      - name: evaluator_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/variants/{evaluator_variant_id}/unarchive:
+    post:
+      tags:
+      - Evaluators
+      summary: Unarchive Evaluator Variant
+      description: Restore a soft-deleted evaluator variant.
+      operationId: unarchive_evaluator_variant
+      parameters:
+      - name: evaluator_variant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Variant Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/variants/query:
+    post:
+      tags:
+      - Evaluators
+      summary: Query Evaluator Variants
+      description: 'Query evaluator variants with filters, reference scoping, and pagination.
+
+
+        Accepts parameters from both the query string and a JSON body;
+
+        the two are merged. Use `evaluator_refs` to scope to one or more
+
+        evaluators, or `evaluator_variant_refs` for specific variants.'
+      operationId: query_evaluator_variants
+      parameters:
+      - name: evaluator_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+      - name: evaluator_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Evaluator Ids
+      - name: evaluator_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evaluator Slug
+      - name: evaluator_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Evaluator Slugs
+      - name: evaluator_variant_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Variant Id
+      - name: evaluator_variant_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Evaluator Variant Ids
+      - name: evaluator_variant_slug
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evaluator Variant Slug
+      - name: evaluator_variant_slugs
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          title: Evaluator Variant Slugs
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - name: description
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - name: flags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Flags
+      - name: tags
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tags
+      - name: meta
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Meta
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+      - name: next
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+      - name: newest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+      - name: oldest
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+      - name: order
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - ascending
+            - descending
+            type: string
+          - type: 'null'
+          title: Order
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorVariantsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/variants/fork:
+    post:
+      tags:
+      - Evaluators
+      summary: Fork Evaluator Variant
+      description: 'Fork an evaluator variant into a new variant.
+
+
+        Creates a new branch whose initial revision is copied from the
+
+        source. Use this to experiment without touching the original.
+
+        The returned variant has a fresh id and slug but inherits
+
+        lineage metadata from its source.'
+      operationId: fork_evaluator_variant
+      parameters:
+      - name: evaluator_variant_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Variant Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorVariantForkRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorVariantResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/retrieve:
+    post:
+      tags:
+      - Evaluators
+      summary: Retrieve Evaluator Revision
+      description: 'Retrieve one evaluator revision, either directly or via an environment key.
+
+
+        Provide one of:
+
+        an evaluator / variant / revision reference (returns that
+
+        revision, or the latest revision on the variant or evaluator),
+
+        or an environment reference plus `key` (returns the revision
+
+        currently pinned to that key). Supplying both forms returns 400.
+
+        Pass `resolve=true` to expand embedded references on the
+
+        returned payload.'
+      operationId: retrieve_evaluator_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorRevisionRetrieveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/deploy:
+    post:
+      tags:
+      - Evaluators
+      summary: Deploy Evaluator Revision
+      description: 'Pin an evaluator revision into an environment revision under a key.
+
+
+        Requires an evaluator ref (`evaluator_ref`,
+
+        `evaluator_variant_ref`, or `evaluator_revision_ref`) and an
+
+        environment ref. When `key` is omitted it defaults to
+
+        `.revision`. The deployment is recorded as a
+
+        new commit on the environment revision. See the Evaluators
+
+        guide for the deployment model.'
+      operationId: deploy_evaluator_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorRevisionDeployRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/:
+    post:
+      tags:
+      - Evaluators
+      summary: Create Evaluator Revision
+      description: 'Create and commit the initial revision for an evaluator variant.
+
+
+        Prefer `/evaluators/revisions/commit` for the standard commit
+
+        flow. This endpoint commits an initial revision with the `initial`
+
+        guard, preventing duplicate initial revisions for the same variant.'
+      operationId: create_evaluator_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorRevisionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/{evaluator_revision_id}:
+    get:
+      tags:
+      - Evaluators
+      summary: Fetch Evaluator Revision
+      description: 'Fetch a specific evaluator revision by id.
+
+
+        Returns the full revision including `data` (handler uri,
+
+        schemas, and parameters). To pick the latest revision on a
+
+        variant without knowing its id, use
+
+        `/evaluators/revisions/retrieve`.'
+      operationId: fetch_evaluator_revision
+      parameters:
+      - name: evaluator_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Evaluators
+      summary: Edit Evaluator Revision
+      description: 'Edit a revision''s metadata.
+
+
+        Revision `data` is immutable once committed. This endpoint is
+
+        for metadata fields only (description, tags, meta). To change
+
+        evaluator behavior, commit a new revision instead.'
+      operationId: edit_evaluator_revision
+      parameters:
+      - name: evaluator_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Revision Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorRevisionEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/{evaluator_revision_id}/archive:
+    post:
+      tags:
+      - Evaluators
+      summary: Archive Evaluator Revision
+      description: 'Soft-delete an evaluator revision.
+
+
+        Archived revisions remain resolvable by id but are excluded from
+
+        revision logs and queries unless `include_archived=true`.'
+      operationId: archive_evaluator_revision
+      parameters:
+      - name: evaluator_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/{evaluator_revision_id}/unarchive:
+    post:
+      tags:
+      - Evaluators
+      summary: Unarchive Evaluator Revision
+      description: Restore a soft-deleted evaluator revision.
+      operationId: unarchive_evaluator_revision
+      parameters:
+      - name: evaluator_revision_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Revision Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/query:
+    post:
+      tags:
+      - Evaluators
+      summary: Query Evaluator Revisions
+      description: 'Query evaluator revisions with filters, reference scoping, and pagination.
+
+
+        Returns revision payloads. Use `evaluator_refs`,
+
+        `evaluator_variant_refs`, or `evaluator_revision_refs` to scope
+
+        the query.'
+      operationId: query_evaluator_revisions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorRevisionQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/commit:
+    post:
+      tags:
+      - Evaluators
+      summary: Commit Evaluator Revision
+      description: 'Commit a new revision on an evaluator variant.
+
+
+        The commit body carries the target `evaluator_variant_id`, an
+
+        optional `message`, and the revision `data` (handler uri,
+
+        schemas, parameters). A committed revision is immutable.'
+      operationId: commit_evaluator_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorRevisionCommitRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/log:
+    post:
+      tags:
+      - Evaluators
+      summary: Log Evaluator Revisions
+      description: 'List the revision log of an evaluator variant.
+
+
+        Returns revisions in commit order. Scope the log by supplying
+
+        an evaluator, variant, or revision reference. Use the retrieve
+
+        endpoint to fetch a specific revision''s full payload.'
+      operationId: log_evaluator_revisions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorRevisionsLogRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /evaluators/revisions/resolve:
+    post:
+      tags:
+      - Evaluators
+      summary: Resolve Evaluator Revision
+      description: 'Resolve embedded references on an evaluator revision''s `data`.
+
+
+        Walks embedded references (for example, references to other
+
+        revisions or to secrets) up to `max_depth` and `max_embeds`.
+
+        The response includes a `resolution_info` block with counts,
+
+        depth reached, and errors according to `error_policy`.'
+      operationId: resolve_evaluator_revision
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluatorRevisionResolveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorRevisionResolveResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluators/:
+    post:
+      tags:
+      - Evaluators
+      summary: Create Simple Evaluator
+      description: 'Create an evaluator via the simple surface.
+
+
+        Creates the artifact, its first variant, and its initial
+
+        revision in one call. Returns the flat evaluator record
+
+        (latest revision merged into `data`). Use this when you do not
+
+        need to manage variants or revisions directly.'
+      operationId: create_simple_evaluator
+      parameters:
+      - name: evaluator_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleEvaluatorCreateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluators/templates:
+    get:
+      tags:
+      - Evaluators
+      summary: List Evaluator Templates
+      description: 'List the legacy built-in evaluator templates.
+
+
+        Returns static evaluator-type definitions shipped with the
+
+        product. Prefer the `/evaluators/catalog/*` endpoints for new
+
+        integrations; this endpoint is kept for older clients. Pass
+
+        `include_archived=true` to include deprecated templates.'
+      operationId: list_evaluator_templates
+      parameters:
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          default: false
+          title: Include Archived
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluatorTemplatesResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluators/{evaluator_id}:
+    get:
+      tags:
+      - Evaluators
+      summary: Fetch Simple Evaluator
+      description: 'Fetch one evaluator via the simple surface.
+
+
+        Returns the flat evaluator record including its current variant
+
+        and revision ids and the merged `data` payload.'
+      operationId: fetch_simple_evaluator
+      parameters:
+      - name: evaluator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Evaluators
+      summary: Edit Simple Evaluator
+      description: 'Edit an evaluator via the simple surface.
+
+
+        Touches metadata and (when `data` is supplied) commits a new
+
+        revision on the evaluator''s variant. Renaming is temporarily
+
+        disabled and returns 400.'
+      operationId: edit_simple_evaluator
+      parameters:
+      - name: evaluator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleEvaluatorEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluators/{evaluator_id}/archive:
+    post:
+      tags:
+      - Evaluators
+      summary: Archive Simple Evaluator
+      description: 'Soft-delete an evaluator via the simple surface.
+
+
+        Archives the underlying artifact. Historical traces that
+
+        reference specific revision ids remain resolvable.'
+      operationId: archive_simple_evaluator
+      parameters:
+      - name: evaluator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluators/{evaluator_id}/unarchive:
+    post:
+      tags:
+      - Evaluators
+      summary: Unarchive Simple Evaluator
+      description: Restore a soft-deleted evaluator via the simple surface.
+      operationId: unarchive_simple_evaluator
+      parameters:
+      - name: evaluator_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Evaluator Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluatorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /simple/evaluators/query:
+    post:
+      tags:
+      - Evaluators
+      summary: Query Simple Evaluators
+      description: 'Query evaluators via the simple surface with filters and pagination.
+
+
+        Returns flat evaluator records (one per artifact with its
+
+        latest variant and revision merged into `data`). Send `{}` to
+
+        list all evaluators in the project. See the Query Pattern
+
+        guide.'
+      operationId: query_simple_evaluators
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleEvaluatorQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleEvaluatorsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    EvaluatorCatalogPresetsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of presets in `presets`.
+          default: 0
+        presets:
+          items:
+            $ref: '#/components/schemas/EvaluatorCatalogPreset'
+          type: array
+          title: Presets
+          description: Named parameter presets defined against a template.
+      type: object
+      title: EvaluatorCatalogPresetsResponse
+      description: Envelope for a list of catalog presets.
     EvaluatorCreateRequest:
+      properties:
+        evaluator:
+          $ref: '#/components/schemas/EvaluatorCreate'
+          description: Evaluator payload (slug, name, flags, data). Slug is required and scoped to the project.
       type: object
       required:
       - evaluator
+      title: EvaluatorCreateRequest
+      description: 'Body for creating an evaluator artifact.
+
+
+        Creating an evaluator also provisions its first variant and its initial
+
+        revision. The evaluator shares the artifact / variant / revision model
+
+        used across versioned resources — see the Versioning guide.'
+    EvaluatorVariantCreateRequest:
       properties:
-        evaluator:
-          type: object
-          required:
-          - slug
-          properties:
-            slug:
-              type: string
-            name:
-              type: string
-            data:
-              type: object
-              additionalProperties: true
-    EvaluatorQueryRequest:
+        evaluator_variant:
+          $ref: '#/components/schemas/EvaluatorVariantCreate'
+          description: Variant payload. Requires the parent `evaluator_id`.
       type: object
+      required:
+      - evaluator_variant
+      title: EvaluatorVariantCreateRequest
+      description: Body for creating a new variant on an existing evaluator.
+    EvaluatorArtifactQueryFlags:
       properties:
-        include_archived:
-          type: boolean
-          default: false
-        windowing:
-          $ref: '#/components/schemas/Windowing'
-    Error:
+        is_application:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+        is_evaluator:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+        is_snippet:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
       type: object
+      title: EvaluatorArtifactQueryFlags
+    EvaluatorResponse:
       properties:
-        detail:
-          oneOf:
-          - type: string
-          - type: object
-    Windowing:
-      type: object
-      description: Cursor / time-window pagination controls.
-      properties:
-        next:
-          type: string
-        limit:
+        count:
           type: integer
-          default: 100
-        oldest:
-          type: string
-          format: date-time
-        newest:
-          type: string
-          format: date-time
-        order:
-          type: string
-          enum:
-          - ascending
-          - descending
-    EvaluatorTemplate:
+          title: Count
+          description: 1 when an evaluator is returned, 0 otherwise.
+          default: 0
+        evaluator:
+          anyOf:
+          - $ref: '#/components/schemas/Evaluator'
+          - type: 'null'
+          description: The evaluator artifact, or null when none matched.
       type: object
+      title: EvaluatorResponse
+      description: Envelope for a single evaluator response.
+    EvaluatorCreate:
       properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: EvaluatorCreate
+    EvaluatorCatalogTypesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of types in `types`.
+          default: 0
+        types:
+          items:
+            $ref: '#/components/schemas/EvaluatorCatalogType'
+          type: array
+          title: Types
+          description: JSON schema types the evaluator catalog understands.
+      type: object
+      title: EvaluatorCatalogTypesResponse
+      description: Envelope for a list of catalog types.
+    EvaluatorCatalogPreset:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
         key:
           type: string
-          example: auto_exact_match
-        name:
-          type: string
-        description:
-          type: string
-        settings_schema:
-          type: object
-          additionalProperties: true
-    Lifecycle:
-      type: object
-      description: Audit metadata attached to most Agenta resources.
-      properties:
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by_id:
-          type: string
-          format: uuid
-        updated_by_id:
-          type: string
-          format: uuid
-    Evaluator:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        name:
-          type: string
+          title: Key
+        categories:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Categories
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogFlags'
+          - type: 'null'
         data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Output'
+          - type: 'null'
+      type: object
+      required:
+      - key
+      title: EvaluatorCatalogPreset
+    WorkflowRevisionOperation:
+      properties:
+        operation:
+          type: string
+          enum:
+          - set
+          - merge
+          - remove
+          - edit_text
+          - add_item
+          - replace_item
+          - remove_item
+          title: Operation
+        target:
+          items: {}
+          type: array
+          title: Target
+        value:
+          anyOf:
+          - {}
+          - type: 'null'
+          title: Value
+        edits:
+          anyOf:
+          - items:
+              additionalProperties:
+                type: string
+              type: object
+            type: array
+          - type: 'null'
+          title: Edits
+        match_mode:
+          anyOf:
+          - type: string
+            enum:
+            - auto
+            - exact
+          - type: 'null'
+          title: Match Mode
+      additionalProperties: false
+      type: object
+      required:
+      - operation
+      - target
+      title: WorkflowRevisionOperation
+      description: 'One ordered operation. The new delta arm (agent-config-editing, contract 3.2).
+
+
+        ``extra="forbid"`` applies to this NEW model only. The legacy ``set``/``remove`` arm
+
+        stays permissive on purpose: tightening it would reject payloads that shipped
+
+        playbooks send today and that the server has always ignored.'
+    EvaluatorArtifactFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+      type: object
+      title: EvaluatorArtifactFlags
+    EvaluatorVariantEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: EvaluatorVariantEdit
+    EvaluatorVariant:
+      properties:
+        evaluator_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evaluator Slug
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        evaluator_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorVariantFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: EvaluatorVariant
+    ErrorPolicy:
+      type: string
+      enum:
+      - exception
+      - placeholder
+      - keep
+      title: ErrorPolicy
+    EvaluatorCatalogTemplatesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of templates in `templates`.
+          default: 0
+        templates:
+          items:
+            $ref: '#/components/schemas/EvaluatorCatalogTemplate'
+          type: array
+          title: Templates
+          description: Evaluator catalog templates (blueprints for creating evaluators).
+      type: object
+      title: EvaluatorCatalogTemplatesResponse
+      description: Envelope for a list of catalog templates.
+    SimpleEvaluatorQueryRequest:
+      properties:
+        evaluator:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluatorQuery'
+          - type: 'null'
+          description: Filter on evaluator attributes (slug, slugs, flags, meta).
+        evaluator_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Evaluator Refs
+          description: Restrict to these evaluators.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When true, include soft-deleted evaluators.
+          default: false
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor-based pagination controls.
+      type: object
+      title: SimpleEvaluatorQueryRequest
+      description: Body for filtering evaluators via the simple surface.
+    SimpleEvaluatorData-Input:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Input'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: SimpleEvaluatorData
+    EvaluatorRevisionResolveRequest:
+      properties:
+        evaluator_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Resolve the latest revision of this evaluator.
+        evaluator_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Resolve the latest revision on this variant.
+        evaluator_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Resolve this specific revision.
+        evaluator_revision:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevision-Input'
+          - type: 'null'
+          description: Resolve the references embedded in this revision payload directly, without fetching it first. Only `data` is used; id and metadata are ignored.
+        max_depth:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Depth
+          description: Maximum recursion depth when following embedded references. Defaults to 10.
+          default: 10
+        max_embeds:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Embeds
+          description: Maximum number of embeds to resolve. Defaults to 100.
+          default: 100
+        error_policy:
+          anyOf:
+          - $ref: '#/components/schemas/ErrorPolicy'
+          - type: 'null'
+          description: How to handle embed-resolution errors (`exception` or `fallback`).
+          default: exception
+      type: object
+      title: EvaluatorRevisionResolveRequest
+      description: Body for resolving embedded references on an evaluator revision's `data`.
+    JsonSchemas-Input:
+      properties:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: JsonSchemas
+    EvaluatorRevisionDeployRequest:
+      properties:
+        evaluator_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Evaluator to deploy (latest revision).
+        evaluator_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Variant to deploy (latest revision on this variant).
+        evaluator_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Specific revision to deploy.
+        environment_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Target environment.
+        environment_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Target environment variant.
+        environment_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Target environment revision.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Named key under which the revision is pinned. Defaults to `<evaluator_slug>.revision`.
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+          description: Commit message stored on the environment revision that records the deployment.
+      type: object
+      title: EvaluatorRevisionDeployRequest
+      description: Body for pinning an evaluator revision into an environment revision under a key.
+    WorkflowRevisionDelta:
+      properties:
+        set:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Set
+        remove:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Remove
+        operations:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/WorkflowRevisionOperation'
+            type: array
+          - type: 'null'
+          title: Operations
+      type: object
+      title: WorkflowRevisionDelta
+      description: "Delta operations on a workflow revision's data tree.\n\nTwo forms, never mixed (contract 3):\n\n- **legacy** — ``set``: a partial data tree deep-merged onto the base revision's data\n  (nested dicts merge; scalars and lists replace); ``remove``: dotted key paths to\n  delete (e.g. ``parameters.agent.tools``).\n- **ordered** — ``operations``: the seven verbs, applied in array order, all or\n  nothing.\n\nThe engine enforces the exclusivity and every operation rule; this model only carries\nthe shapes.\n\nUnknown keys beside ``set``/``remove``/``operations`` are refused on the ORDERED arm\nonly, so a caller cannot believe it sent an operation modifier the server never saw.\nA pure-legacy envelope keeps its shipped tolerance: the server has always ignored\nstray keys there, and playbooks in the field send them. Neither rule reaches the tree\ninside ``set``, which stays free-form."
+    ResolutionInfo:
+      properties:
+        references_used:
+          items:
+            additionalProperties:
+              $ref: '#/components/schemas/Reference'
+            type: object
+          type: array
+          title: References Used
+        depth_reached:
+          type: integer
+          title: Depth Reached
+        embeds_resolved:
+          type: integer
+          title: Embeds Resolved
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+      type: object
+      required:
+      - references_used
+      - depth_reached
+      - embeds_resolved
+      title: ResolutionInfo
+    SimpleEvaluator:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluatorData-Output'
+          - type: 'null'
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+      type: object
+      title: SimpleEvaluator
+    EvaluatorCatalogPresetResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: 1 when a preset is returned, 0 otherwise.
+          default: 0
+        preset:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorCatalogPreset'
+          - type: 'null'
+          description: The catalog preset, or null when none matched.
+      type: object
+      title: EvaluatorCatalogPresetResponse
+      description: Envelope for a single catalog preset.
+    EvaluatorRevisionCreate:
+      properties:
+        evaluator_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        evaluator_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: EvaluatorRevisionCreate
+    EvaluatorVariantFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+      type: object
+      title: EvaluatorVariantFlags
+    SimpleEvaluatorsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of evaluators in `evaluators`.
+          default: 0
+        evaluators:
+          items:
+            $ref: '#/components/schemas/SimpleEvaluator'
+          type: array
+          title: Evaluators
+          description: Matching flat evaluator records.
+      type: object
+      title: SimpleEvaluatorsResponse
+      description: Envelope for a list of simple evaluators.
+    RevisionGrouping:
+      properties:
+        by:
+          type: string
+          enum:
+          - artifact
+          - variant
+          title: By
+        get:
+          type: string
+          const: latest
+          title: Get
+      type: object
+      required:
+      - by
+      - get
+      title: RevisionGrouping
+    EvaluatorRevisionResolveResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: 1 when a revision was resolved, 0 otherwise.
+          default: 0
+        evaluator_revision:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevision-Output'
+          - type: 'null'
+          description: The resolved revision.
+        resolution_info:
+          anyOf:
+          - $ref: '#/components/schemas/ResolutionInfo'
+          - type: 'null'
+          description: Diagnostic information about the resolution pass (depth, embed count, errors).
+        retrieval_info:
+          anyOf:
+          - $ref: '#/components/schemas/RetrievalInfo'
+          - type: 'null'
+          description: References (artifact / variant / revision) actually used to retrieve this revision.
+      type: object
+      title: EvaluatorRevisionResolveResponse
+      description: Envelope for a resolved evaluator revision.
+    EvaluatorRevisionQueryRequest:
+      properties:
+        evaluator_revision:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevisionQuery'
+          - type: 'null'
+          description: Filter on revision attributes.
+        evaluator_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Evaluator Refs
+          description: Restrict to revisions under these evaluators.
+        evaluator_variant_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Evaluator Variant Refs
+          description: Restrict to revisions under these variants.
+        evaluator_revision_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Evaluator Revision Refs
+          description: Restrict to these specific revisions.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When true, include soft-deleted revisions.
+        grouping:
+          anyOf:
+          - $ref: '#/components/schemas/RevisionGrouping'
+          - type: 'null'
+          description: Divide matching revisions by artifact or variant and select one revision from each group.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor-based pagination controls.
+      type: object
+      title: EvaluatorRevisionQueryRequest
+      description: Body for filtering evaluator revisions. Supports scoping to evaluators, variants, or specific revisions.
+    EvaluatorRevisionsLog:
+      properties:
+        evaluator_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Revision Id
+        workflow_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Revision Id
+        evaluator_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        evaluator_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        depth:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Depth
+      type: object
+      title: EvaluatorRevisionsLog
+    EvaluatorVariantsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of variants in `evaluator_variants`.
+          default: 0
+        evaluator_variants:
+          items:
+            $ref: '#/components/schemas/EvaluatorVariant'
+          type: array
+          title: Evaluator Variants
+          description: Matching evaluator variants.
+      type: object
+      title: EvaluatorVariantsResponse
+      description: Envelope for a list of evaluator variants.
+    LabelJson-Input:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Input'
+        type: object
+    EvaluatorRevisionFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+      type: object
+      title: EvaluatorRevisionFlags
+    EvaluatorCatalogTemplateResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: 1 when a template is returned, 0 otherwise.
+          default: 0
+        template:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorCatalogTemplate'
+          - type: 'null'
+          description: The catalog template, or null when none matched.
+      type: object
+      title: EvaluatorCatalogTemplateResponse
+      description: Envelope for a single catalog template.
+    FullJson-Input:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Input'
+        type: array
+      - type: 'null'
+    FullJson-Output:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - additionalProperties:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: object
+      - items:
+          $ref: '#/components/schemas/FullJson-Output'
+        type: array
+      - type: 'null'
+    EvaluatorRevisionRetrieveRequest:
+      properties:
+        evaluator_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Evaluator artifact to look up. Identifies the artifact by `id` or `slug` (both project-unique). When no variant_ref or revision_ref is provided, returns the latest revision of the evaluator's default variant.
+        evaluator_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Evaluator variant to look up. Identifies the variant by `id` or `slug` (both project-unique). When no revision_ref is provided, returns the latest revision of this variant.
+        evaluator_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Evaluator revision to look up. `id` alone identifies a revision (project-unique). `slug` alone identifies a revision (project-unique). `version` alone is a per-variant sequence number and is **not** sufficient on its own; it must be combined with an `evaluator_variant_ref`. Sending only `version` without a variant ref returns HTTP 400.
+        environment_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Environment to resolve through. Requires `key`.
+        environment_variant_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Environment variant to resolve through. Requires `key`.
+        environment_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Specific environment revision to resolve through. Requires `key`.
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Named deployment key inside the environment revision. Required with environment refs.
+        resolve:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Resolve
+          description: When true, resolve embedded references on the returned revision's `data`.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When false, an archived evaluator, variant, or revision resolves to nothing.
+      type: object
+      title: EvaluatorRevisionRetrieveRequest
+      description: 'Body for retrieving one revision, either by direct reference or through an environment key.
+
+
+        Provide an evaluator / variant / revision reference, an environment
+
+        reference (with `key` derived from the evaluator slug by default), or a
+
+        combination of both. Every reference supplied must agree with the
+
+        resolved revision; contradictions return HTTP 400.'
+    EvaluatorRevisionCommit:
+      properties:
+        evaluator_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        evaluator_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevisionData-Input'
+          - type: 'null'
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Revision Id
+        delta:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionDelta'
+          - type: 'null'
+        base_revision_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Base Revision Id
+          description: 'The revision this change was built on. Omit it to keep today''s last-write-wins behavior. Send it on a legacy delta and the commit is refused with `409` when the variant''s head has moved since: sending the field is how a caller asks for that check. An ordered delta requires it.'
+      type: object
+      title: EvaluatorRevisionCommit
+    EvaluatorRevision-Output:
+      properties:
+        evaluator_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evaluator Variant Slug
+        workflow_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Slug
+        evaluator_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evaluator Slug
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        evaluator_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        evaluator_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Variant Slug
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevisionFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevisionData-Output'
+          - type: 'null'
+      type: object
+      title: EvaluatorRevision
+    WorkflowCatalogFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_archived:
+          type: boolean
+          title: Is Archived
+          default: false
+        is_recommended:
+          type: boolean
+          title: Is Recommended
+          default: false
+      type: object
+      title: WorkflowCatalogFlags
+    EvaluatorCatalogType:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
+          type: string
+          title: Key
+        json_schema:
+          additionalProperties:
+            $ref: '#/components/schemas/FullJson-Output'
           type: object
+          title: Json Schema
+      type: object
+      required:
+      - key
+      - json_schema
+      title: EvaluatorCatalogType
+    EvaluatorRevisionData-Output:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: EvaluatorRevisionData
+    EvaluatorCatalogTemplate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        key:
+          type: string
+          title: Key
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        categories:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Categories
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowCatalogFlags'
+          - type: 'null'
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/WorkflowRevisionData-Output'
+          - type: 'null'
+      type: object
+      required:
+      - key
+      title: EvaluatorCatalogTemplate
+    EvaluatorRevisionsLogRequest:
+      properties:
+        evaluator_revisions:
+          $ref: '#/components/schemas/EvaluatorRevisionsLog'
+          description: Log request scoped to an evaluator / variant / revision by id, slug, or version.
+      type: object
+      required:
+      - evaluator_revisions
+      title: EvaluatorRevisionsLogRequest
+      description: Body for listing the revision log of an evaluator variant.
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    EvaluatorEdit:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: EvaluatorEdit
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    EvaluatorRevisionCommitRequest:
+      properties:
+        evaluator_revision:
+          $ref: '#/components/schemas/EvaluatorRevisionCommit'
+          description: Commit payload carrying the `evaluator_variant_id`, optional commit `message`, and the revision `data`.
+      type: object
+      required:
+      - evaluator_revision
+      title: EvaluatorRevisionCommitRequest
+      description: Body for committing a new revision on a variant.
+    EvaluatorQueryRequest:
+      properties:
+        evaluator:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorQuery'
+          - type: 'null'
+          description: Filter on evaluator attributes (flags, tags, meta).
+        evaluator_refs:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Reference'
+            type: array
+          - type: 'null'
+          title: Evaluator Refs
+          description: Restrict the query to these evaluators. Accepts `id` or `slug` per reference.
+        include_archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include Archived
+          description: When true, include soft-deleted evaluators in the response.
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+          description: Cursor-based pagination controls (limit, order, next, newest, oldest).
+      type: object
+      title: EvaluatorQueryRequest
+      description: Body for filtering evaluators. See the Query Pattern guide for field semantics.
+    EvaluatorRevisionsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of revisions in `evaluator_revisions`.
+          default: 0
+        evaluator_revisions:
+          items:
+            $ref: '#/components/schemas/EvaluatorRevision-Output'
+          type: array
+          title: Evaluator Revisions
+          description: Matching evaluator revisions.
+      type: object
+      title: EvaluatorRevisionsResponse
+      description: Envelope for a list of evaluator revisions.
+    RetrievalInfo:
+      properties:
+        references:
+          additionalProperties:
+            $ref: '#/components/schemas/Reference'
+          type: object
+          title: References
+        selector:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Selector
+      type: object
+      title: RetrievalInfo
+      description: 'References actually used to retrieve a revision.
+
+
+        For direct retrievals, `references` carries the artifact / variant / revision
+
+        that was fetched. For environment-backed retrievals, it additionally carries
+
+        the environment + environment_variant + environment_revision used to look
+
+        the target up, and `selector` is {the key: path} map inside the environment''s
+
+        references map that selected the target.'
+    LabelJson-Output:
+      anyOf:
+      - type: boolean
+      - type: string
+      - additionalProperties:
+          $ref: '#/components/schemas/LabelJson-Output'
+        type: object
+    EvaluatorRevisionResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: 1 when a revision is returned, 0 otherwise.
+          default: 0
+        evaluator_revision:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevision-Output'
+          - type: 'null'
+          description: The evaluator revision, or null when none matched.
+        resolution_info:
+          anyOf:
+          - $ref: '#/components/schemas/ResolutionInfo'
+          - type: 'null'
+          description: Embed-resolution metadata. Populated when `resolve=true` was requested.
+        retrieval_info:
+          anyOf:
+          - $ref: '#/components/schemas/RetrievalInfo'
+          - type: 'null'
+          description: References used to retrieve the top-level revision.
+      type: object
+      title: EvaluatorRevisionResponse
+      description: Envelope for a single evaluator revision.
+    EvaluatorRevisionQueryFlags:
+      properties:
+        is_application:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+        is_evaluator:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+        is_snippet:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
+        is_managed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Managed
+        is_custom:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Custom
+        is_llm:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Llm
+        is_hook:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Hook
+        is_code:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Code
+        is_match:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Match
+        is_feedback:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Feedback
+        is_agent:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Agent
+        is_skill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Skill
+        is_chat:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Chat
+        has_url:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Url
+        has_script:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Script
+        has_handler:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Handler
+        is_static:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Static
+      type: object
+      title: EvaluatorRevisionQueryFlags
+    EvaluatorFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+      type: object
+      title: EvaluatorFlags
+      description: Legacy full evaluator flag set.
+    EvaluatorVariantFork:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorVariantFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: EvaluatorVariantFork
+    EvaluatorRevision-Input:
+      properties:
+        evaluator_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evaluator Variant Slug
+        workflow_variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Variant Slug
+        evaluator_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evaluator Slug
+        workflow_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Workflow Slug
+        evaluator_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Variant Id
+        workflow_variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Variant Id
+        evaluator_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        variant_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Variant Slug
+        artifact_slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Artifact Slug
+        variant_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Variant Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevisionFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevisionData-Input'
+          - type: 'null'
+      type: object
+      title: EvaluatorRevision
+    SimpleEvaluatorResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: 1 when an evaluator is returned, 0 otherwise.
+          default: 0
+        evaluator:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluator'
+          - type: 'null'
+          description: The flat evaluator record with latest variant and revision merged into `data`.
+      type: object
+      title: SimpleEvaluatorResponse
+      description: Envelope for a single simple evaluator.
+    SimpleEvaluatorData-Output:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: SimpleEvaluatorData
+    EvaluatorVariantEditRequest:
+      properties:
+        evaluator_variant:
+          $ref: '#/components/schemas/EvaluatorVariantEdit'
+          description: Variant edit payload. Requires the variant `id`.
+      type: object
+      required:
+      - evaluator_variant
+      title: EvaluatorVariantEditRequest
+      description: Body for editing a variant's metadata.
+    SimpleEvaluatorCreateRequest:
+      properties:
+        evaluator:
+          $ref: '#/components/schemas/SimpleEvaluatorCreate'
+          description: Simple evaluator payload (slug, name, flags, and `data` with `uri` + `parameters`).
+      type: object
+      required:
+      - evaluator
+      title: SimpleEvaluatorCreateRequest
+      description: 'Body for creating an evaluator via the simple surface.
+
+
+        Collapses artifact, variant, and first revision into one call. The
+
+        response returns the same flat shape that `/simple/evaluators/query`
+
+        exposes.'
+    Reference:
+      properties:
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Reference
+    EvaluatorRevisionEditRequest:
+      properties:
+        evaluator_revision:
+          $ref: '#/components/schemas/EvaluatorRevisionEdit'
+          description: Revision edit payload. Requires the revision `id`.
+      type: object
+      required:
+      - evaluator_revision
+      title: EvaluatorRevisionEditRequest
+      description: Body for editing a revision's mutable fields (currently limited; payload data is immutable).
+    EvaluatorEditRequest:
+      properties:
+        evaluator:
+          $ref: '#/components/schemas/EvaluatorEdit'
+          description: Evaluator edit payload. Requires the evaluator `id`. Renaming is temporarily disabled.
+      type: object
+      required:
+      - evaluator
+      title: EvaluatorEditRequest
+      description: Body for editing the metadata of an existing evaluator artifact.
+    EvaluatorRevisionCreateRequest:
+      properties:
+        evaluator_revision:
+          $ref: '#/components/schemas/EvaluatorRevisionCreate'
+          description: Revision payload. Requires the parent `evaluator_variant_id` and a `data` object.
+      type: object
+      required:
+      - evaluator_revision
+      title: EvaluatorRevisionCreateRequest
+      description: Body for creating a new revision (commit) on an evaluator variant.
+    EvaluatorVariantResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: 1 when a variant is returned, 0 otherwise.
+          default: 0
+        evaluator_variant:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorVariant'
+          - type: 'null'
+          description: The evaluator variant, or null when none matched.
+      type: object
+      title: EvaluatorVariantResponse
+      description: Envelope for a single evaluator variant.
+    SimpleEvaluatorEditRequest:
+      properties:
+        evaluator:
+          $ref: '#/components/schemas/SimpleEvaluatorEdit'
+          description: Simple evaluator edit payload. Requires the evaluator `id`. Renaming is temporarily disabled.
+      type: object
+      required:
+      - evaluator
+      title: SimpleEvaluatorEditRequest
+      description: Body for editing an evaluator via the simple surface.
+    SimpleEvaluatorEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluatorData-Input'
+          - type: 'null'
+      type: object
+      title: SimpleEvaluatorEdit
+    SimpleEvaluatorFlags:
+      properties:
+        is_application:
+          type: boolean
+          title: Is Application
+          default: false
+        is_evaluator:
+          type: boolean
+          title: Is Evaluator
+          default: false
+        is_snippet:
+          type: boolean
+          title: Is Snippet
+          default: false
+        is_managed:
+          type: boolean
+          title: Is Managed
+          default: false
+        is_custom:
+          type: boolean
+          title: Is Custom
+          default: false
+        is_llm:
+          type: boolean
+          title: Is Llm
+          default: false
+        is_hook:
+          type: boolean
+          title: Is Hook
+          default: false
+        is_code:
+          type: boolean
+          title: Is Code
+          default: false
+        is_match:
+          type: boolean
+          title: Is Match
+          default: false
+        is_feedback:
+          type: boolean
+          title: Is Feedback
+          default: false
+        is_agent:
+          type: boolean
+          title: Is Agent
+          default: false
+        is_skill:
+          type: boolean
+          title: Is Skill
+          default: false
+        is_chat:
+          type: boolean
+          title: Is Chat
+          default: false
+        has_url:
+          type: boolean
+          title: Has Url
+          default: false
+        has_script:
+          type: boolean
+          title: Has Script
+          default: false
+        has_handler:
+          type: boolean
+          title: Has Handler
+          default: false
+        is_static:
+          type: boolean
+          title: Is Static
+          default: false
+      type: object
+      title: SimpleEvaluatorFlags
+    EvaluatorRevisionData-Input:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Input'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: EvaluatorRevisionData
+    Evaluator:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorArtifactFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Output'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: Evaluator
+    SimpleEvaluatorQueryFlags:
+      properties:
+        is_application:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Application
+        is_evaluator:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Evaluator
+        is_snippet:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Snippet
+        is_managed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Managed
+        is_custom:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Custom
+        is_llm:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Llm
+        is_hook:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Hook
+        is_code:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Code
+        is_match:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Match
+        is_feedback:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Feedback
+        is_agent:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Agent
+        is_skill:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Skill
+        is_chat:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Chat
+        has_url:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Url
+        has_script:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Script
+        has_handler:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Has Handler
+        is_static:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Static
+      type: object
+      title: SimpleEvaluatorQueryFlags
+    JsonSchemas-Output:
+      properties:
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+        inputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Inputs
+        outputs:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Outputs
+      type: object
+      title: JsonSchemas
+    SimpleEvaluatorCreate:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        data:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluatorData-Input'
+          - type: 'null'
+      type: object
+      title: SimpleEvaluatorCreate
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    EvaluatorQuery:
+      properties:
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorArtifactQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        slugs:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Slugs
+      type: object
+      title: EvaluatorQuery
+    EvaluatorTemplatesResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of templates in `templates`.
+          default: 0
+        templates:
+          items:
+            $ref: '#/components/schemas/EvaluatorTemplate'
+          type: array
+          title: Templates
+          description: Built-in evaluator templates.
+      type: object
+      title: EvaluatorTemplatesResponse
+      description: Envelope for a list of evaluator templates.
+    SimpleEvaluatorQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/SimpleEvaluatorQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        slugs:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Slugs
+      type: object
+      title: SimpleEvaluatorQuery
+    EvaluatorTemplate:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: Human-readable template name.
+        key:
+          type: string
+          title: Key
+          description: Stable template identifier, used to create evaluators from the template.
+        direct_use:
+          type: boolean
+          title: Direct Use
+          description: Whether the template can be used without further configuration.
+        settings_presets:
+          anyOf:
+          - items:
+              additionalProperties: true
+              type: object
+            type: array
+          - type: 'null'
+          title: Settings Presets
+          description: Preset parameter configurations shipped with the template.
+        settings_template:
           additionalProperties: true
-        lifecycle:
-          $ref: '#/components/schemas/Lifecycle'
-  responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+          type: object
+          title: Settings Template
+          description: JSON Schema describing the template's configurable parameters.
+        outputs_schema:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Outputs Schema
+          description: JSON Schema describing the template's evaluator output shape.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: Template description.
+        oss:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Oss
+          description: True when the template is available in OSS builds.
+          default: false
+        requires_llm_api_keys:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Requires Llm Api Keys
+          description: True when the template calls an LLM provider and requires an API key.
+          default: false
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+          description: Tags for grouping templates.
+        archived:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Archived
+          description: True when the template is deprecated. Hidden unless `include_archived=true`.
+          default: false
+      type: object
+      required:
+      - name
+      - key
+      - direct_use
+      - settings_template
+      title: EvaluatorTemplate
+      description: 'Static evaluator template definition (built-in evaluator types).
+
+
+        Templates are shipped with the product and describe the available
+
+        evaluator types. They are read-only and separate from user-owned
+
+        evaluator artifacts.'
+    EvaluatorsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          description: Number of evaluators in `evaluators`.
+          default: 0
+        evaluators:
+          items:
+            $ref: '#/components/schemas/Evaluator'
+          type: array
+          title: Evaluators
+          description: Matching evaluator artifacts.
+      type: object
+      title: EvaluatorsResponse
+      description: Envelope for a list of evaluators.
+    WorkflowRevisionData-Output:
+      properties:
+        uri:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uri
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        headers:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/Reference'
+            type: object
+          - type: 'null'
+          title: Headers
+        runtime:
+          anyOf:
+          - type: string
+            enum:
+            - python
+            - typescript
+            - javascript
+          - type: 'null'
+          title: Runtime
+        script:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Script
+        schemas:
+          anyOf:
+          - $ref: '#/components/schemas/JsonSchemas-Output'
+          - type: 'null'
+        parameters:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Output'
+            type: object
+          - type: 'null'
+          title: Parameters
+      additionalProperties: false
+      type: object
+      title: WorkflowRevisionData
+    EvaluatorRevisionEdit:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+      type: object
+      title: EvaluatorRevisionEdit
+    EvaluatorRevisionQuery:
+      properties:
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorRevisionQueryFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        slugs:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Slugs
+        author:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Author
+        authors:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Authors
+        date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date
+        dates:
+          anyOf:
+          - items:
+              type: string
+              format: date-time
+            type: array
+          - type: 'null'
+          title: Dates
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+      type: object
+      title: EvaluatorRevisionQuery
+    EvaluatorVariantForkRequest:
+      properties:
+        evaluator_variant:
+          $ref: '#/components/schemas/EvaluatorVariantFork'
+          description: Config for the new variant (slug, name, description, flags).
+        evaluator_variant_ref:
+          $ref: '#/components/schemas/Reference'
+          description: Source variant to fork from.
+        evaluator_revision_ref:
+          anyOf:
+          - $ref: '#/components/schemas/Reference'
+          - type: 'null'
+          description: Pin the fork to this revision; defaults to the source variant's head.
+      type: object
+      required:
+      - evaluator_variant
+      - evaluator_variant_ref
+      title: EvaluatorVariantForkRequest
+    EvaluatorVariantCreate:
+      properties:
+        evaluator_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Evaluator Id
+        workflow_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Workflow Id
+        artifact_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Artifact Id
+        flags:
+          anyOf:
+          - $ref: '#/components/schemas/EvaluatorFlags'
+          - type: 'null'
+        tags:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/LabelJson-Input'
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/FullJson-Input'
+            type: object
+          - type: 'null'
+          title: Meta
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+      type: object
+      title: EvaluatorVariantCreate
   securitySchemes:
-    ApiKeyAuth:
-      type: http
-      scheme: bearer
-      description: 'Agenta API key sent in the Authorization header. Generate keys from the Agenta web app under Settings > API keys. The value is passed as `Authorization: ApiKey <key>` (Bearer-style header credential).'
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

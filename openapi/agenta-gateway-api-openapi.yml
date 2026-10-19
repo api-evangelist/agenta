@@ -1,0 +1,165 @@
+openapi: 3.2.0
+info:
+  title: Agenta Gateway API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Gateway
+paths:
+  /gateways/credentials:
+    post:
+      tags:
+      - Gateway
+      summary: Issue Gateway Credentials
+      description: 'Exchange the caller''s credential for one that only the gateway accepts.
+
+
+        No permission check of its own: the result is strictly weaker than the credential
+
+        that bought it — same tenant scope, same run, fewer routes — so a caller can reach
+
+        nothing here it could not already reach with what it presented.
+
+
+        It does check the switch for the plane the caller named, because minting a credential
+
+        for a plane that will refuse every request is worse than refusing here: the caller
+
+        still has a pre-gateway path at this point and none once the run is under way.
+
+
+        The LLM plane checks the master switch only, not the per-organization rollout. The
+
+        SDK exchanges a credential only after `/resolve` admitted the organization, and two
+
+        API processes may briefly hold different rollout payloads: refusing here then would
+
+        fail the run instead of falling back to the vault. The relay still checks the
+
+        rollout on every call.'
+      operationId: issue_gateway_credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/GatewayCredentialsRequest'
+              - type: 'null'
+              title: Body
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayCredentialsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    GatewayCredentialsResponse:
+      properties:
+        credentials:
+          type: string
+          title: Credentials
+      type: object
+      required:
+      - credentials
+      title: GatewayCredentialsResponse
+      description: The scheme-tagged credential value, used verbatim as ``X-AG-Credentials``.
+    GatewayPlane:
+      type: string
+      enum:
+      - llm
+      - mcp
+      title: GatewayPlane
+    GatewayCredentialsRequest:
+      properties:
+        plane:
+          anyOf:
+          - $ref: '#/components/schemas/GatewayPlane'
+          - type: 'null'
+        session_id:
+          anyOf:
+          - type: string
+            maxLength: 128
+          - type: 'null'
+          title: Session Id
+        agent_id:
+          anyOf:
+          - type: string
+            maxLength: 128
+          - type: 'null'
+          title: Agent Id
+      type: object
+      title: GatewayCredentialsRequest
+      description: 'Optionally, which plane the caller is about to use the credential on.
+
+
+        The exchange itself is plane-agnostic — one credential reaches both data planes — so
+
+        this field exists for one reason: it is the only moment a caller that is about to use
+
+        the MCP gateway talks to the API before it dials. Without it, an SDK asking for a
+
+        credential cannot learn that the MCP plane is switched off until a tool call fails
+
+        mid-run, which is far too late to fall back to dialling the server directly.
+
+
+        Optional, so an older SDK that sends `{}` still gets a credential. That caller then
+
+        meets the refusal on the data plane instead, which is a worse error but not a wrong one.'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

@@ -1,0 +1,12 @@
+{
+ "url": "https://eu.cloud.agenta.ai/api/openapi.json",
+ "final": "https://eu.cloud.agenta.ai/api/openapi.json",
+ "status": 200,
+ "content_type": "application/json",
+ "bytes": 1194644,
+ "sha256": "d684955565c264daf81eef3183869536df1626fb2c6a789916f4922c7d588d4c",
+ "fetched_at": "2026-10-19",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "re-archived: the provider's current document replaced a stale archive (roadmap#793); the old files are in openapi/_superseded/2026-10-19-stale"
+}

@@ -1,0 +1,415 @@
+openapi: 3.2.0
+info:
+  title: Agenta Wallets API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Wallets
+paths:
+  /wallets/summary:
+    get:
+      tags:
+      - Wallets
+      summary: Fetch Summary
+      operationId: fetch_wallet_summary
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletSummaryResponse'
+  /wallets/usage/query:
+    post:
+      tags:
+      - Wallets
+      summary: Query Usage
+      operationId: query_wallet_usage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/WalletUsageQueryRequest'
+              - type: 'null'
+              title: Body
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletUsageResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    WalletUsageSummary:
+      properties:
+        spendable_musd:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Spendable Musd
+        general_balance_musd:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: General Balance Musd
+        floor_musd:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Floor Musd
+        active_credit_total_musd:
+          type: integer
+          title: Active Credit Total Musd
+          default: 0
+        credits:
+          items:
+            $ref: '#/components/schemas/WalletCreditUsage'
+          type: array
+          title: Credits
+      type: object
+      title: WalletUsageSummary
+    WalletUsageResponse:
+      properties:
+        usage:
+          $ref: '#/components/schemas/WalletUsage'
+      type: object
+      required:
+      - usage
+      title: WalletUsageResponse
+    WalletUsage:
+      properties:
+        start:
+          type: string
+          format: date-time
+          title: Start
+        end:
+          type: string
+          format: date-time
+          title: End
+        truncated:
+          type: boolean
+          title: Truncated
+          default: false
+        days:
+          items:
+            $ref: '#/components/schemas/WalletUsageDay'
+          type: array
+          title: Days
+        sessions:
+          items:
+            $ref: '#/components/schemas/WalletUsageSession'
+          type: array
+          title: Sessions
+      type: object
+      required:
+      - start
+      - end
+      title: WalletUsage
+    WalletUsageSession:
+      properties:
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        agent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+        agent_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Name
+        user_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: User Id
+        user_email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Email
+        started_at:
+          type: string
+          format: date-time
+          title: Started At
+        last_at:
+          type: string
+          format: date-time
+          title: Last At
+        amount_musd:
+          type: integer
+          title: Amount Musd
+        charge_count:
+          type: integer
+          title: Charge Count
+        charges:
+          items:
+            $ref: '#/components/schemas/WalletUsageCharge'
+          type: array
+          title: Charges
+      type: object
+      required:
+      - started_at
+      - last_at
+      - amount_musd
+      - charge_count
+      title: WalletUsageSession
+    WalletUsageQueryRequest:
+      properties:
+        start:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start
+        end:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: End
+      type: object
+      title: WalletUsageQueryRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    WalletUsageDay:
+      properties:
+        day:
+          type: string
+          format: date
+          title: Day
+        category:
+          type: string
+          title: Category
+        amount_musd:
+          type: integer
+          title: Amount Musd
+        charge_count:
+          type: integer
+          title: Charge Count
+      type: object
+      required:
+      - day
+      - category
+      - amount_musd
+      - charge_count
+      title: WalletUsageDay
+    WalletUsageCharge:
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        category:
+          type: string
+          title: Category
+        resource_key:
+          type: string
+          title: Resource Key
+        model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Model
+        provider:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider
+        amount_musd:
+          type: integer
+          title: Amount Musd
+        pricing_version:
+          type: string
+          title: Pricing Version
+        measurement_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Measurement Id
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        input_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Input Tokens
+        output_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Output Tokens
+        cache_read_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cache Read Tokens
+        cache_write_tokens:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cache Write Tokens
+        request_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Request Count
+        sandbox_seconds:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Sandbox Seconds
+        vcpu:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Vcpu
+        memory_gib:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Memory Gib
+        action:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Action
+        unit:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Unit
+        quantity:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Quantity
+      type: object
+      required:
+      - created_at
+      - category
+      - resource_key
+      - amount_musd
+      - pricing_version
+      title: WalletUsageCharge
+    WalletSummaryResponse:
+      properties:
+        summary:
+          $ref: '#/components/schemas/WalletUsageSummary'
+        mode:
+          type: string
+          title: Mode
+      type: object
+      required:
+      - summary
+      - mode
+      title: WalletSummaryResponse
+    WalletCreditUsage:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        credit_kind:
+          type: string
+          title: Credit Kind
+        amount_musd:
+          type: integer
+          title: Amount Musd
+        remaining_musd:
+          type: integer
+          title: Remaining Musd
+        priority:
+          type: integer
+          title: Priority
+        start_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start Time
+        end_time:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: End Time
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+      type: object
+      required:
+      - id
+      - credit_kind
+      - amount_musd
+      - remaining_musd
+      - priority
+      title: WalletCreditUsage
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

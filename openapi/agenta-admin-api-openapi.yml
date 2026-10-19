@@ -1,0 +1,2136 @@
+openapi: 3.2.0
+info:
+  title: Agenta Admin API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Admin
+  description: Internal administration endpoints — restricted to platform operators.
+paths:
+  /admin/accounts/:
+    post:
+      tags:
+      - Admin
+      summary: Create accounts
+      operationId: create_accounts_admin_accounts__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminAccountsCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Admin
+      summary: Delete accounts
+      operationId: delete_accounts_admin_accounts__delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminAccountsDelete'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/:
+    post:
+      tags:
+      - Admin
+      summary: Create simple accounts
+      operationId: create_simple_accounts_admin_simple_accounts__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSimpleAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Admin
+      summary: Delete simple accounts
+      operationId: delete_simple_accounts_admin_simple_accounts__delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsDelete'
+        required: true
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/users/:
+    post:
+      tags:
+      - Admin
+      summary: Create users
+      operationId: create_user_admin_simple_accounts_users__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsUsersCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/users/{user_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete user
+      operationId: delete_user_admin_simple_accounts_users__user_id__delete
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/users/identities/:
+    post:
+      tags:
+      - Admin
+      summary: Create user identities
+      operationId: create_user_identity_admin_simple_accounts_users_identities__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsUsersIdentitiesCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/users/{user_id}/identities/{identity_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete user identity
+      operationId: delete_user_identity_admin_simple_accounts_users__user_id__identities__identity_id__delete
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: User Id
+      - name: identity_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Identity Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/organizations/:
+    post:
+      tags:
+      - Admin
+      summary: Create organizations
+      operationId: create_organization_admin_simple_accounts_organizations__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsOrganizationsCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/organizations/{organization_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete organization
+      operationId: delete_organization_admin_simple_accounts_organizations__organization_id__delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/organizations/memberships/:
+    post:
+      tags:
+      - Admin
+      summary: Create organization memberships
+      operationId: create_organization_membership_admin_simple_accounts_organizations_memberships__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsOrganizationsMembershipsCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/organizations/{organization_id}/memberships/{membership_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete organization membership
+      operationId: delete_organization_membership_admin_simple_accounts_organizations__organization_id__memberships__membership_id__delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Organization Id
+      - name: membership_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Membership Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/workspaces/:
+    post:
+      tags:
+      - Admin
+      summary: Create workspaces
+      operationId: create_workspace_admin_simple_accounts_workspaces__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsWorkspacesCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/workspaces/{workspace_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete workspace
+      operationId: delete_workspace_admin_simple_accounts_workspaces__workspace_id__delete
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/workspaces/memberships/:
+    post:
+      tags:
+      - Admin
+      summary: Create workspace memberships
+      operationId: create_workspace_membership_admin_simple_accounts_workspaces_memberships__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsWorkspacesMembershipsCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/workspaces/{workspace_id}/memberships/{membership_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete workspace membership
+      operationId: delete_workspace_membership_admin_simple_accounts_workspaces__workspace_id__memberships__membership_id__delete
+      parameters:
+      - name: workspace_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Workspace Id
+      - name: membership_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Membership Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/projects/:
+    post:
+      tags:
+      - Admin
+      summary: Create projects
+      operationId: create_project_admin_simple_accounts_projects__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsProjectsCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/projects/{project_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete project
+      operationId: delete_project_admin_simple_accounts_projects__project_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/projects/memberships/:
+    post:
+      tags:
+      - Admin
+      summary: Create project memberships
+      operationId: create_project_membership_admin_simple_accounts_projects_memberships__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsProjectsMembershipsCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/projects/{project_id}/memberships/{membership_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete project membership
+      operationId: delete_project_membership_admin_simple_accounts_projects__project_id__memberships__membership_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Project Id
+      - name: membership_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Membership Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/api-keys/:
+    post:
+      tags:
+      - Admin
+      summary: Create API keys
+      operationId: create_api_key_admin_simple_accounts_api_keys__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsApiKeysCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/api-keys/{api_key_id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete API key
+      operationId: delete_api_key_admin_simple_accounts_api_keys__api_key_id__delete
+      parameters:
+      - name: api_key_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Api Key Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/reset-password:
+    post:
+      tags:
+      - Admin
+      summary: Reset user password
+      operationId: reset_password_admin_simple_accounts_reset_password_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsUsersResetPassword'
+        required: true
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /admin/simple/accounts/transfer-ownership:
+    post:
+      tags:
+      - Admin
+      summary: Transfer organization ownership
+      operationId: transfer_ownership_admin_simple_accounts_transfer_ownership_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSimpleAccountsOrganizationsTransferOwnership'
+        required: true
+      responses:
+        '204':
+          description: Successful Response
+        '200':
+          description: Partial transfer — some orgs could not be transferred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSimpleAccountsOrganizationsTransferOwnershipResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AdminApiKeyResponse:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        prefix:
+          type: string
+          title: Prefix
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        project_id:
+          type: string
+          title: Project Id
+        user_id:
+          type: string
+          title: User Id
+        expires_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Expires At
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        revoked_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Revoked At
+        value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Value
+        returned_once:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Returned Once
+      type: object
+      required:
+      - prefix
+      - project_id
+      - user_id
+      title: AdminApiKeyResponse
+    AdminUserIdentityRead:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        user_id:
+          type: string
+          title: User Id
+        method:
+          type: string
+          title: Method
+        subject:
+          type: string
+          title: Subject
+        domain:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        status:
+          type: string
+          enum:
+          - created
+          - linked
+          - pending_confirmation
+          - skipped
+          - failed
+          title: Status
+          default: created
+        verified:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Verified
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+      type: object
+      required:
+      - user_id
+      - method
+      - subject
+      title: AdminUserIdentityRead
+    AdminSimpleAccountsProjectsCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        project:
+          $ref: '#/components/schemas/AdminProjectCreate'
+      type: object
+      required:
+      - project
+      title: AdminSimpleAccountsProjectsCreate
+    AdminOrganizationRead:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        owner_user_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Owner User Id
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+      type: object
+      required:
+      - id
+      - name
+      title: AdminOrganizationRead
+    AdminSimpleAccountDeleteEntry:
+      properties:
+        user:
+          $ref: '#/components/schemas/EntityRef'
+      type: object
+      required:
+      - user
+      title: AdminSimpleAccountDeleteEntry
+      description: 'One account entry in a batch simple-accounts delete request.
+
+
+        Identifies the account by its user (typically by id).'
+    AdminDeletedEntity:
+      properties:
+        id:
+          type: string
+          title: Id
+        ref:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ref
+      type: object
+      required:
+      - id
+      title: AdminDeletedEntity
+    AdminSimpleAccountsOrganizationsCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        organization:
+          $ref: '#/components/schemas/AdminOrganizationCreate'
+        owner:
+          anyOf:
+          - $ref: '#/components/schemas/AdminUserCreate'
+          - type: 'null'
+      type: object
+      required:
+      - organization
+      title: AdminSimpleAccountsOrganizationsCreate
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    AdminProjectMembershipCreate:
+      properties:
+        project_ref:
+          $ref: '#/components/schemas/EntityRef'
+        user_ref:
+          $ref: '#/components/schemas/EntityRef'
+        role:
+          type: string
+          title: Role
+      type: object
+      required:
+      - project_ref
+      - user_ref
+      - role
+      title: AdminProjectMembershipCreate
+    AdminStructuredError:
+      properties:
+        code:
+          type: string
+          title: Code
+        message:
+          type: string
+          title: Message
+        details:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Details
+      type: object
+      required:
+      - code
+      - message
+      title: AdminStructuredError
+    AdminSimpleAccountCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        user:
+          $ref: '#/components/schemas/AdminUserCreate'
+        user_identities:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminUserIdentityCreate'
+            type: array
+          - type: 'null'
+          title: User Identities
+        organization:
+          anyOf:
+          - $ref: '#/components/schemas/AdminOrganizationCreate'
+          - type: 'null'
+        workspace:
+          anyOf:
+          - $ref: '#/components/schemas/AdminWorkspaceCreate'
+          - type: 'null'
+        project:
+          anyOf:
+          - $ref: '#/components/schemas/AdminProjectCreate'
+          - type: 'null'
+        organization_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminOrganizationMembershipCreate'
+            type: array
+          - type: 'null'
+          title: Organization Memberships
+        workspace_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminWorkspaceMembershipCreate'
+            type: array
+          - type: 'null'
+          title: Workspace Memberships
+        project_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminProjectMembershipCreate'
+            type: array
+          - type: 'null'
+          title: Project Memberships
+        api_keys:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminApiKeyCreate'
+            type: array
+          - type: 'null'
+          title: Api Keys
+        subscription:
+          anyOf:
+          - $ref: '#/components/schemas/AdminSubscriptionCreate'
+          - type: 'null'
+      type: object
+      required:
+      - user
+      title: AdminSimpleAccountCreate
+      description: One account entry in a batch simple-accounts create request.
+    AdminSimpleAccountRead:
+      properties:
+        user:
+          anyOf:
+          - $ref: '#/components/schemas/AdminUserRead'
+          - type: 'null'
+        user_identities:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminUserIdentityRead'
+            type: array
+          - type: 'null'
+          title: User Identities
+        organizations:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminOrganizationRead'
+            type: object
+          - type: 'null'
+          title: Organizations
+        workspaces:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminWorkspaceRead'
+            type: object
+          - type: 'null'
+          title: Workspaces
+        projects:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminProjectRead'
+            type: object
+          - type: 'null'
+          title: Projects
+        organization_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminOrganizationMembershipRead'
+            type: array
+          - type: 'null'
+          title: Organization Memberships
+        workspace_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminWorkspaceMembershipRead'
+            type: array
+          - type: 'null'
+          title: Workspace Memberships
+        project_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminProjectMembershipRead'
+            type: array
+          - type: 'null'
+          title: Project Memberships
+        subscriptions:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminSubscriptionRead'
+            type: object
+          - type: 'null'
+          title: Subscriptions
+        api_keys:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Api Keys
+      type: object
+      title: AdminSimpleAccountRead
+      description: 'Per-account entry in the simple-accounts response.
+
+
+        ``user`` is a flat object (there is always exactly one per account).
+
+        ``organizations``, ``workspaces``, ``projects`` are named dicts (keys match
+
+        the ref keys used internally, e.g. "org", "wrk", "prj").
+
+        ``api_keys`` maps ref names to raw key values (plain strings, not DTOs).'
+    AdminAccountsResponse:
+      properties:
+        accounts:
+          items:
+            $ref: '#/components/schemas/AdminAccountRead'
+          type: array
+          title: Accounts
+          default: []
+        errors:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminStructuredError'
+            type: array
+          - type: 'null'
+          title: Errors
+      type: object
+      title: AdminAccountsResponse
+    AdminSimpleAccountsOrganizationsTransferOwnership:
+      properties:
+        organizations:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/EntityRef'
+            type: object
+          - type: 'null'
+          title: Organizations
+        users:
+          additionalProperties:
+            $ref: '#/components/schemas/EntityRef'
+          type: object
+          title: Users
+        include_workspaces:
+          anyOf:
+          - type: string
+            const: all
+          - items:
+              type: string
+            type: array
+          title: Include Workspaces
+          default: all
+        include_projects:
+          anyOf:
+          - type: string
+            const: all
+          - items:
+              type: string
+            type: array
+          title: Include Projects
+          default: all
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        recovery:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Recovery
+      type: object
+      required:
+      - users
+      title: AdminSimpleAccountsOrganizationsTransferOwnership
+    AdminSimpleAccountsResponse:
+      properties:
+        accounts:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminSimpleAccountRead'
+          type: object
+          title: Accounts
+          default: {}
+        errors:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminStructuredError'
+            type: array
+          - type: 'null'
+          title: Errors
+      type: object
+      title: AdminSimpleAccountsResponse
+    AdminOrganizationMembershipCreate:
+      properties:
+        organization_ref:
+          $ref: '#/components/schemas/EntityRef'
+        user_ref:
+          $ref: '#/components/schemas/EntityRef'
+        role:
+          type: string
+          title: Role
+      type: object
+      required:
+      - organization_ref
+      - user_ref
+      - role
+      title: AdminOrganizationMembershipCreate
+    AdminDeleteResponse:
+      properties:
+        dry_run:
+          type: boolean
+          title: Dry Run
+          default: false
+        deleted:
+          $ref: '#/components/schemas/AdminDeletedEntities'
+          default: {}
+        skipped:
+          anyOf:
+          - $ref: '#/components/schemas/AdminDeletedEntities'
+          - type: 'null'
+        errors:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminStructuredError'
+            type: array
+          - type: 'null'
+          title: Errors
+      type: object
+      title: AdminDeleteResponse
+    AdminSimpleAccountsOrganizationsTransferOwnershipResponse:
+      properties:
+        transferred:
+          items:
+            type: string
+          type: array
+          title: Transferred
+          default: []
+        errors:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminStructuredError'
+            type: array
+          - type: 'null'
+          title: Errors
+      type: object
+      title: AdminSimpleAccountsOrganizationsTransferOwnershipResponse
+    AdminWorkspaceMembershipCreate:
+      properties:
+        workspace_ref:
+          $ref: '#/components/schemas/EntityRef'
+        user_ref:
+          $ref: '#/components/schemas/EntityRef'
+        role:
+          type: string
+          title: Role
+      type: object
+      required:
+      - workspace_ref
+      - user_ref
+      - role
+      title: AdminWorkspaceMembershipCreate
+    AdminAccountsDelete:
+      properties:
+        target:
+          $ref: '#/components/schemas/AdminAccountsDeleteTarget'
+        dry_run:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Dry Run
+          default: true
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        confirm:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Confirm
+      type: object
+      required:
+      - target
+      title: AdminAccountsDelete
+    AdminUserIdentityCreate:
+      properties:
+        user_ref:
+          anyOf:
+          - $ref: '#/components/schemas/EntityRef'
+          - type: 'null'
+        method:
+          type: string
+          title: Method
+        subject:
+          type: string
+          title: Subject
+        domain:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        password:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Password
+        verified:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Verified
+        provider_user_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Provider User Id
+        claims:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Claims
+      type: object
+      required:
+      - method
+      - subject
+      title: AdminUserIdentityCreate
+    EntityRef:
+      properties:
+        ref:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ref
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+      type: object
+      title: EntityRef
+      description: 'Polymorphic reference that can point to a request-local key, an
+
+        existing persisted ID, a stable slug, or an email address.
+
+        Exactly one field must be set.'
+    AdminSimpleAccountsUsersCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        user:
+          $ref: '#/components/schemas/AdminUserCreate'
+      type: object
+      required:
+      - user
+      title: AdminSimpleAccountsUsersCreate
+    AdminOrganizationCreate:
+      properties:
+        name:
+          type: string
+          title: Name
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        owner_user_ref:
+          anyOf:
+          - $ref: '#/components/schemas/EntityRef'
+          - type: 'null'
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+      type: object
+      required:
+      - name
+      title: AdminOrganizationCreate
+    AdminWorkspaceCreate:
+      properties:
+        name:
+          type: string
+          title: Name
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        organization_ref:
+          $ref: '#/components/schemas/EntityRef'
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+      type: object
+      required:
+      - name
+      - organization_ref
+      title: AdminWorkspaceCreate
+    AdminAccountsCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        users:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminUserCreate'
+            type: object
+          - type: 'null'
+          title: Users
+        user_identities:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminUserIdentityCreate'
+            type: object
+          - type: 'null'
+          title: User Identities
+        organizations:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminOrganizationCreate'
+            type: object
+          - type: 'null'
+          title: Organizations
+        workspaces:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminWorkspaceCreate'
+            type: object
+          - type: 'null'
+          title: Workspaces
+        projects:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminProjectCreate'
+            type: object
+          - type: 'null'
+          title: Projects
+        organization_memberships:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminOrganizationMembershipCreate'
+            type: object
+          - type: 'null'
+          title: Organization Memberships
+        workspace_memberships:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminWorkspaceMembershipCreate'
+            type: object
+          - type: 'null'
+          title: Workspace Memberships
+        project_memberships:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminProjectMembershipCreate'
+            type: object
+          - type: 'null'
+          title: Project Memberships
+        api_keys:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminApiKeyCreate'
+            type: object
+          - type: 'null'
+          title: Api Keys
+        subscriptions:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminSubscriptionCreate'
+            type: object
+          - type: 'null'
+          title: Subscriptions
+      type: object
+      title: AdminAccountsCreate
+    AdminSimpleAccountsUsersResetPassword:
+      properties:
+        user_identities:
+          items:
+            $ref: '#/components/schemas/AdminUserIdentityCreate'
+          type: array
+          title: User Identities
+      type: object
+      required:
+      - user_identities
+      title: AdminSimpleAccountsUsersResetPassword
+    AdminSimpleAccountsUsersIdentitiesCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        user_ref:
+          $ref: '#/components/schemas/EntityRef'
+        user_identity:
+          $ref: '#/components/schemas/AdminUserIdentityCreate'
+      type: object
+      required:
+      - user_ref
+      - user_identity
+      title: AdminSimpleAccountsUsersIdentitiesCreate
+    AdminAccountRead:
+      properties:
+        users:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminUserRead'
+          type: object
+          title: Users
+          default: {}
+        user_identities:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminUserIdentityRead'
+          type: object
+          title: User Identities
+          default: {}
+        organizations:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminOrganizationRead'
+          type: object
+          title: Organizations
+          default: {}
+        workspaces:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminWorkspaceRead'
+          type: object
+          title: Workspaces
+          default: {}
+        projects:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminProjectRead'
+          type: object
+          title: Projects
+          default: {}
+        organization_memberships:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminOrganizationMembershipRead'
+          type: object
+          title: Organization Memberships
+          default: {}
+        workspace_memberships:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminWorkspaceMembershipRead'
+          type: object
+          title: Workspace Memberships
+          default: {}
+        project_memberships:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminProjectMembershipRead'
+          type: object
+          title: Project Memberships
+          default: {}
+        subscriptions:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminSubscriptionRead'
+            type: object
+          - type: 'null'
+          title: Subscriptions
+        api_keys:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/AdminApiKeyResponse'
+            type: object
+          - type: 'null'
+          title: Api Keys
+      type: object
+      title: AdminAccountRead
+      description: Per-account projection in the full graph response (plural entity maps).
+    AdminProjectCreate:
+      properties:
+        name:
+          type: string
+          title: Name
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        organization_ref:
+          $ref: '#/components/schemas/EntityRef'
+        workspace_ref:
+          $ref: '#/components/schemas/EntityRef'
+        is_default:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Default
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+      type: object
+      required:
+      - name
+      - organization_ref
+      - workspace_ref
+      title: AdminProjectCreate
+    AdminAccountCreateOptions:
+      properties:
+        dry_run:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Dry Run
+          default: false
+        idempotency_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency Key
+        create_identities:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Create Identities
+        create_api_keys:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Create Api Keys
+        return_api_keys:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Return Api Keys
+        seed_defaults:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Seed Defaults
+          default: true
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      title: AdminAccountCreateOptions
+    AdminAccountsDeleteTarget:
+      properties:
+        user_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: User Ids
+        user_emails:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: User Emails
+        organization_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Organization Ids
+        workspace_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Workspace Ids
+        project_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Project Ids
+      type: object
+      title: AdminAccountsDeleteTarget
+    AdminSimpleAccountsOrganizationsMembershipsCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        membership:
+          $ref: '#/components/schemas/AdminOrganizationMembershipCreate'
+      type: object
+      required:
+      - membership
+      title: AdminSimpleAccountsOrganizationsMembershipsCreate
+    AdminDeletedEntities:
+      properties:
+        users:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: Users
+        user_identities:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: User Identities
+        organizations:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: Organizations
+        workspaces:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: Workspaces
+        projects:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: Projects
+        organization_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: Organization Memberships
+        workspace_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: Workspace Memberships
+        project_memberships:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: Project Memberships
+        api_keys:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AdminDeletedEntity'
+            type: array
+          - type: 'null'
+          title: Api Keys
+      type: object
+      title: AdminDeletedEntities
+    AdminSimpleAccountsWorkspacesMembershipsCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        membership:
+          $ref: '#/components/schemas/AdminWorkspaceMembershipCreate'
+      type: object
+      required:
+      - membership
+      title: AdminSimpleAccountsWorkspacesMembershipsCreate
+    AdminSimpleAccountsCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        accounts:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminSimpleAccountCreate'
+          type: object
+          title: Accounts
+      type: object
+      required:
+      - accounts
+      title: AdminSimpleAccountsCreate
+    AdminSimpleAccountsApiKeysCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        api_key:
+          $ref: '#/components/schemas/AdminApiKeyCreate'
+      type: object
+      required:
+      - api_key
+      title: AdminSimpleAccountsApiKeysCreate
+    AdminUserCreate:
+      properties:
+        email:
+          type: string
+          title: Email
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        is_admin:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Admin
+        is_root:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Root
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+      type: object
+      required:
+      - email
+      title: AdminUserCreate
+    AdminWorkspaceMembershipRead:
+      properties:
+        id:
+          type: string
+          title: Id
+        workspace_id:
+          type: string
+          title: Workspace Id
+        user_id:
+          type: string
+          title: User Id
+        role:
+          type: string
+          title: Role
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+      type: object
+      required:
+      - id
+      - workspace_id
+      - user_id
+      - role
+      title: AdminWorkspaceMembershipRead
+    AdminOrganizationMembershipRead:
+      properties:
+        id:
+          type: string
+          title: Id
+        organization_id:
+          type: string
+          title: Organization Id
+        user_id:
+          type: string
+          title: User Id
+        role:
+          type: string
+          title: Role
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+      type: object
+      required:
+      - id
+      - organization_id
+      - user_id
+      - role
+      title: AdminOrganizationMembershipRead
+    AdminWorkspaceRead:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        organization_id:
+          type: string
+          title: Organization Id
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+      type: object
+      required:
+      - id
+      - name
+      - organization_id
+      title: AdminWorkspaceRead
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    AdminUserRead:
+      properties:
+        id:
+          type: string
+          title: Id
+        uid:
+          type: string
+          title: Uid
+        email:
+          type: string
+          title: Email
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        is_admin:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Admin
+        is_root:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Root
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+      type: object
+      required:
+      - id
+      - uid
+      - email
+      title: AdminUserRead
+    AdminProjectMembershipRead:
+      properties:
+        id:
+          type: string
+          title: Id
+        project_id:
+          type: string
+          title: Project Id
+        user_id:
+          type: string
+          title: User Id
+        role:
+          type: string
+          title: Role
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+      type: object
+      required:
+      - id
+      - project_id
+      - user_id
+      - role
+      title: AdminProjectMembershipRead
+    AdminSimpleAccountsWorkspacesCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        workspace:
+          $ref: '#/components/schemas/AdminWorkspaceCreate'
+      type: object
+      required:
+      - workspace
+      title: AdminSimpleAccountsWorkspacesCreate
+    AdminSimpleAccountsDelete:
+      properties:
+        accounts:
+          additionalProperties:
+            $ref: '#/components/schemas/AdminSimpleAccountDeleteEntry'
+          type: object
+          title: Accounts
+        dry_run:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Dry Run
+          default: false
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        confirm:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Confirm
+      type: object
+      required:
+      - accounts
+      title: AdminSimpleAccountsDelete
+    AdminApiKeyCreate:
+      properties:
+        project_ref:
+          $ref: '#/components/schemas/EntityRef'
+        user_ref:
+          $ref: '#/components/schemas/EntityRef'
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        expires_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Expires At
+      type: object
+      required:
+      - project_ref
+      - user_ref
+      title: AdminApiKeyCreate
+    AdminSubscriptionCreate:
+      properties:
+        plan:
+          type: string
+          title: Plan
+      type: object
+      required:
+      - plan
+      title: AdminSubscriptionCreate
+    AdminSimpleAccountsProjectsMembershipsCreate:
+      properties:
+        options:
+          anyOf:
+          - $ref: '#/components/schemas/AdminAccountCreateOptions'
+          - type: 'null'
+        membership:
+          $ref: '#/components/schemas/AdminProjectMembershipCreate'
+      type: object
+      required:
+      - membership
+      title: AdminSimpleAccountsProjectsMembershipsCreate
+    AdminProjectRead:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        organization_id:
+          type: string
+          title: Organization Id
+        workspace_id:
+          type: string
+          title: Workspace Id
+        is_default:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Default
+        created_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+        metadata:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Metadata
+      type: object
+      required:
+      - id
+      - name
+      - organization_id
+      - workspace_id
+      title: AdminProjectRead
+    AdminSubscriptionRead:
+      properties:
+        plan:
+          type: string
+          title: Plan
+        active:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Active
+      type: object
+      required:
+      - plan
+      title: AdminSubscriptionRead
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

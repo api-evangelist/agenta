@@ -1,0 +1,180 @@
+openapi: 3.2.0
+info:
+  title: Agenta Keys API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Keys
+  description: Create and revoke API keys used to authenticate programmatic requests.
+paths:
+  /keys:
+    get:
+      tags:
+      - Keys
+      summary: List Api Keys
+      description: 'List all API keys associated with the authenticated user.
+
+
+        Args:
+
+        request (Request): The incoming request object.
+
+
+        Returns:
+
+        List[ListAPIKeysResponse]: A list of API Keys associated with the user.'
+      operationId: list_api_keys
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ListAPIKeysResponse'
+                type: array
+                title: Response List Api Keys
+    post:
+      tags:
+      - Keys
+      summary: Create Api Key
+      description: 'Creates an API key for a user.
+
+
+        Args:
+
+        request (Request): The request object containing the user ID in the request state.
+
+
+        Returns:
+
+        str: The created API key.'
+      operationId: create_api_key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: string
+                title: Response Create Api Key
+  /keys/{key_prefix}:
+    delete:
+      tags:
+      - Keys
+      summary: Delete Api Key
+      description: 'Delete an API key with the given key prefix for the authenticated user.
+
+
+        Args:
+
+        key_prefix (str): The prefix of the API key to be deleted.
+
+        request (Request): The incoming request object.
+
+
+        Returns:
+
+        dict: A dictionary containing a success message upon successful deletion.
+
+
+        Raises:
+
+        HTTPException: If the API key is not found or does not belong to the user.'
+      operationId: delete_api_key
+      parameters:
+      - name: key_prefix
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Key Prefix
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Delete Api Key
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ListAPIKeysResponse:
+      properties:
+        prefix:
+          type: string
+          title: Prefix
+        created_at:
+          type: string
+          title: Created At
+        last_used_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Used At
+        expiration_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Expiration Date
+      type: object
+      required:
+      - prefix
+      - created_at
+      title: ListAPIKeysResponse
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header

@@ -1,0 +1,1226 @@
+openapi: 3.2.0
+info:
+  title: Agenta Mounts API
+  description: Agenta API
+  contact:
+    name: Agenta
+    url: https://agenta.ai/
+    email: team@agenta.ai
+  version: 0.1.0
+servers:
+- url: /api
+- url: https://eu.cloud.agenta.ai/api
+security:
+- APIKeyHeader: []
+tags:
+- name: Mounts
+  description: Durable object-store mounts for agent working directories.
+paths:
+  /mounts/:
+    post:
+      tags:
+      - Mounts
+      summary: Create Mount
+      operationId: create_mount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MountCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/query:
+    post:
+      tags:
+      - Mounts
+      summary: Query Mounts
+      operationId: query_mounts
+      parameters:
+      - name: session_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+      - name: agent_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Id
+      - name: include_archived
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Include Archived
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MountQueryRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/agents/sign:
+    post:
+      tags:
+      - Mounts
+      summary: Sign Agent Mount Credentials
+      operationId: sign_agent_mount_credentials
+      parameters:
+      - name: artifact_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Artifact Id
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+          default: default
+          title: Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountCredentialsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/agents/query:
+    post:
+      tags:
+      - Mounts
+      summary: Query Agent Mount
+      operationId: query_agent_mount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentMountQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}:
+    get:
+      tags:
+      - Mounts
+      summary: Fetch Mount
+      operationId: fetch_mount
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Mounts
+      summary: Edit Mount
+      operationId: edit_mount
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MountEditRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}/sign:
+    post:
+      tags:
+      - Mounts
+      summary: Sign Mount Credentials
+      operationId: sign_mount_credentials
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountCredentialsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/files/export:
+    post:
+      tags:
+      - Mounts
+      summary: Export Mount Files
+      operationId: export_mount_files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MountArchiveRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}/archive:
+    post:
+      tags:
+      - Mounts
+      summary: Archive Mount
+      operationId: archive_mount
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}/unarchive:
+    post:
+      tags:
+      - Mounts
+      summary: Unarchive Mount
+      operationId: unarchive_mount
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}/apps/scope:
+    post:
+      tags:
+      - Mounts
+      summary: Mint App Scope Token
+      description: 'Issue a folder-scoped token for a running HTML app.
+
+
+        The browser asks for one when the person grants an app access, then attaches it to every
+
+        bridge call so the server can refuse a path outside the folder. It only ever narrows what
+
+        the caller already has, so minting is gated on the level being asked for: read-write needs
+
+        EDIT_MOUNTS, exactly as the write itself does.'
+      operationId: mint_app_scope_token
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppScopeRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppScopeResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}/files/folder:
+    post:
+      tags:
+      - Mounts
+      summary: Create Folder
+      operationId: create_mount_folder
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountFolderCreatedResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}/files/upload:
+    post:
+      tags:
+      - Mounts
+      summary: Upload Mount File
+      operationId: upload_mount_file
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      - name: path
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_mount_file'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountFileWrittenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}/files/download:
+    get:
+      tags:
+      - Mounts
+      summary: Download Mount File
+      operationId: download_mount_file
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /mounts/{mount_id}/files:
+    get:
+      tags:
+      - Mounts
+      summary: Get Mount Files
+      operationId: get_mount_files
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      - name: path
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+      - name: read
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Read
+      - name: order
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - recent
+            - name
+            - path
+            type: string
+          - type: 'null'
+          title: Order
+      - name: limit
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            minimum: 0
+          - type: 'null'
+          title: Limit
+      - name: depth
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 1
+            minimum: 1
+          - type: 'null'
+          title: Depth
+      - name: with_counts
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: With Counts
+      - name: git_aware
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Git Aware
+      - name: include_gitignored
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Include Gitignored
+      - name: x-agenta-app-scope
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Agenta-App-Scope
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '413':
+          description: The `read` file is too large to return as text; download it from `/mounts/{mount_id}/files/download` instead.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Mounts
+      summary: Write Mount File
+      operationId: write_mount_file
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Path
+      - name: if-match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: if-none-match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-None-Match
+      - name: x-agenta-app-scope
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Agenta-App-Scope
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountFileWrittenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+    delete:
+      tags:
+      - Mounts
+      summary: Delete Mount File
+      operationId: delete_mount_file
+      parameters:
+      - name: mount_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mount Id
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Path
+      - name: if-match
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: If-Match
+      - name: x-agenta-app-scope
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Agenta-App-Scope
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountFileDeletedResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    MountEdit:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        flags:
+          $ref: '#/components/schemas/MountFlags'
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+      type: object
+      title: MountEdit
+    Windowing:
+      properties:
+        newest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Newest
+        oldest:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Oldest
+        next:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Next
+        limit:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Limit
+        order:
+          anyOf:
+          - type: string
+            enum:
+            - ascending
+            - descending
+          - type: 'null'
+          title: Order
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+        rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rate
+      type: object
+      title: Windowing
+    MountCredentialsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        mount:
+          anyOf:
+          - $ref: '#/components/schemas/Mount'
+          - type: 'null'
+        credentials:
+          anyOf:
+          - $ref: '#/components/schemas/MountCredentials'
+          - type: 'null'
+      type: object
+      title: MountCredentialsResponse
+    AppScopeRequest:
+      properties:
+        dir:
+          type: string
+          title: Dir
+        level:
+          type: string
+          enum:
+          - read
+          - read-write
+          title: Level
+          default: read
+      type: object
+      required:
+      - dir
+      title: AppScopeRequest
+      description: Ask for a folder-scoped token for one app. `dir` is mount-relative.
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    MountCredentials:
+      properties:
+        endpoint:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Endpoint
+        region:
+          type: string
+          title: Region
+          default: us-east-1
+        bucket:
+          type: string
+          title: Bucket
+        prefix:
+          type: string
+          title: Prefix
+        access_key:
+          type: string
+          title: Access Key
+        secret_key:
+          type: string
+          title: Secret Key
+        session_token:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Token
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+      type: object
+      required:
+      - bucket
+      - prefix
+      - access_key
+      - secret_key
+      title: MountCredentials
+      description: 'Short-lived, prefix-scoped credentials for a single mount.
+
+
+        Signed API-side from the store''s STS endpoint; the master key never leaves the
+
+        API. Scoped to `<bucket>/<project_id>/<mount_id>/*` and expires within minutes,
+
+        so a leak grants only this mount''s prefix for a short window.'
+    MountFileWrittenResponse:
+      properties:
+        path:
+          type: string
+          title: Path
+        size:
+          type: integer
+          title: Size
+          default: 0
+        etag:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Etag
+      type: object
+      required:
+      - path
+      title: MountFileWrittenResponse
+    Mount:
+      properties:
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        deleted_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deleted At
+        created_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By Id
+        updated_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Updated By Id
+        deleted_by_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Deleted By Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        agent_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Id
+        purpose:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Purpose
+        data:
+          $ref: '#/components/schemas/MountData'
+        flags:
+          $ref: '#/components/schemas/MountFlags'
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+      type: object
+      required:
+      - project_id
+      title: Mount
+    MountResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        mount:
+          anyOf:
+          - $ref: '#/components/schemas/Mount'
+          - type: 'null'
+      type: object
+      title: MountResponse
+    MountCreateRequest:
+      properties:
+        mount:
+          $ref: '#/components/schemas/PublicMountCreate'
+      type: object
+      required:
+      - mount
+      title: MountCreateRequest
+    AgentMountQueryRequest:
+      properties:
+        artifact_id:
+          type: string
+          title: Artifact Id
+        name:
+          type: string
+          title: Name
+          default: default
+      type: object
+      required:
+      - artifact_id
+      title: AgentMountQueryRequest
+    MountQuery:
+      properties:
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        agent_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Id
+        include_archived:
+          type: boolean
+          title: Include Archived
+          default: false
+      type: object
+      title: MountQuery
+    MountData:
+      properties: {}
+      type: object
+      title: MountData
+    Body_upload_mount_file:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_upload_mount_file
+    MountArchiveRequest:
+      properties:
+        mounts:
+          items:
+            $ref: '#/components/schemas/ArchiveMount'
+          type: array
+          title: Mounts
+        filename:
+          type: string
+          title: Filename
+          default: files.zip
+      type: object
+      title: MountArchiveRequest
+      description: Zip several mounts into ONE archive (the drive folds cwd + agent-files into one tree).
+    MountFlags:
+      properties: {}
+      type: object
+      title: MountFlags
+    MountQueryRequest:
+      properties:
+        mount:
+          anyOf:
+          - $ref: '#/components/schemas/MountQuery'
+          - type: 'null'
+        windowing:
+          anyOf:
+          - $ref: '#/components/schemas/Windowing'
+          - type: 'null'
+      type: object
+      title: MountQueryRequest
+    AppScopeResponse:
+      properties:
+        token:
+          type: string
+          title: Token
+        expires_at:
+          type: integer
+          title: Expires At
+        dir:
+          type: string
+          title: Dir
+        level:
+          type: string
+          title: Level
+      type: object
+      required:
+      - token
+      - expires_at
+      - dir
+      - level
+      title: AppScopeResponse
+      description: The token the browser attaches to every bridge call, and when it stops working.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    PublicMountCreate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        slug:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Slug
+        session_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Session Id
+        agent_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Agent Id
+        flags:
+          $ref: '#/components/schemas/MountFlags'
+        tags:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tags
+        meta:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Meta
+      additionalProperties: false
+      type: object
+      title: PublicMountCreate
+    MountFolderCreatedResponse:
+      properties:
+        path:
+          type: string
+          title: Path
+      type: object
+      required:
+      - path
+      title: MountFolderCreatedResponse
+    MountEditRequest:
+      properties:
+        mount:
+          $ref: '#/components/schemas/MountEdit'
+      type: object
+      required:
+      - mount
+      title: MountEditRequest
+    ArchiveMount:
+      properties:
+        mount_id:
+          type: string
+          format: uuid
+          title: Mount Id
+        prefix:
+          type: string
+          title: Prefix
+          default: ''
+        path:
+          type: string
+          title: Path
+          default: ''
+      type: object
+      required:
+      - mount_id
+      title: ArchiveMount
+      description: 'One mount to include in an archive. `path` scopes it to a folder within the mount ("" = the
+
+        whole mount); `prefix` places its files under `prefix/` in the zip (the folded drive layout).'
+    MountFileDeletedResponse:
+      properties:
+        deleted:
+          type: string
+          title: Deleted
+        count:
+          type: integer
+          title: Count
+          default: 0
+      type: object
+      required:
+      - deleted
+      title: MountFileDeletedResponse
+    MountsResponse:
+      properties:
+        count:
+          type: integer
+          title: Count
+          default: 0
+        mounts:
+          items:
+            $ref: '#/components/schemas/Mount'
+          type: array
+          title: Mounts
+      type: object
+      title: MountsResponse
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      name: Authorization
+      in: header
