@@ -1,4 +1,4 @@
-# Agenta (agenta)
+# Agenta
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,139 +66,129 @@
 
 Agenta is an open-source LLMOps platform that brings prompt management, LLM evaluation, and LLM observability together in one place. Its cloud REST API at https://cloud.agenta.ai/api exposes apps and variants, versioned prompt configurations, evaluations and evaluators, testsets, and OpenTelemetry-based tracing, all authenticated with a Bearer API key. The platform is MIT licensed and can be self-hosted or used via Agenta Cloud.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/agenta/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/agenta/refs/heads/main/apis.yml)
+**Areas:** Artificial Intelligence · LLMOps · Prompt Management · LLM Evaluation · Observability
 
-## Tags
+## Agenta on APIs.io
 
-- AI
-- LLMOps
-- Prompt Management
-- LLM Evaluation
-- Observability
+Everything profiled for Agenta is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/agenta/](https://apis.io/providers/agenta/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (7)
 
-- **Created:** 2026-06-20
-- **Modified:** 2026-06-20
+- [Agenta Applications API](https://apis.io/apis/agenta/agenta-applications-api/) — Create and manage LLM applications and their variants.
+- [Agenta Configs API](https://apis.io/apis/agenta/agenta-configs-api/) — Fetch and deploy versioned prompt configurations.
+- [Agenta Evaluations API](https://apis.io/apis/agenta/agenta-evaluations-api/) — Run evaluations of variants against testsets.
+- [Agenta Evaluators API](https://apis.io/apis/agenta/agenta-evaluators-api/) — Configure evaluators used to score variants.
+- [Agenta Traces API](https://apis.io/apis/agenta/agenta-traces-api/) — Query observability traces and spans.
+- [Agenta Open Telemetry API](https://apis.io/apis/agenta/agenta-open-telemetry-api/) — Ingest LLM telemetry over OTLP/HTTP.
+- [Agenta Test Sets API](https://apis.io/apis/agenta/agenta-test-sets-api/) — Manage evaluation datasets (testsets).
 
-## APIs
+### Published properties
 
-### Agenta Apps and Variants API
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-Create and manage LLM applications and their variants, including revisions, forking, committing, and deploying. Variants hold versioned prompt and parameter configurations that power Agenta's prompt management workflow.
+#### Agentic access (1)
 
-- **Human URL:** [https://docs.agenta.ai/reference/api/list-api-endpoints](https://docs.agenta.ai/reference/api/list-api-endpoints)
-- **Base URL:** `https://cloud.agenta.ai/api`
+Which operations an agent can call, which act, and which need a human in the loop.
 
-#### Tags
+- [Agenta Agentic Access](https://apis.io/agentic-access/agenta/agenta-agentic-access/)
 
-- Apps
-- Variants
-- Prompt Management
+#### Collections (8)
 
-#### Properties
+Postman and Open Collection request collections.
 
-- [Documentation](https://docs.agenta.ai/prompt-engineering/overview)
-- [API Reference](https://docs.agenta.ai/reference/api/list-api-endpoints)
-- [OpenAPI](openapi/agenta-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/agenta.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/agenta.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+- [Agenta API](https://apis.io/collections/agenta/open-agenta/)
+- [Agenta Applications API](https://apis.io/collections/agenta/open-agenta-applications-api/)
+- [Agenta Applications Configs API](https://apis.io/collections/agenta/open-agenta-configs-api/)
+- [Agenta Applications Evaluations API](https://apis.io/collections/agenta/open-agenta-evaluations-api/)
+- [Agenta Applications Evaluators API](https://apis.io/collections/agenta/open-agenta-evaluators-api/)
+- [Agenta Applications OpenTelemetry API](https://apis.io/collections/agenta/open-agenta-opentelemetry-api/)
+- [Agenta Applications Testsets API](https://apis.io/collections/agenta/open-agenta-testsets-api/)
+- [Agenta Applications Traces API](https://apis.io/collections/agenta/open-agenta-traces-api/)
 
-### Agenta Configs and Prompts API
+#### Security (2)
 
-Fetch and deploy versioned prompt configurations by application, variant, or environment so production code can pull the latest committed prompt without a redeploy. Backs Agenta's configuration management SDK.
+Authentication, trust centre, and vulnerability disclosure.
 
-- **Human URL:** [https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically](https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically)
-- **Base URL:** `https://cloud.agenta.ai/api`
+- [Agenta Authentication](https://apis.io/security/agenta/agenta-authentication/)
+- [Agenta Domain Security](https://apis.io/security/agenta/agenta-domain-security/)
 
-#### Tags
+#### Plans and pricing (1)
 
-- Configs
-- Prompts
-- Versioning
+Published plans, tiers and prices.
 
-#### Properties
+- [Agenta Plans Pricing](https://apis.io/plans/agenta/agenta-plans-pricing/)
 
-- [Documentation](https://docs.agenta.ai/prompt-engineering/integrating-prompts/fetch-prompt-programatically)
-- [API Reference](https://docs.agenta.ai/reference/sdk/configuration-management)
-- [OpenAPI](openapi/agenta-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/agenta.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/agenta.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+#### Rate limits (1)
 
-### Agenta Evaluations and Evaluators API
+Published request limits.
 
-Run and manage evaluations and configure evaluators (LLM-as-a-judge, exact match, similarity, custom code, and more) to score variants against testsets, with queues, runs, results, and metrics.
+- [Agenta Rate Limits](https://apis.io/rate-limits/agenta/agenta-rate-limits/)
 
-- **Human URL:** [https://docs.agenta.ai/reference/api/evaluations](https://docs.agenta.ai/reference/api/evaluations)
-- **Base URL:** `https://cloud.agenta.ai/api`
+#### FinOps (1)
 
-#### Tags
+What the API costs to run, by operation.
 
-- Evaluations
-- Evaluators
-- LLM Evaluation
+- [Agenta Finops](https://apis.io/finops/agenta/agenta-finops/)
 
-#### Properties
+## Where to find this API
 
-- [Documentation](https://docs.agenta.ai/evaluation/overview)
-- [API Reference](https://docs.agenta.ai/reference/api/evaluations)
-- [OpenAPI](openapi/agenta-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/agenta.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/agenta.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
-### Agenta Testsets API
-
-Create, query, version, and import or export the testsets (evaluation datasets) used to drive evaluations, including CSV/JSON file upload and download.
-
-- **Human URL:** [https://docs.agenta.ai/reference/api/testsets](https://docs.agenta.ai/reference/api/testsets)
-- **Base URL:** `https://cloud.agenta.ai/api`
-
-#### Tags
-
-- Testsets
-- Datasets
-- Evaluation
-
-#### Properties
-
-- [Documentation](https://docs.agenta.ai/evaluation/create-test-sets)
-- [API Reference](https://docs.agenta.ai/reference/api/testsets)
-- [OpenAPI](openapi/agenta-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/agenta.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/agenta.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-
-### Agenta Observability and Traces API
-
-Ingest LLM telemetry over the OpenTelemetry OTLP/HTTP endpoint and query traces and spans for analytics, sessions, and users. Powers Agenta's LLM observability for cost, latency, and quality monitoring.
-
-- **Human URL:** [https://docs.agenta.ai/observability/overview](https://docs.agenta.ai/observability/overview)
-- **Base URL:** `https://cloud.agenta.ai/api`
-
-#### Tags
-
-- Observability
-- Traces
-- OpenTelemetry
-
-#### Properties
-
-- [Documentation](https://docs.agenta.ai/observability/overview)
-- [API Reference](https://docs.agenta.ai/reference/api/traces)
-- [OpenAPI](openapi/agenta-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/agenta.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/agenta.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-
-## Common Properties
-
-- [GitHub Organization](https://github.com/Agenta-AI)
-- [LinkedIn](https://www.linkedin.com/company/agenta-ai)
 - [Website](https://agenta.ai/)
 - [Documentation](https://docs.agenta.ai/)
-- [Plans](plans/agenta-plans-pricing.yml)
-- [Rate Limits](rate-limits/agenta-rate-limits.yml)
-- [Fin Ops](finops/agenta-finops.yml)
+- [Pricing](https://agenta.ai/pricing)
+- [Blog](https://agenta.ai/blog)
+- [GitHub](https://github.com/Agenta-AI)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Kin Score 33.6** — thin · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 66.1 |
+| Contract quality | 48.6 |
+| Contract governance | 0.0 |
+| Operational transparency | 10.5 |
+| Developer ergonomics | 32.1 |
+| Access clarity | 42.1 |
+
+**Agent readiness 17.9** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 10.9** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/agenta/](https://apis.io/providers/agenta/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Agenta: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/agenta/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
