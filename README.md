@@ -72,15 +72,45 @@ Agenta is an open-source LLMOps platform that brings prompt management, LLM eval
 
 Everything profiled for Agenta is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/agenta/](https://apis.io/providers/agenta/)** — or go straight to one of the APIs or properties below.
 
-### APIs (7)
+### APIs (37)
 
 - [Agenta Applications API](https://apis.io/apis/agenta/agenta-applications-api/) — Create and manage LLM applications and their variants.
-- [Agenta Configs API](https://apis.io/apis/agenta/agenta-configs-api/) — Fetch and deploy versioned prompt configurations.
 - [Agenta Evaluations API](https://apis.io/apis/agenta/agenta-evaluations-api/) — Run evaluations of variants against testsets.
 - [Agenta Evaluators API](https://apis.io/apis/agenta/agenta-evaluators-api/) — Configure evaluators used to score variants.
 - [Agenta Traces API](https://apis.io/apis/agenta/agenta-traces-api/) — Query observability traces and spans.
-- [Agenta Open Telemetry API](https://apis.io/apis/agenta/agenta-open-telemetry-api/) — Ingest LLM telemetry over OTLP/HTTP.
-- [Agenta Test Sets API](https://apis.io/apis/agenta/agenta-test-sets-api/) — Manage evaluation datasets (testsets).
+- [Agenta Access API](https://apis.io/apis/agenta/agenta-access-api/) — Authentication discovery, organization access checks, and SSO callback endpoints.
+- [Agenta Admin API](https://apis.io/apis/agenta/agenta-admin-api/) — Internal administration endpoints — restricted to platform operators.
+- [Agenta Annotations API](https://apis.io/apis/agenta/agenta-annotations-api/) — Attach evaluator-style feedback to existing traces and spans.
+- [Agenta Billing API](https://apis.io/apis/agenta/agenta-billing-api/) — Subscription, plan, and usage endpoints for workspace billing.
+- [Agenta Channels API](https://apis.io/apis/agenta/agenta-channels-api/) — Chat platform channels — connections, agents, spaces, grants, and the inbound event log.
+- [Agenta Deprecated API](https://apis.io/apis/agenta/agenta-deprecated-api/) — Deprecated endpoints kept for backwards compatibility — avoid in new integrations.
+- [Agenta Environments API](https://apis.io/apis/agenta/agenta-environments-api/) — Deployment environments (e.g. production, staging) and their active variants.
+- [Agenta Events API](https://apis.io/apis/agenta/agenta-events-api/) — The Events API from Agenta — 1 operation(s) for events.
+- [Agenta Folders API](https://apis.io/apis/agenta/agenta-folders-api/) — Organize applications and other resources into folder hierarchies.
+- [Agenta Gateway API](https://apis.io/apis/agenta/agenta-gateway-api/) — The Gateway API from Agenta — 1 operation(s) for gateway.
+- [Agenta Gateway: LLM API](https://apis.io/apis/agenta/agenta-gateway-llm-api/) — The Gateway: LLM API from Agenta — 4 operation(s) for gateway: llm.
+- [Agenta Gateway: MCP API](https://apis.io/apis/agenta/agenta-gateway-mcp-api/) — The Gateway: MCP API from Agenta — 8 operation(s) for gateway: mcp.
+- [Agenta Invocations API](https://apis.io/apis/agenta/agenta-invocations-api/) — Run an application against a payload and capture the resulting trace.
+- [Agenta Keys API](https://apis.io/apis/agenta/agenta-keys-api/) — Create and revoke API keys used to authenticate programmatic requests.
+- [Agenta Legacy API](https://apis.io/apis/agenta/agenta-legacy-api/) — Stable legacy endpoints retained for existing integrations — not deprecated, but new integrations should prefer the canonical surface.
+- [Agenta Mounts API](https://apis.io/apis/agenta/agenta-mounts-api/) — Durable object-store mounts for agent working directories.
+- [Agenta Organizations API](https://apis.io/apis/agenta/agenta-organizations-api/) — Manage organizations, workspaces, SSO domains, and identity providers.
+- [Agenta Projects API](https://apis.io/apis/agenta/agenta-projects-api/) — Manage projects within a workspace.
+- [Agenta Queries API](https://apis.io/apis/agenta/agenta-queries-api/) — Saved query definitions used to filter and retrieve trace data.
+- [Agenta Secrets API](https://apis.io/apis/agenta/agenta-secrets-api/) — Manage provider credentials and secret values stored in the vault.
+- [Agenta Sessions API](https://apis.io/apis/agenta/agenta-sessions-api/) — Agent sessions — runner coordination (invoke/cancel/steer/attach/detach/heartbeat/liveness), state persistence (durable SDK state and sandbox resume…
+- [Agenta Skills API](https://apis.io/apis/agenta/agenta-skills-api/) — The Skills API from Agenta — 11 operation(s) for skills.
+- [Agenta Status API](https://apis.io/apis/agenta/agenta-status-api/) — API server liveness and readiness status.
+- [Agenta Tools API](https://apis.io/apis/agenta/agenta-tools-api/) — External tool connections and OAuth integrations available to applications.
+- [Agenta Triggers API](https://apis.io/apis/agenta/agenta-triggers-api/) — Inbound provider event triggers and their watchable event catalog.
+- [Agenta Users API](https://apis.io/apis/agenta/agenta-users-api/) — User profile and account management — view profile, update username, reset password.
+- [Agenta Wallets API](https://apis.io/apis/agenta/agenta-wallets-api/) — The Wallets API from Agenta — 2 operation(s) for wallets.
+- [Agenta Webhooks API](https://apis.io/apis/agenta/agenta-webhooks-api/) — Register and manage webhooks that fire on platform events.
+- [Agenta Workflows API](https://apis.io/apis/agenta/agenta-workflows-api/) — Workflow definitions — the runnable pipelines that back an application.
+- [Agenta Workspaces API](https://apis.io/apis/agenta/agenta-workspaces-api/) — Manage workspaces within an organization and their members.
+- [Agenta Open Telemetry API](https://apis.io/apis/agenta/agenta-open-telemetry-api/) — OTLP-compatible endpoints for ingesting traces directly from OpenTelemetry-instrumented services.
+- [Agenta Test Cases API](https://apis.io/apis/agenta/agenta-test-cases-api/) — Individual test cases within a testset.
+- [Agenta Test Sets API](https://apis.io/apis/agenta/agenta-test-sets-api/) — Test datasets — collections of input/output pairs used in evaluations.
 
 ### Published properties
 
@@ -104,6 +134,12 @@ Postman and Open Collection request collections.
 - [Agenta Applications OpenTelemetry API](https://apis.io/collections/agenta/open-agenta-opentelemetry-api/)
 - [Agenta Applications Testsets API](https://apis.io/collections/agenta/open-agenta-testsets-api/)
 - [Agenta Applications Traces API](https://apis.io/collections/agenta/open-agenta-traces-api/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [Agenta API Rules](https://apis.io/rules/agenta/agenta-rules/)
 
 #### Security (2)
 
@@ -142,28 +178,28 @@ Links to the company's own pages. This repository publishes no copy of their spe
 
 ## API Evangelist rating
 
-**Kin Score 33.6** — thin · rubric 0.24.0 · scored 2026-10-17
+**Kin Score 38.8** — thin · rubric 0.28.1 · scored 2026-11-21
 
 | Facet | Score |
 |---|---|
-| Discoverability | 66.1 |
-| Contract quality | 48.6 |
-| Contract governance | 0.0 |
-| Operational transparency | 10.5 |
+| Discoverability | 73.2 |
+| Contract quality | 53.3 |
+| Contract governance | 13.6 |
+| Operational transparency | 11.9 |
 | Developer ergonomics | 32.1 |
-| Access clarity | 42.1 |
+| Access clarity | 34.0 |
 
-**Agent readiness 17.9** — agent-aware
+**Agent readiness 27.2** — agent-aware
 
 | Agent-readiness dimension | Result |
 |---|---|
 | Spec Presence | yes |
 | Agentic Access | derived (partial credit) |
-| Reversibility Documented | — |
+| Reversibility Documented | documented (partial credit) |
 | MCP Server | — |
 | Auth Clarity | bearer (partial credit) |
 | Idempotency | — |
-| Error Semantics | — |
+| Error Semantics | verified |
 | OpenAPI Examples | — |
 | Rate Limit Signal | derived (partial credit) |
 | Event Surface Described | — |
@@ -171,13 +207,19 @@ Links to the company's own pages. This repository publishes no copy of their spe
 | Well Known Catalog | — |
 | Consent Identity | — |
 | Agent Card | — |
-| Dry Run Mode | — |
+| Dry Run Mode | yes |
 | Delegated Identity | — |
 | Protected Resource Metadata | — |
 | Dynamic Client Registration | — |
 | Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | mostly (partial credit) |
+| MCP Tool Quality | na |
+| Onboarding Descriptor | — |
+| Dns Aid Index | na |
+| Markdown Negotiation | na |
 
-**Regulatory alignment 10.9** — Horizontal (data, software, accessibility, platform)
+**Regulatory alignment 5.5** — Horizontal (data, software, accessibility, platform)
 
 The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/agenta/](https://apis.io/providers/agenta/).
 
